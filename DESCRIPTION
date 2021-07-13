@@ -1,6 +1,6 @@
 Package: BayesPPD
 Title: Bayesian Power Prior Design
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: c(
     person(given = "Yueqi",
            family = "Shen",
@@ -23,13 +23,15 @@ Description: Bayesian power/type I error calculation and model fitting using
 License: MIT + file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.1.1
-Imports: Rcpp, RcppNumerical,
+LazyData: true
+Imports: Rcpp, RcppNumerical
 LinkingTo: Rcpp, RcppArmadillo, RcppEigen, RcppNumerical
 NeedsCompilation: yes
-Packaged: 2021-05-07 17:01:02 UTC; angie
+Packaged: 2021-07-02 04:44:25 UTC; angie
 Author: Yueqi Shen [cre],
   Matthew A. Psioda [aut],
   Joseph G. Ibrahim [aut]
 Maintainer: Yueqi Shen <ys137@live.unc.edu>
+Depends: R (>= 3.5.0)
 Repository: CRAN
-Date/Publication: 2021-05-10 07:52:23 UTC
+Date/Publication: 2021-07-13 12:00:23 UTC

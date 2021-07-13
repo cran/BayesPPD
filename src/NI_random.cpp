@@ -12,7 +12,7 @@ using namespace Rcpp;
     arma::vec y_normal; // for normal data with covariates
     arma::mat x_normal; // for normal case with covariates
     double y_c;
-    int n_c;
+    double n_c;
     double v_c;
 
     arma::mat historical;
@@ -38,7 +38,7 @@ using namespace Rcpp;
 
 
     // public member functions;
-    random_a0(std::string dType0, double y0, int n0, double v0, arma::vec y_normal0,
+    random_a0(std::string dType0, double y0, double n0, double v0, arma::vec y_normal0,
               arma::mat x_normal0, arma::mat historical0,
               Rcpp::List historical_normal0,
               double b_010, double b_020, double c_10, double c_20,
@@ -52,7 +52,7 @@ using namespace Rcpp;
 
 
 
-random_a0::random_a0(std::string dType0, double y0, int n0, double v0,
+random_a0::random_a0(std::string dType0, double y0, double n0, double v0,
                      arma::vec y_normal0, arma::mat x_normal0, arma::mat historical0,
                      Rcpp::List historical_normal0,
                      double b_010, double b_020, double c_10, double c_20,
@@ -368,7 +368,7 @@ Rcpp::List two_grp_random_a0(std::string & dType0, double & y0, double & n0, arm
 
 
 // [[Rcpp::export]]
-Rcpp::List two_grp_random_a0_normal(double y0, int n0, double v0,
+Rcpp::List two_grp_random_a0_normal(double y0, double n0, double v0,
                                     arma::mat historical0,
                                     double & c_10, double & c_20,
                                     arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,
@@ -752,7 +752,7 @@ Rcpp::List power_two_grp_random_a0(std::string & dType0, double & n_t, double & 
 
 
 // [[Rcpp::export]]
-Rcpp::List power_glm_random_a0_normal(int & n_total, Rcpp::List & historical0,
+Rcpp::List power_glm_random_a0_normal(double & n_total, Rcpp::List & historical0,
                                       arma::mat & beta_c_prior_samps, arma::vec & var_prior_samps,
                                       double & c_10, double & c_20,
                                       arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,

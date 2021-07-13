@@ -3,8 +3,12 @@
 // [[Rcpp::depends(RcppEigen)]]
 // [[Rcpp::depends(RcppNumerical)]]
 #include <RcppArmadillo.h>
+#define NDEBUG
 #include <RcppEigen.h>
 #include <RcppNumerical.h>
+
+
+
 
 
 using namespace Rcpp;
@@ -74,7 +78,7 @@ double num_integrate(std::string dType, double b_c1_post, double b_c2_post, doub
 
 
 // [[Rcpp::export]]
-Rcpp::List power_two_grp_fixed_a0(std::string dType, int n_t, int n_c,
+Rcpp::List power_two_grp_fixed_a0(std::string dType, double n_t, double n_c,
                                   arma::mat historical,
                                   NumericVector p_t_prior_samps,
                                   NumericVector p_c_prior_samps,
@@ -148,7 +152,7 @@ Rcpp::List power_two_grp_fixed_a0(std::string dType, int n_t, int n_c,
 
 //
 // [[Rcpp::export]]
-Rcpp::List two_grp_fixed_a0_normal(double & y_c, int & n_c, double & v, arma::mat & historical, int & nMC, int & nBI) {
+Rcpp::List two_grp_fixed_a0_normal(double & y_c, double & n_c, double & v, arma::mat & historical, int & nMC, int & nBI) {
   Rcpp::RNGScope scope;
 
   arma::vec gibbs_mu_c(nMC+nBI);
@@ -225,7 +229,7 @@ Rcpp::List two_grp_fixed_a0_normal(double & y_c, int & n_c, double & v, arma::ma
 
 
 // [[Rcpp::export]]
-Rcpp::List power_two_grp_fixed_a0_normal(int n_t, int n_c, arma::mat historical,
+Rcpp::List power_two_grp_fixed_a0_normal(double n_t, double n_c, arma::mat historical,
                                          NumericVector mu_t_prior_samps,
                                          NumericVector mu_c_prior_samps,
                                          NumericVector var_t_prior_samps,

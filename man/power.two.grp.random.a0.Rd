@@ -40,7 +40,7 @@ power.two.grp.random.a0(
 \itemize{
 \item The first column contains the sum of responses for the control group.
 \item The second column contains the sample size of the control group.
-\item The third column contains the variance of responses for the control group.
+\item The third column contains the sample variance of responses for the control group.
 }
 For all other data types, \code{historical} is a matrix with two columns:
 \itemize{
@@ -94,7 +94,7 @@ Power/type I error calculation using normalized power priors for two groups (tre
 }
 \details{
 If \code{data.type} is "Bernoulli", "Poisson" or "Exponential", a single response from the treatment group is assumed to follow Bern(\eqn{\mu_t}), Pois(\eqn{\mu_t}) or Exp(rate=\eqn{\mu_t}), respectively,
-where \eqn{mu_t} is the mean of responses for the treatment group. If \code{data.type} is "Normal", a single response from the treatment group is assumed to follow \eqn{N(\mu_t, \tau^{-1})}
+where \eqn{\mu_t} is the mean of responses for the treatment group. If \code{data.type} is "Normal", a single response from the treatment group is assumed to follow \eqn{N(\mu_t, \tau^{-1})}
 where \eqn{\tau} is the precision parameter.
 The distributional assumptions for the control group data are analogous.
 

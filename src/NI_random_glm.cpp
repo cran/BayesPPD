@@ -84,7 +84,8 @@ random_a0_glm::random_a0_glm(	std::string & dType0, std::string & dLink0, arma::
 double random_a0_glm::logFC(const arma::vec & parm0, const int & p)
 {
   // extract regression parameters;
-  arma::vec beta0 = parm0.subvec(0,P-1), mean;
+  arma::vec beta0 = parm0.subvec(0,P-1);
+  arma::vec mean;
   arma::vec a0_vec = parm0.subvec(P, parm0.size()-1);
 
   //arma::vec beta_h = beta0;
@@ -128,7 +129,9 @@ double random_a0_glm::logFC(const arma::vec & parm0, const int & p)
 
       double a0 = a0_vec[i];
       arma::vec n_h;
-      if ((dType=="Bernoulli")) {n_h.resize(y_h.size()); n_h.ones();} else {n_h = Rcpp::as<arma::vec>(dat["n"]);}
+      n_h.zeros();
+      if (dType=="Bernoulli") {n_h.resize(y_h.size()); n_h.ones();} 
+      if (dType=="Binomial") {n_h = Rcpp::as<arma::vec>(dat["n0"]);}
 
 
       arma:: vec mean_h = exp(x_h*beta_h)/(1 + exp(x_h*beta_h));
@@ -307,7 +310,7 @@ Rcpp::List glm_random_a0(std::string & dType0, std::string & dLink0, arma::vec &
 
 
 // [[Rcpp::export]]
-Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, int & n_total, arma::vec & n0, Rcpp::List & historical0,
+Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, double & n_total, arma::vec & n0, Rcpp::List & historical0,
                                arma::mat & beta_c_prior_samps, double & c_10, double & c_20, arma::vec & coef0,
                                arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,
                               double & delta, double & gamma,

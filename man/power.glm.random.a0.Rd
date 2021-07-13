@@ -34,10 +34,14 @@ power.glm.random.a0(
 
 \item{n}{(For binomial data only) vector of integers specifying the number of subjects who have a particular value of the covariate vector. If the data is binary and all covariates are discrete, collapsing Bernoulli data into a binomial structure can make the slice sampler much faster.}
 
-\item{historical}{List of historical dataset(s). East historical dataset is stored in a list which constains two \emph{named} elements: \code{y0} and \code{x0}.
+\item{historical}{List of historical dataset(s). East historical dataset is stored in a list which contains two \emph{named} elements: \code{y0} and \code{x0}.
 \itemize{
 \item \code{y0} is a vector of responses.
 \item \code{x0} is a matrix of covariates. \code{x0} should NOT have the treatment indicator. Apart from missing the treatent/control indicator, \code{x0} should have the same set of covariates in the same order as \code{x}.
+}
+For binomial data, an additional element \code{n0} is required.
+\itemize{
+\item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
 }}
 
 \item{samp.prior.beta}{Matrix of possible values of \eqn{\beta} to sample (with replacement) from. Each row is a possible \eqn{\beta} vector (a realization from the sampling prior for \eqn{\beta}), where the first element is the coefficient for the intercept and the second element is the coefficient for the treatment indicator.
@@ -127,8 +131,10 @@ samp.prior.beta1 <- rnorm(100, mean=-3, sd=1)
 # Here, mass is put on the alternative region, so power is calculated.
 samp.prior.beta <- cbind(rnorm(100), samp.prior.beta1, matrix(rnorm(100*p), 100, p))
 
-# Please see function "normalizing.constant" for how to obstain a0.coefficients
-a0.coefficients <- c(1, 0.5)
+# Please see function "normalizing.constant" for how to obtain a0.coefficients
+# Here, suppose one-degree polynomial regression is chosen by the "normalizing.constant" 
+# function. The coefficients are obtained for the intercept, a0_1 and a0_2. 
+a0.coefficients <- c(1, 0.5, -1)
 
 nMC <- 100 # nMC should be larger in practice
 nBI <- 50

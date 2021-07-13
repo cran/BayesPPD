@@ -35,14 +35,14 @@ power.two.grp.fixed.a0(
 \itemize{
 \item The first column contains the sum of responses for the control group.
 \item The second column contains the sample size of the control group.
-\item The third column contains the variance of responses for the control group.
+\item The third column contains the sample variance of responses for the control group.
 \item The fourth column contains the discounting parameter value \eqn{a_0} (between 0 and 1).
 }
 For all other data types, \code{historical} is a matrix with three columns:
 \itemize{
 \item The first column contains the sum of responses for the control group.
 \item The second column contains the sample size of the control group.
-\item The fourth column contains the discounting parameter value \eqn{a_0} (between 0 and 1).
+\item The third column contains the discounting parameter value \eqn{a_0} (between 0 and 1).
 }
 Each row represents a historical dataset.}
 
@@ -80,7 +80,7 @@ Power/type I error calculation for data with two groups (treatment and control g
 }
 \details{
 If \code{data.type} is "Bernoulli", "Poisson" or "Exponential", a single response from the treatment group is assumed to follow Bern(\eqn{\mu_t}), Pois(\eqn{\mu_t}) or Exp(rate=\eqn{\mu_t}), respectively,
-where \eqn{mu_t} is the mean of responses for the treatment group. If \code{data.type} is "Normal", a single response from the treatment group is assumed to follow \eqn{N(\mu_t, \tau^{-1})}
+where \eqn{\mu_t} is the mean of responses for the treatment group. If \code{data.type} is "Normal", a single response from the treatment group is assumed to follow \eqn{N(\mu_t, \tau^{-1})}
 where \eqn{\tau} is the precision parameter.
 The distributional assumptions for the control group data are analogous.
 
@@ -133,7 +133,7 @@ samp.prior.mu.c <- samp.prior.mu.c[sub_ind]
 N <- 1000 # N should be larger in practice
 result <- power.two.grp.fixed.a0(data.type=data.type, n.t=n.t, n.c=n.t, historical=historical,
                                  samp.prior.mu.t=samp.prior.mu.t, samp.prior.mu.c=samp.prior.mu.c,
-                                 delta=0, nMC=10000, nBI=250, N=N)
+                                 delta=0, N=N)
 
 }
 \references{

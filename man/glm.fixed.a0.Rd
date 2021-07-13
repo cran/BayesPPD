@@ -29,11 +29,15 @@ glm.fixed.a0(
 
 \item{x}{Matrix of covariates. The first column should be the treatment indicator with 1 indicating treatment group. The number of rows should equal the length of the response vector \code{y}.}
 
-\item{historical}{(Optional) list of historical dataset(s). East historical dataset is stored in a list which constains three \emph{named} elements: \code{y0}, \code{x0} and \code{a0}.
+\item{historical}{(Optional) list of historical dataset(s). East historical dataset is stored in a list which contains three \emph{named} elements: \code{y0}, \code{x0} and \code{a0}.
 \itemize{
 \item \code{y0} is a vector of responses.
 \item \code{x0} is a matrix of covariates. \code{x0} should NOT have the treatment indicator. Apart from missing the treatent/control indicator, \code{x0} should have the same set of covariates in the same order as \code{x}.
 \item \code{a0} is a number between 0 and 1 indicating the discounting parameter value for that historical dataset.
+}
+For binomial data, an additional element \code{n0} is required.
+\itemize{
+\item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
 }}
 
 \item{lower.limits}{Vector of lower limits for parameters to be used by the slice sampler. The length of the vector should be equal to the total number of parameters, i.e. P+1 where P is the number of covariates. The default is -100 for all parameters (may not be appropriate for all situations). Does not apply if \code{data.type} is "Normal".}

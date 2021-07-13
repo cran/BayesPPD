@@ -32,11 +32,15 @@ power.glm.fixed.a0(
 
 \item{n}{(For binomial data only) vector of integers specifying the number of subjects who have a particular value of the covariate vector. If the data is binary and all covariates are discrete, collapsing Bernoulli data into a binomial structure can make the slice sampler much faster.}
 
-\item{historical}{(Optional) list of historical dataset(s). East historical dataset is stored in a list which constains three \emph{named} elements: \code{y0}, \code{x0} and \code{a0}.
+\item{historical}{(Optional) list of historical dataset(s). East historical dataset is stored in a list which contains three \emph{named} elements: \code{y0}, \code{x0} and \code{a0}.
 \itemize{
 \item \code{y0} is a vector of responses.
 \item \code{x0} is a matrix of covariates. \code{x0} should NOT have the treatment indicator. Apart from missing the treatent/control indicator, \code{x0} should have the same set of covariates in the same order as \code{x}.
 \item \code{a0} is a number between 0 and 1 indicating the discounting parameter value for that historical dataset.
+}
+For binomial data, an additional element \code{n0} is required.
+\itemize{
+\item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
 }}
 
 \item{x.samples}{Matrix of possible values of covariates from which covariate vectors are sampled with replacement. Only applies when there is no historical dataset. The matrix should not include the treatment indicator.}

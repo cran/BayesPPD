@@ -92,6 +92,10 @@ calc_a0_func <- function(a0, historical, data.type, data.link,
 #' \item \code{y0} is a vector of responses.
 #' \item \code{x0} is a matrix of covariates. \code{x0} should NOT have the treatment/control group indicator. Apart from missing the treatent/control indicator, \code{x0} should have the same set of covariates in the same order as \code{x}.
 #' }
+#' For binomial data, an additional element \code{n0} is required. 
+#' \itemize{
+#' \item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
+#' }
 #' @inheritParams power.glm.fixed.a0
 #'
 #' @details
@@ -120,6 +124,7 @@ calc_a0_func <- function(a0, historical, data.type, data.link,
 #'
 #'
 #' @return Vector of coefficients for \eqn{a_0} that defines a function \eqn{f(a_0)} that approximates the normalizing constant, necessary for functions \code{\link{glm.random.a0}} and \code{\link{power.glm.random.a0}}.
+#' The length of the vector is equal to 1+K*L where K is the number of historical datasets and L is the degree of the polynomial regression determined by the algorithm. 
 #' @references Wang, Yu-Bo; Chen, Ming-Hui; Kuo, Lynn; Lewis, Paul O. A New Monte Carlo Method for Estimating Marginal Likelihoods. Bayesian Anal. 13 (2018), no. 2, 311--333.
 #' @seealso \code{\link{glm.random.a0}} and \code{\link{power.glm.random.a0}}
 #' @examples

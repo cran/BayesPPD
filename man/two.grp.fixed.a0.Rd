@@ -18,13 +18,13 @@ two.grp.fixed.a0(
 
 \item{n.c}{Sample size of the control group.}
 
-\item{v.c}{Variance of responses for the control group.}
+\item{v.c}{Sample variance of responses for the control group.}
 
 \item{historical}{(Optional) matrix of historical dataset(s) with four columns:
 \itemize{
 \item The first column contains the sum of responses for the control group.
 \item The second column contains the sample size of the control group.
-\item The third column contains the variance of responses for the control group.
+\item The third column contains the sample variance of responses for the control group.
 \item The fourth column contains the discounting parameter value \eqn{a_0} (between 0 and 1).
 }
 Each row represents a historical dataset.}

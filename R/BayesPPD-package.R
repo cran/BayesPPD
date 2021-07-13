@@ -68,6 +68,6 @@ NULL
 #'
 #' @references Chen, Ming-Hui, et al. "Bayesian design of noninferiority trials for medical devices using historical data." Biometrics 67.3 (2011): 1163-1170.
 #' @docType package
-#' @name BayesPPD
+#' @name BayesPPD-package
 NULL
 #> NULL

@@ -6,12 +6,12 @@
 #'
 #' @param y.c Sum of responses (assumed to follow Normal distribution) for the control group.
 #' @param n.c Sample size of the control group.
-#' @param v.c Variance of responses for the control group.
+#' @param v.c Sample variance of responses for the control group.
 #' @param historical (Optional) matrix of historical dataset(s) with four columns:
 #' \itemize{
 #' \item The first column contains the sum of responses for the control group.
 #' \item The second column contains the sample size of the control group.
-#' \item The third column contains the variance of responses for the control group.
+#' \item The third column contains the sample variance of responses for the control group.
 #' \item The fourth column contains the discounting parameter value \eqn{a_0} (between 0 and 1).
 #' }
 #' Each row represents a historical dataset.
@@ -62,7 +62,7 @@ two.grp.fixed.a0 <- function(y.c, n.c, v.c, historical=matrix(0,1,4), nMC=10000,
 #' \itemize{
 #' \item The first column contains the sum of responses for the control group.
 #' \item The second column contains the sample size of the control group.
-#' \item The third column contains the variance of responses for the control group.
+#' \item The third column contains the sample variance of responses for the control group.
 #' \item The fourth column contains the discounting parameter value \eqn{a_0} (between 0 and 1).
 #' }
 #' For all other data types, \code{historical} is a matrix with three columns:
@@ -246,12 +246,17 @@ glm.fixed.a0 <- function(data.type, data.link, y, n=1, x, historical=list(),
 #' @param data.type Character string specifying the type of response. The options are "Normal", "Bernoulli", "Binomial", "Poisson" and "Exponential".
 #' @param data.link Character string specifying the link function. The options are "Logistic", "Probit", "Log", "Identity-Positive", "Identity-Probability" and "Complementary Log-Log". Does not apply if \code{data.type} is "Normal".
 #' @param n (For binomial data only) vector of integers specifying the number of subjects who have a particular value of the covariate vector. If the data is binary and all covariates are discrete, collapsing Bernoulli data into a binomial structure can make the slice sampler much faster.
-#' @param historical (Optional) list of historical dataset(s). East historical dataset is stored in a list which constains three \emph{named} elements: \code{y0}, \code{x0} and \code{a0}.
+#' @param historical (Optional) list of historical dataset(s). East historical dataset is stored in a list which contains three \emph{named} elements: \code{y0}, \code{x0} and \code{a0}.
 #' \itemize{
 #' \item \code{y0} is a vector of responses.
 #' \item \code{x0} is a matrix of covariates. \code{x0} should NOT have the treatment indicator. Apart from missing the treatent/control indicator, \code{x0} should have the same set of covariates in the same order as \code{x}.
 #' \item \code{a0} is a number between 0 and 1 indicating the discounting parameter value for that historical dataset.
 #' }
+#' For binomial data, an additional element \code{n0} is required. 
+#' \itemize{
+#' \item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
+#' }
+#' 
 #' @param x.samples Matrix of possible values of covariates from which covariate vectors are sampled with replacement. Only applies when there is no historical dataset. The matrix should not include the treatment indicator.
 #' @param samp.prior.beta Matrix of possible values of \eqn{\beta} to sample (with replacement) from. Each row is a possible \eqn{\beta} vector (a realization from the sampling prior for \eqn{\beta}), where the first element is the coefficient for the intercept and the second element is the coefficient for the treatment indicator.
 #' The length of the vector should be equal to the total number of parameters, i.e. P+2 where P is the number of columns of \code{x0} in \code{historical}.
@@ -342,12 +347,12 @@ power.glm.fixed.a0 <- function(data.type, data.link="", data.size, n=1, historic
 #'
 #' @param y.c Sum of responses for the control group.
 #' @param n.c Sample size of the control group.
-#' @param v.c (For normal data only) variance of responses for the control group.
+#' @param v.c (For normal data only) sample variance of responses for the control group.
 #' @param historical Matrix of historical dataset(s). If \code{data.type} is "Normal", \code{historical} is a matrix with three columns:
 #' \itemize{
 #' \item The first column contains the sum of responses for the control group.
 #' \item The second column contains the sample size of the control group.
-#' \item The third column contains the variance of responses for the control group.
+#' \item The third column contains the sample variance of responses for the control group.
 #' }
 #' For all other data types, \code{historical} is a matrix with two columns:
 #' \itemize{
@@ -528,10 +533,14 @@ power.two.grp.random.a0 <- function(data.type, n.t, n.c, historical,
 #'
 #' @description Model fitting using normalized power priors for generalized linear models with random \eqn{a_0}
 #'
-#' @param historical List of historical dataset(s). East historical dataset is stored in a list which constains two \emph{named} elements: \code{y0} and \code{x0}.
+#' @param historical List of historical dataset(s). East historical dataset is stored in a list which contains two \emph{named} elements: \code{y0} and \code{x0}.
 #' \itemize{
 #' \item \code{y0} is a vector of responses.
 #' \item \code{x0} is a matrix of covariates. \code{x0} should NOT have the treatment indicator. Apart from missing the treatent/control indicator, \code{x0} should have the same set of covariates in the same order as \code{x}.
+#' }
+#' For binomial data, an additional element \code{n0} is required. 
+#' \itemize{
+#' \item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
 #' }
 #' @param lower.limits Vector of lower limits for parameters to be used by the slice sampler. If \code{data.type} is "Normal", slice sampling is used for \eqn{a_0}, and the length of the vector should be equal to the number of historical datasets.
 #' For all other data types, slice sampling is used for \eqn{\beta} and \eqn{a_0}. The first P+1 elements apply to the sampling of \eqn{\beta} and the rest apply to the sampling of \eqn{a_0}.
@@ -593,12 +602,16 @@ power.two.grp.random.a0 <- function(data.type, n.t, n.c, historical,
 #'                         x0=matrix(rnorm(p*n_total),ncol=p,nrow=n_total)))
 #'
 #' # Please see function "normalizing.constant" for how to obtain a0.coefficients
-#' a0.coefficients <- c(1, 0.5)
+#' # Here, suppose one-degree polynomial regression is chosen by the "normalizing.constant" 
+#' # function. The coefficients are obtained for the intercept, a0_1 and a0_2. 
+#' a0.coefficients <- c(1, 0.5, -1)
 #'
 #' # Set parameters of the slice sampler
-#' lower.limits <- rep(-100, 5) # The dimension is the number of columns of x plus 1 (intercept)
-#' upper.limits <- rep(100, 5)
-#' slice.widths <- rep(0.1, 5)
+#' # The dimension is the number of columns of x plus 1 (intercept) 
+#' # plus the number of historical datasets
+#' lower.limits <- rep(-100, 7) 
+#' upper.limits <- rep(100, 7)
+#' slice.widths <- rep(0.1, 7)
 #'
 #' nMC <- 500 # nMC should be larger in practice
 #' nBI <- 100
@@ -681,8 +694,10 @@ glm.random.a0 <- function(data.type, data.link, y, n=1, x, historical,
 #' # Here, mass is put on the alternative region, so power is calculated.
 #' samp.prior.beta <- cbind(rnorm(100), samp.prior.beta1, matrix(rnorm(100*p), 100, p))
 #'
-#' # Please see function "normalizing.constant" for how to obstain a0.coefficients
-#' a0.coefficients <- c(1, 0.5)
+#' # Please see function "normalizing.constant" for how to obtain a0.coefficients
+#' # Here, suppose one-degree polynomial regression is chosen by the "normalizing.constant" 
+#' # function. The coefficients are obtained for the intercept, a0_1 and a0_2. 
+#' a0.coefficients <- c(1, 0.5, -1)
 #'
 #' nMC <- 100 # nMC should be larger in practice
 #' nBI <- 50

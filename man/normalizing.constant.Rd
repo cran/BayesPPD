@@ -23,6 +23,10 @@ normalizing.constant(
 \itemize{
 \item \code{y0} is a vector of responses.
 \item \code{x0} is a matrix of covariates. \code{x0} should NOT have the treatment/control group indicator. Apart from missing the treatent/control indicator, \code{x0} should have the same set of covariates in the same order as \code{x}.
+}
+For binomial data, an additional element \code{n0} is required.
+\itemize{
+\item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
 }}
 
 \item{data.type}{Character string specifying the type of response. The options are "Normal", "Bernoulli", "Binomial", "Poisson" and "Exponential".}
@@ -41,6 +45,7 @@ normalizing.constant(
 }
 \value{
 Vector of coefficients for \eqn{a_0} that defines a function \eqn{f(a_0)} that approximates the normalizing constant, necessary for functions \code{\link{glm.random.a0}} and \code{\link{power.glm.random.a0}}.
+The length of the vector is equal to 1+K*L where K is the number of historical datasets and L is the degree of the polynomial regression determined by the algorithm.
 }
 \description{
 This function returns a vector of coefficients that defines a function \eqn{f(a_0)} that approximates the normalizing constant for generalized linear models with random \eqn{a_0}.

@@ -32,10 +32,14 @@ glm.random.a0(
 
 \item{x}{Matrix of covariates. The first column should be the treatment indicator with 1 indicating treatment group. The number of rows should equal the length of the response vector \code{y}.}
 
-\item{historical}{List of historical dataset(s). East historical dataset is stored in a list which constains two \emph{named} elements: \code{y0} and \code{x0}.
+\item{historical}{List of historical dataset(s). East historical dataset is stored in a list which contains two \emph{named} elements: \code{y0} and \code{x0}.
 \itemize{
 \item \code{y0} is a vector of responses.
 \item \code{x0} is a matrix of covariates. \code{x0} should NOT have the treatment indicator. Apart from missing the treatent/control indicator, \code{x0} should have the same set of covariates in the same order as \code{x}.
+}
+For binomial data, an additional element \code{n0} is required.
+\itemize{
+\item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
 }}
 
 \item{prior.a0.shape1}{First shape parameter of the beta prior for \eqn{a_0}. The default is 1.}
@@ -107,12 +111,16 @@ historical <- list(list(y0=rbinom(n_total,size=1,prob=0.2),
                         x0=matrix(rnorm(p*n_total),ncol=p,nrow=n_total)))
 
 # Please see function "normalizing.constant" for how to obtain a0.coefficients
-a0.coefficients <- c(1, 0.5)
+# Here, suppose one-degree polynomial regression is chosen by the "normalizing.constant" 
+# function. The coefficients are obtained for the intercept, a0_1 and a0_2. 
+a0.coefficients <- c(1, 0.5, -1)
 
 # Set parameters of the slice sampler
-lower.limits <- rep(-100, 5) # The dimension is the number of columns of x plus 1 (intercept)
-upper.limits <- rep(100, 5)
-slice.widths <- rep(0.1, 5)
+# The dimension is the number of columns of x plus 1 (intercept) 
+# plus the number of historical datasets
+lower.limits <- rep(-100, 7) 
+upper.limits <- rep(100, 7)
+slice.widths <- rep(0.1, 7)
 
 nMC <- 500 # nMC should be larger in practice
 nBI <- 100
