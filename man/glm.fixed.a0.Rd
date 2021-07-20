@@ -7,15 +7,16 @@
 glm.fixed.a0(
   data.type,
   data.link,
-  y,
+  y = 0,
   n = 1,
-  x,
+  x = matrix(),
   historical = list(),
   lower.limits = rep(-100, 50),
   upper.limits = rep(100, 50),
   slice.widths = rep(1, 50),
   nMC = 10000,
-  nBI = 250
+  nBI = 250,
+  current.data = TRUE
 )
 }
 \arguments{
@@ -49,6 +50,11 @@ For binomial data, an additional element \code{n0} is required.
 \item{nMC}{Number of iterations (excluding burn-in samples) for the slice sampler or Gibbs sampler. The default is 10,000.}
 
 \item{nBI}{Number of burn-in samples for the slice sampler or Gibbs sampler. The default is 250.}
+
+\item{current.data}{Logical value indicating whether current data is included. The default is TRUE. If FALSE, only historical data is included in the analysis,
+and the posterior samples can be used as discrete approximation to the sampling prior in
+
+\code{\link{power.glm.fixed.a0}}.}
 }
 \value{
 If \code{data.type} is "Normal", posterior samples of \eqn{\beta}, \eqn{\tau} and \eqn{\tau_k}'s (if historical data is given) are returned.

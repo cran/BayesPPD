@@ -135,7 +135,7 @@ double random_a0::logFC(const arma::vec & parm0, const int & p)
         a_y = a_y + parm0[j]*y_h;
       }
 
-      double log_c_a0 = lgamma(0.5*(a_n-1))-0.5*log(a_n)+0.5*(a_n-1)*log(2)-
+      double log_c_a0 = lgamma(0.5*(a_n-1))-0.5*log(a_n)+0.5*(a_n-1)*log(2.0)-
         0.5*(a_n-1)*log(a_y2-pow(a_y,2)/a_n);
 
       double y_h = historical(p,0);

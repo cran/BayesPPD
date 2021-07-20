@@ -7,6 +7,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // power_two_grp_fixed_a0
 Rcpp::List power_two_grp_fixed_a0(std::string dType, double n_t, double n_c, arma::mat historical, NumericVector p_t_prior_samps, NumericVector p_c_prior_samps, double b_t1, double b_t2, double b_01, double b_02, double delta, double gamma, int N, double upper_inf);
 RcppExport SEXP _BayesPPD_power_two_grp_fixed_a0(SEXP dTypeSEXP, SEXP n_tSEXP, SEXP n_cSEXP, SEXP historicalSEXP, SEXP p_t_prior_sampsSEXP, SEXP p_c_prior_sampsSEXP, SEXP b_t1SEXP, SEXP b_t2SEXP, SEXP b_01SEXP, SEXP b_02SEXP, SEXP deltaSEXP, SEXP gammaSEXP, SEXP NSEXP, SEXP upper_infSEXP) {

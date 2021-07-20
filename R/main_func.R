@@ -173,7 +173,10 @@ power.two.grp.fixed.a0 <- function(data.type, n.t, n.c, historical=matrix(0,1,4)
 #'
 #' @param y Vector of responses.
 #' @param x Matrix of covariates. The first column should be the treatment indicator with 1 indicating treatment group. The number of rows should equal the length of the response vector \code{y}.
-#'
+#' @param current.data Logical value indicating whether current data is included. The default is TRUE. If FALSE, only historical data is included in the analysis, 
+#' and the posterior samples can be used as discrete approximation to the sampling prior in 
+#' 
+#' \code{\link{power.glm.fixed.a0}}. 
 #' @inheritParams power.glm.fixed.a0
 #'
 #' @details If \code{data.type} is "Normal", the response \eqn{y_i} is assumed to follow \eqn{N(x_i'\beta, \tau^{-1})} where \eqn{x_i} is the vector of covariates for subject \eqn{i}.
@@ -226,14 +229,14 @@ power.two.grp.fixed.a0 <- function(data.type, n.t, n.c, historical=matrix(0,1,4)
 #' colMeans(result) # posterior mean of beta
 #'
 #' @export
-glm.fixed.a0 <- function(data.type, data.link, y, n=1, x, historical=list(),
+glm.fixed.a0 <- function(data.type, data.link, y=0, n=1, x=matrix(), historical=list(),
                          lower.limits=rep(-100, 50), upper.limits=rep(100, 50),
-                         slice.widths=rep(1, 50), nMC=10000, nBI=250) {
+                         slice.widths=rep(1, 50), nMC=10000, nBI=250, current.data=TRUE) {
 
   if(data.type == "Normal"){
     return(glm_fixed_a0_normal(y, x, historical, nMC, nBI))
   }else{
-    return(glm_fixed_a0(data.type, data.link, y, n, x, historical, lower.limits, upper.limits, slice.widths, nMC, nBI, TRUE))
+    return(glm_fixed_a0(data.type, data.link, y, n, x, historical, lower.limits, upper.limits, slice.widths, nMC, nBI, current.data))
   }
 }
 
