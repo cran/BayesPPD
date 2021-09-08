@@ -6,7 +6,7 @@ NULL
 
 #' Bayesian sample size determination using the power and normalized power prior for generalized linear models
 #'
-#' The \pkg{BayesPPD} (Bayesian Power Prior Design) package provides two catogries of functions:
+#' The \pkg{BayesPPD} (Bayesian Power Prior Design) package provides two catogories of functions:
 #' functions for Bayesian power/type I error calculation and functions for model fitting.
 #' Supported distributions include normal, binary (Bernoulli/binomial), Poisson and exponential.
 #' The power parameter \eqn{a_0} can be fixed or modeled as random using a normalized power prior.

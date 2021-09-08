@@ -1,7 +1,7 @@
-bdc398e38182096315f04baa3972b19a *DESCRIPTION
+18e102fbe4b6c77673094bc00278e6c6 *DESCRIPTION
 2f5a97df83383b9e2ab60d18d1cb5bb2 *LICENSE
 b47eea2a7be55e8fa66b54cc5feff8ce *NAMESPACE
-9b179203b04fe99709bb61572635d8de *R/BayesPPD-package.R
+e4412a969b68f634eb21478b1c17e298 *R/BayesPPD-package.R
 7015227c6036d21b5af5e966088f21da *R/PWK_helper.R
 cd95cebb5a13631fc0614009d0ef7506 *R/PWK_main.R
 555b4599e5f40083e768cdccc1f1e3d1 *R/RcppExports.R
@@ -24,7 +24,7 @@ ccfd91a807c3be7cd2c5a9e209823d52 *man/power.two.grp.fixed.a0.Rd
 e4a9a47c4a3aca98677ab8b16336e5de *src/Makevars
 e4a9a47c4a3aca98677ab8b16336e5de *src/Makevars.win
 890332569236ea105dad4dc91b879c90 *src/NI_fixed.cpp
-fe293c4ef28773442ecb0d21f65cb29c *src/NI_fixed_glm.cpp
+afb25ee404266cc437eb2dcc33467032 *src/NI_fixed_glm.cpp
 1299440a2b453f16527e06021ade6c74 *src/NI_random.cpp
-79dca7b083a1a4a03089fb6388856cf5 *src/NI_random_glm.cpp
+9c4009279fcaec71f3728a06acc53b70 *src/NI_random_glm.cpp
 ca66b2e66c1e4f39aa87e9c1bef9aeb2 *src/RcppExports.cpp

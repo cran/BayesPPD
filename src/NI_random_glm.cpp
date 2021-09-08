@@ -134,7 +134,7 @@ double random_a0_glm::logFC(const arma::vec & parm0, const int & p)
       if (dType=="Binomial") {n_h = Rcpp::as<arma::vec>(dat["n0"]);}
 
 
-      arma:: vec mean_h = exp(x_h*beta_h)/(1 + exp(x_h*beta_h));
+      arma:: vec mean_h = x_h*beta_h;
 
       if (dLink=="Logistic") 		    { mean_h = exp(mean_h) / (1 + exp(mean_h)); 					}
       if (dLink=="Probit")

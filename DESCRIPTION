@@ -1,6 +1,6 @@
 Package: BayesPPD
 Title: Bayesian Power Prior Design
-Version: 1.0.2
+Version: 1.0.3
 Authors@R: c(
     person(given = "Yueqi",
            family = "Shen",
@@ -27,11 +27,11 @@ LazyData: true
 Imports: Rcpp, RcppNumerical
 LinkingTo: Rcpp, RcppArmadillo, RcppEigen, RcppNumerical
 NeedsCompilation: yes
-Packaged: 2021-07-20 21:12:20 UTC; angie
+Packaged: 2021-09-08 16:36:58 UTC; angie
 Author: Yueqi Shen [aut, cre],
   Matthew A. Psioda [aut],
   Joseph G. Ibrahim [aut]
 Maintainer: Yueqi Shen <ys137@live.unc.edu>
 Depends: R (>= 3.5.0)
 Repository: CRAN
-Date/Publication: 2021-07-20 21:40:02 UTC
+Date/Publication: 2021-09-08 17:00:02 UTC

@@ -63,7 +63,7 @@ glm::glm(	std::string & dType0, std::string & dLink0, arma::vec & y0, arma::vec 
   dCurrent = dCurrent0;
 
   if (dCurrent0==TRUE){
-    P = x.n_cols;
+    P = x.n_cols; // here an intercept has been added to x already
 
   }else{
     Rcpp::List dat = historical0[0];
@@ -138,7 +138,7 @@ double glm::logFC(const arma::vec & parm0, const int & p)
     if (dType=="Bernoulli") {n_h.resize(y_h.size()); n_h.ones();} 
     if (dType=="Binomial") {n_h = Rcpp::as<arma::vec>(dat["n0"]);}
 
-    arma:: vec mean_h = exp(x_h*beta_h)/(1 + exp(x_h*beta_h));
+    arma:: vec mean_h = x_h*beta_h;
 
 
     if (dLink=="Logistic") 		    { mean_h = exp(mean_h) / (1 + exp(mean_h)); 					}
@@ -390,8 +390,6 @@ Rcpp::List glm_fixed_a0_normal(arma::vec & y, arma::mat & x, Rcpp::List & histor
 
   return(result);
 }
-
-
 
 
 
