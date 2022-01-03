@@ -51,7 +51,7 @@ using namespace Rcpp;
 
 
 
-
+// define constructor
 random_a0::random_a0(std::string dType0, double y0, double n0, double v0,
                      arma::vec y_normal0, arma::mat x_normal0, arma::mat historical0,
                      Rcpp::List historical_normal0,
@@ -92,6 +92,8 @@ random_a0::random_a0(std::string dType0, double y0, double n0, double v0,
   m=10;
 }
 
+// Define the log likelihood of the posterior using the normalized power prior
+// for two group cases, and for the normal linear model.
 double random_a0::logFC(const arma::vec & parm0, const int & p)
 {
   double log_C_1 = 0;
@@ -147,7 +149,7 @@ double random_a0::logFC(const arma::vec & parm0, const int & p)
       log_C_0 = parm0[p] * parm0[P+1] / 2 * ss_h + log_c_a0;
       log_C_1 = parm0[p] * n_h / 2 * log(parm0[P+1]);
 
-    }else{
+    }else{ // normal linear model
 
 
       double a_y2 = 0;
@@ -290,8 +292,8 @@ double random_a0::logFC(const arma::vec & parm0, const int & p)
 
 
 
-
-
+// This function generates the parameters of the posterior distribution of a_0 (using slice sampling) 
+// and mu_c (the distribution of mu_c given a_0 has closed form solutions) for Bernoulli, Poisson and Exponential responses.
 // [[Rcpp::export]]
 Rcpp::List two_grp_random_a0(std::string & dType0, double & y0, double & n0, arma::mat & historical0,
                             double & b_010, double & b_020, double & c_10, double & c_20,
@@ -312,12 +314,8 @@ Rcpp::List two_grp_random_a0(std::string & dType0, double & y0, double & n0, arm
 
   int P = historical0.n_rows;
 
-
-  // Construct container for mcmc samples;
-
   arma::mat a0_samples(nMC,P);
 
-  // create parameter vector container and initial values;
   arma::vec parms(P);
   for (int p=0;p < P;p++)
   {
@@ -326,11 +324,14 @@ Rcpp::List two_grp_random_a0(std::string & dType0, double & y0, double & n0, arm
 
   for (int s=-nBI;s<nMC;s++)
   {
+    // call the slice sampler for samples of a_0
     slice(parms,b);
 
     if (s>=0){	a0_samples.row(s) = parms.t();	}
   }
 
+  
+  // sample mu_c given samples of a_0
   arma::vec mu_c_post(nMC);
 
   if(dType0=="Bernoulli"){
@@ -366,7 +367,8 @@ Rcpp::List two_grp_random_a0(std::string & dType0, double & y0, double & n0, arm
 
 
 
-
+// This function generates posterior samples of mu_c, tau, and a_0 
+// using Gibbs and slice sampling for normal responses.
 // [[Rcpp::export]]
 Rcpp::List two_grp_random_a0_normal(double y0, double n0, double v0,
                                     arma::mat historical0,
@@ -454,7 +456,6 @@ Rcpp::List two_grp_random_a0_normal(double y0, double n0, double v0,
   arma::mat a0_samples_sub = a0_samples.rows(nBI, nMC+nBI-1);
 
   return Rcpp::List::create(
-    //Rcpp::Named("post_samples")    = post_samples,
     Rcpp::Named("posterior samples of mu_c")    = gibbs_mu_c_sub,
     Rcpp::Named("posterior samples of tau")    = gibbs_tau_sub,
     Rcpp::Named("posterior samples of a0")    = a0_samples_sub);
@@ -462,7 +463,9 @@ Rcpp::List two_grp_random_a0_normal(double y0, double n0, double v0,
 
 
 
-
+// This function generates posterior samples of beta, tau, and a_0 
+// using Gibbs and slice sampling for the normal linear model.
+// The normalized power prior is used. 
 // [[Rcpp::export]]
 Rcpp::List glm_random_a0_normal(arma::vec y_normal0, arma::mat x_normal0,
                                 Rcpp::List historical_normal0,
@@ -570,7 +573,6 @@ Rcpp::List glm_random_a0_normal(arma::vec y_normal0, arma::mat x_normal0,
   arma::mat a0_samples_sub = a0_samples.rows(nBI, nMC+nBI-1);
 
   return Rcpp::List::create(
-    //Rcpp::Named("post_samples")    = post_samples,
     Rcpp::Named("posterior samples of beta")    = gibbs_beta_sub,
     Rcpp::Named("posterior samples of tau")    = gibbs_tau_sub,
     Rcpp::Named("posterior samples of a0")    = a0_samples_sub);
@@ -580,7 +582,8 @@ Rcpp::List glm_random_a0_normal(arma::vec y_normal0, arma::mat x_normal0,
 
 
 
-
+// This function performs sample size determination for all four data types using the normalized power prior.
+// This function calls two_grp_random_a0() and two_grp_random_a0_normal() to obtain posterior samples of a_0 and mu_c. 
 // [[Rcpp::export]]
 Rcpp::List power_two_grp_random_a0(std::string & dType0, double & n_t, double & n0, arma::mat & historical0,
                                    arma::vec & mu_t_prior_samps, arma::vec & mu_c_prior_samps, arma::vec & var_t_prior_samps, arma::vec & var_c_prior_samps,
@@ -600,8 +603,6 @@ Rcpp::List power_two_grp_random_a0(std::string & dType0, double & n_t, double & 
   for (int i=0;i<N;i++){
 
     // data simulation
-    //std::random_shuffle(mu_t_prior_samps.begin(), mu_t_prior_samps.end());
-    //std::random_shuffle(mu_c_prior_samps.begin(), mu_c_prior_samps.end());
     int ind_t = floor(R::runif(0,mu_t_prior_samps.size()));
     int ind_c = floor(R::runif(0,mu_c_prior_samps.size()));
     double mu_t = mu_t_prior_samps[ind_t];
@@ -730,7 +731,6 @@ Rcpp::List power_two_grp_random_a0(std::string & dType0, double & n_t, double & 
   if(dType0 == "Normal"){
     double mean_tau = mean(tau_samples);
     return Rcpp::List::create(
-      //Rcpp::Named("post_samples")    = post_samples,
       Rcpp::Named("average posterior mean of mu_t")  = mean_mu_t,
       Rcpp::Named("average posterior mean of mu_c")  = mean_mu_c,
       Rcpp::Named("average posterior mean of tau")  = mean_tau,
@@ -738,7 +738,6 @@ Rcpp::List power_two_grp_random_a0(std::string & dType0, double & n_t, double & 
       Rcpp::Named("power/type I error")    = res);
   }else{
       return Rcpp::List::create(
-        //Rcpp::Named("post_samples")    = post_samples,
         Rcpp::Named("average posterior mean of mu_t")  = mean_mu_t,
         Rcpp::Named("average posterior mean of mu_c")  = mean_mu_c,
         Rcpp::Named("average posterior means of a0")  = final_a0_vec,
@@ -750,7 +749,8 @@ Rcpp::List power_two_grp_random_a0(std::string & dType0, double & n_t, double & 
 
 
 
-
+// This function performs sample size determination for the normal linear model using the normalized power prior.
+// This function calls glm_random_a0_normal() to obtain posterior samples of a_0, tau and beta. 
 // [[Rcpp::export]]
 Rcpp::List power_glm_random_a0_normal(double & n_total, Rcpp::List & historical0,
                                       arma::mat & beta_c_prior_samps, arma::vec & var_prior_samps,
@@ -807,10 +807,6 @@ Rcpp::List power_glm_random_a0_normal(double & n_total, Rcpp::List & historical0
     for(int k = 0; k < n_total; k++){ y_s[k] = R::rnorm(mean(k),sqrt(var)); }
 
 
-    //y_samp.row(i) = y_s.t();
-    //x_samp = join_cols(x_samp, x_s);
-
-
     arma::mat beta_samps(nMC,x_s.n_cols);
 
     // need to remove intercept column when plugging into following functions
@@ -864,7 +860,6 @@ Rcpp::List power_glm_random_a0_normal(double & n_total, Rcpp::List & historical0
   double mean_tau = mean(tau_samples);
 
   return Rcpp::List::create(
-    //Rcpp::Named("post_samples")    = post_samples,
     Rcpp::Named("average posterior mean of beta") = mean_beta_vec,
     Rcpp::Named("average posterior mean of tau")  = mean_tau,
     Rcpp::Named("average posterior means of a0")  = final_a0_vec,

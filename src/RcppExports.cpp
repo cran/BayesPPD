@@ -12,6 +12,22 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// two_grp_fixed_a0
+arma::vec two_grp_fixed_a0(std::string dType, double& y_c, double& n_c, arma::mat& historical, double b_01, double b_02);
+RcppExport SEXP _BayesPPD_two_grp_fixed_a0(SEXP dTypeSEXP, SEXP y_cSEXP, SEXP n_cSEXP, SEXP historicalSEXP, SEXP b_01SEXP, SEXP b_02SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type dType(dTypeSEXP);
+    Rcpp::traits::input_parameter< double& >::type y_c(y_cSEXP);
+    Rcpp::traits::input_parameter< double& >::type n_c(n_cSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type historical(historicalSEXP);
+    Rcpp::traits::input_parameter< double >::type b_01(b_01SEXP);
+    Rcpp::traits::input_parameter< double >::type b_02(b_02SEXP);
+    rcpp_result_gen = Rcpp::wrap(two_grp_fixed_a0(dType, y_c, n_c, historical, b_01, b_02));
+    return rcpp_result_gen;
+END_RCPP
+}
 // power_two_grp_fixed_a0
 Rcpp::List power_two_grp_fixed_a0(std::string dType, double n_t, double n_c, arma::mat historical, NumericVector p_t_prior_samps, NumericVector p_c_prior_samps, double b_t1, double b_t2, double b_01, double b_02, double delta, double gamma, int N, double upper_inf);
 RcppExport SEXP _BayesPPD_power_two_grp_fixed_a0(SEXP dTypeSEXP, SEXP n_tSEXP, SEXP n_cSEXP, SEXP historicalSEXP, SEXP p_t_prior_sampsSEXP, SEXP p_c_prior_sampsSEXP, SEXP b_t1SEXP, SEXP b_t2SEXP, SEXP b_01SEXP, SEXP b_02SEXP, SEXP deltaSEXP, SEXP gammaSEXP, SEXP NSEXP, SEXP upper_infSEXP) {
@@ -135,6 +151,27 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type N(NSEXP);
     Rcpp::traits::input_parameter< bool& >::type dCurrent0(dCurrent0SEXP);
     rcpp_result_gen = Rcpp::wrap(power_glm_fixed_a0(dType0, dLink0, n_total, n0, historical0, x_samps, beta_c_prior_samps, var_prior_samps, lower_limits0, upper_limits0, slice_widths0, delta, gamma, nMC, nBI, N, dCurrent0));
+    return rcpp_result_gen;
+END_RCPP
+}
+// power_glm_fixed_a0_approx
+double power_glm_fixed_a0_approx(std::string& dType0, double& n_total, Rcpp::List& historical0, arma::mat& x_samps, arma::mat& beta_c_prior_samps, arma::vec& var_prior_samps, double& delta, double& gamma, int nNR, double tol, int N);
+RcppExport SEXP _BayesPPD_power_glm_fixed_a0_approx(SEXP dType0SEXP, SEXP n_totalSEXP, SEXP historical0SEXP, SEXP x_sampsSEXP, SEXP beta_c_prior_sampsSEXP, SEXP var_prior_sampsSEXP, SEXP deltaSEXP, SEXP gammaSEXP, SEXP nNRSEXP, SEXP tolSEXP, SEXP NSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string& >::type dType0(dType0SEXP);
+    Rcpp::traits::input_parameter< double& >::type n_total(n_totalSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List& >::type historical0(historical0SEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type x_samps(x_sampsSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type beta_c_prior_samps(beta_c_prior_sampsSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type var_prior_samps(var_prior_sampsSEXP);
+    Rcpp::traits::input_parameter< double& >::type delta(deltaSEXP);
+    Rcpp::traits::input_parameter< double& >::type gamma(gammaSEXP);
+    Rcpp::traits::input_parameter< int >::type nNR(nNRSEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    Rcpp::traits::input_parameter< int >::type N(NSEXP);
+    rcpp_result_gen = Rcpp::wrap(power_glm_fixed_a0_approx(dType0, n_total, historical0, x_samps, beta_c_prior_samps, var_prior_samps, delta, gamma, nNR, tol, N));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -311,12 +348,14 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_BayesPPD_two_grp_fixed_a0", (DL_FUNC) &_BayesPPD_two_grp_fixed_a0, 6},
     {"_BayesPPD_power_two_grp_fixed_a0", (DL_FUNC) &_BayesPPD_power_two_grp_fixed_a0, 14},
     {"_BayesPPD_two_grp_fixed_a0_normal", (DL_FUNC) &_BayesPPD_two_grp_fixed_a0_normal, 6},
     {"_BayesPPD_power_two_grp_fixed_a0_normal", (DL_FUNC) &_BayesPPD_power_two_grp_fixed_a0_normal, 12},
     {"_BayesPPD_glm_fixed_a0", (DL_FUNC) &_BayesPPD_glm_fixed_a0, 12},
     {"_BayesPPD_glm_fixed_a0_normal", (DL_FUNC) &_BayesPPD_glm_fixed_a0_normal, 5},
     {"_BayesPPD_power_glm_fixed_a0", (DL_FUNC) &_BayesPPD_power_glm_fixed_a0, 17},
+    {"_BayesPPD_power_glm_fixed_a0_approx", (DL_FUNC) &_BayesPPD_power_glm_fixed_a0_approx, 11},
     {"_BayesPPD_two_grp_random_a0", (DL_FUNC) &_BayesPPD_two_grp_random_a0, 13},
     {"_BayesPPD_two_grp_random_a0_normal", (DL_FUNC) &_BayesPPD_two_grp_random_a0_normal, 11},
     {"_BayesPPD_glm_random_a0_normal", (DL_FUNC) &_BayesPPD_glm_random_a0_normal, 10},

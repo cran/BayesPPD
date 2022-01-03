@@ -39,8 +39,6 @@ public:
   arma::vec                slice_widths;
   int m;
 
-
-
   // public member functions;
   random_a0_glm(std::string & dType0, std::string & dLink0, arma::vec & y0, arma::vec & n0, arma::mat & x0, Rcpp::List & historical0,
            double & c_1,double & c_2,arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0, arma::vec & coef0);
@@ -57,7 +55,6 @@ random_a0_glm::random_a0_glm(	std::string & dType0, std::string & dLink0, arma::
   dLink = dLink0;
 
   y = y0;
-  //n = n0;
   if ((dType=="Bernoulli")) {n.resize(y.size()); n.ones();} else {n = n0;}
   x     = x0;
   historical = historical0;
@@ -80,7 +77,8 @@ random_a0_glm::random_a0_glm(	std::string & dType0, std::string & dLink0, arma::
   m=10;
 }
 
-// beta has P elements; a0 has historical.size elements
+// Define the log likelihood of the posterior for beta and a_0 using the normalized power prior
+// for GLMS with Bernoulli, Poisson and Exponential responses.
 double random_a0_glm::logFC(const arma::vec & parm0, const int & p)
 {
   // extract regression parameters;
@@ -88,11 +86,9 @@ double random_a0_glm::logFC(const arma::vec & parm0, const int & p)
   arma::vec mean;
   arma::vec a0_vec = parm0.subvec(P, parm0.size()-1);
 
-  //arma::vec beta_h = beta0;
   arma::uvec ind;
   ind << 0;
   arma::vec beta_h = join_cols(parm0.elem(ind), parm0.subvec(2,P-1));
-
 
 
   // compute mean parameter;
@@ -175,7 +171,7 @@ double random_a0_glm::logFC(const arma::vec & parm0, const int & p)
   return  lp;
 }
 
-
+// slice sampler
 void slice( arma::vec & parms, random_a0_glm & b)
 {
 
@@ -259,7 +255,9 @@ void slice( arma::vec & parms, random_a0_glm & b)
   }
 }
 
-
+// This function generates posterior samples of beta, and a_0 
+// using slice sampling for GLMs with Bernoulli, Poisson and Exponential responses.
+// The normalized power prior is used.
 // [[Rcpp::export]]
 Rcpp::List glm_random_a0(std::string & dType0, std::string & dLink0, arma::vec & y0, arma::vec & n0, arma::mat & x0, Rcpp::List & historical0,
                    double & c_10,double & c_20, arma::vec & coef0, arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,
@@ -299,7 +297,6 @@ Rcpp::List glm_random_a0(std::string & dType0, std::string & dLink0, arma::vec &
   }
 
   return Rcpp::List::create(
-    //Rcpp::Named("post_samples")    = post_samples,
     Rcpp::Named("posterior samples of beta")    = samples.cols(0,P-1),
     Rcpp::Named("posterior samples of a0")    = samples.cols(P,P+historical0.size()-1));
 
@@ -308,7 +305,9 @@ Rcpp::List glm_random_a0(std::string & dType0, std::string & dLink0, arma::vec &
 
 
 
-
+// This function performs sample size determination for GLMs using the normalized power prior
+// for Bernoulli, Poisson and Exponential responses.
+// This function calls glm_random_a0() to obtain posterior samples of a_0 and beta. 
 // [[Rcpp::export]]
 Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, double & n_total, arma::vec & n0, Rcpp::List & historical0,
                                arma::mat & beta_c_prior_samps, double & c_10, double & c_20, arma::vec & coef0,
@@ -318,8 +317,7 @@ Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, doubl
 
   NumericVector power(N);
 
-  //arma::mat y_samp(N, n_total);
-  //arma::mat x_samp;
+
   arma::mat beta_mean(N, beta_c_prior_samps.n_cols);
   arma::mat a0_mean(N, historical0.size());
 
@@ -371,10 +369,6 @@ Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, doubl
     if (dType0=="Exponential")	{ for(int k = 0; k < n_total; k++){ y_s[k] = R::rexp(1/mean(k)); }}
 
 
-
-    //y_samp.row(i) = y_s.t();
-    //x_samp = join_cols(x_samp, x_s);
-
     // need to remove intercept column when plugging into following functions
     arma::mat x_sub = x_s.cols(1, x_s.n_cols-1);
 
@@ -423,7 +417,6 @@ Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, doubl
 
 
   return Rcpp::List::create(
-    //Rcpp::Named("post_samples")    = post_samples,
     Rcpp::Named("average posterior mean of beta") = mean_beta_vec,
     Rcpp::Named("average posterior means of a0")  = final_a0_vec,
     Rcpp::Named("power/type I error")    = res

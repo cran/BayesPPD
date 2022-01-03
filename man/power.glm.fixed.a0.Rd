@@ -20,7 +20,10 @@ power.glm.fixed.a0(
   gamma = 0.95,
   nMC = 10000,
   nBI = 250,
-  N = 10000
+  N = 10000,
+  approximate = FALSE,
+  nNR = 10000,
+  tol = 1e-05
 )
 }
 \arguments{
@@ -35,7 +38,7 @@ power.glm.fixed.a0(
 \item{historical}{(Optional) list of historical dataset(s). East historical dataset is stored in a list which contains three \emph{named} elements: \code{y0}, \code{x0} and \code{a0}.
 \itemize{
 \item \code{y0} is a vector of responses.
-\item \code{x0} is a matrix of covariates. \code{x0} should NOT have the treatment indicator. Apart from missing the treatent/control indicator, \code{x0} should have the same set of covariates in the same order as \code{x}.
+\item \code{x0} is a matrix of covariates. \code{x0} should NOT have the treatment indicator. Apart from missing the treatment indicator, \code{x0} should have the same set of covariates in the same order as \code{x}.
 \item \code{a0} is a number between 0 and 1 indicating the discounting parameter value for that historical dataset.
 }
 For binomial data, an additional element \code{n0} is required.
@@ -65,6 +68,13 @@ The length of the vector should be equal to the total number of parameters, i.e.
 \item{nBI}{Number of burn-in samples for the slice sampler or Gibbs sampler. The default is 250.}
 
 \item{N}{Number of simulated datasets to generate. The default is 10,000.}
+
+\item{approximate}{Logical value indicating whether the approximation method based on asymptotic theory is used. The default is FALSE. If TRUE, an approximation method based on the Newton-Raphson algorithm (assuming canonical links) is used.
+This feature helps users quickly obtain a rough estimate of the sample size required for the desired level of power or type I error rate.}
+
+\item{nNR}{(Only applies if \code{approximate=TRUE}) number of iterations of the Newton-Raphson algorithm. The default value is 10,000.}
+
+\item{tol}{(Only applies if \code{approximate=TRUE}) absolute tolerance of the Newton-Raphson algorithm. The default value is 0.00001.}
 }
 \value{
 Power or type I error is returned, depending on the sampling prior used. If \code{data.type} is "Normal", average posterior means of \eqn{\beta}, \eqn{\tau} and \eqn{\tau_k}'s (if historical data is given) are also returned.
@@ -93,6 +103,11 @@ and slice width for each parameter.
 
 If a sampling prior with support in the null space is used, the value returned is a Bayesian type I error rate.
 If a sampling prior with support in the alternative space is used, the value returned is a Bayesian power.
+
+Because running \code{power.glm.fixed.a0()} and \code{power.glm.random.a0()} is potentially time-consuming,
+an approximation method based on asymptotic theory has been implemented for the model with fixed \eqn{a_0}.
+In order to attain the exact sample size needed for the desired power, the user can start with the approximation
+to get a rough estimate of the sample size required, using \code{power.glm.fixed.a0()} with \code{approximate=TRUE}.
 }
 \examples{
 

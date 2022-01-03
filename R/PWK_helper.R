@@ -1,8 +1,7 @@
-#### NI_PWK #####
 
-#Purpose: compute [L(\beta,\lambda|D_0)]^{a_0} in log scale
-#Input: "dat" is the historical data set and "mcmc" denotes an MC/MCMC sample point
-#Output: [L(\beta,\lambda|D_0)]^{a_0} at that point in log scale
+# The following comments appeared in the source code for 
+# Wang YB, Chen MH, Kuo L, Lewis PO (2018). “A New Monte Carlo Method for Estimating Marginal Likelihoods.” Bayesian Analysis, 13(2), 311–333.
+
 library(stats)
 logpowerprior <- function(mcmc, a0){
   beta = mcmc
@@ -34,7 +33,6 @@ logpowerprior <- function(mcmc, a0){
 
 
       mean = min(max(mean, 10^(-4)), 0.9999)
-      #print(sum(y_h * log(mean) + (n_h - y_h) * log1p(-mean) ))
       if (data.type=="Bernoulli"|data.type=="Binomial"){
         lp = lp + a0_i * sum(y_h * log(mean) + (n_h - y_h) * log1p(-mean) )
 
@@ -60,7 +58,7 @@ denominator_control <- function(ratios)
 {
   tot <- length(ratios)
   b <- ratios[!is.na(ratios)]
-  #print(length(b))
+
   est_d_r <- 0
   b.max <- max(b)
   est_d_r <- log(sum(exp(b-b.max)))+b.max - log(tot)
@@ -89,16 +87,14 @@ LOR_partition_pp <- function(r,nslice,mcmc,a0){
     rpp <- means+sds*reprp[i]
     kreprp[i] <- 0
     kreprp[i] <- kreprp[i] + logpowerprior(rpp, a0) # not plugging in actual mcmc
-    #print(i)
-    #print(rpp)
-    #print(logpowerprior(rpp, a0))
+
     kreprp[i] <- kreprp[i] + partjo1
   }
 
   rings <- cbind(rings, kreprp)
   rarea <- pi^(P/2)*interval^P/gamma(P/2+1)  # pi^(p/2)/gamma(p/2+1) 0.4
   rvol <- log(rarea[-1]-rarea[-(nslice+1)]) + kreprp
-  #print(log(rarea[-1]-rarea[-(nslice+1)]))
+
   rings <- cbind(rings, rvol)
   return(rings)
 }

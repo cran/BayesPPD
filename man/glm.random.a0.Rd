@@ -70,6 +70,8 @@ The default is 0.1 for all parameter (may not be appropriate for all situations)
 \value{
 If \code{data.type} is "Normal", posterior samples of \eqn{\beta}, \eqn{\tau} and \eqn{a_0} are returned.
 For all other data types, posterior samples of \eqn{\beta} and \eqn{a_0} are returned.
+The first column of the matrix of posterior samples of \eqn{\beta} contains posterior samples of the intercept.
+The second column contains posterior samples of \eqn{\beta_1}, the parameter for the treatment indicator.
 }
 \description{
 Model fitting using normalized power priors for generalized linear models with random \eqn{a_0}

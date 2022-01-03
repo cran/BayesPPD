@@ -57,7 +57,7 @@ This function performs the following steps:
 \enumerate{
 
 \item	Suppose there are K historical datasets. The user inputs a grid of M rows and K columns of potential values for \eqn{a_0}. For example, one can choose the vector \code{v = c(0.1, 0.25, 0.5, 0.75, 1)}
-and use \code{expand.grid(a0_1=v, a0_2=v, a0_3=v)} when K=3 to get a grid with \eqn{M=5^3=125} rows and 3 columns. If there are more than three historical datasets, the dimension of \code{v} can be reduced
+and use \code{expand.grid(a0_1=v, a0_2=v, a0_3=v)} when \eqn{K=3} to get a grid with \eqn{M=5^3=125} rows and 3 columns. If there are more than three historical datasets, the dimension of \code{v} can be reduced
 to limit the size of the grid. A large grid will increase runtime.
 \item	For each row of \eqn{a_0} values in the grid, obtain \eqn{M} samples for \eqn{\beta} from the power prior associated with the current values of \eqn{a_0} using the slice sampler.
 \item	For each of the M sets of posterior samples, execute the PWK algorithm (Wang et al., 2018) to estimate the log of normalizing constant \eqn{d_1,...,d_M} for the normalized power prior.
@@ -71,8 +71,8 @@ When a row of the \code{grid} contains elements that are close to zero, the resu
 Therefore, it is recommended that \code{grid} values should be at least 0.05.
 
 If one encounters the error message "some coefficients not defined because of singularities",
-it could be due to the following factors: insufficient sample size of the historical data, insufficient number of iterations for the slice sampler,
-insufficient number of \code{grid} rows, or near-zero \code{grid} values.
+it could be due to the following factors: number of \code{grid} rows too large or too small, insufficient sample size of the historical data, insufficient number of iterations for the slice sampler,
+or near-zero \code{grid} values.
 }
 \examples{
 

@@ -106,6 +106,7 @@ lower.limits <- rep(0, 3) # The dimension is the number of historical datasets
 upper.limits <- rep(1, 3)
 slice.widths <- rep(0.1, 3)
 
+set.seed(1)
 result <- two.grp.random.a0(data.type=data.type, y.c=y.c, n.c=n.c, historical=historical,
                             lower.limits=lower.limits, upper.limits=upper.limits,
                             slice.widths=slice.widths, nMC=10000, nBI=250)

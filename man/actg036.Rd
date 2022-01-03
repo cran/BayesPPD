@@ -5,15 +5,13 @@
 \alias{actg036}
 \title{AIDS Clinical Trial ACTG036 (1991).}
 \format{
-A data frame with 183 rows and 7 variables:
+A data frame with 183 rows and 5 variables:
 \describe{
 \item{outcome}{binary variable with 1 indicating death, development of AIDS or ARC and 0 otherwise}
 \item{treat}{binary variable with 1 indicating Zidovudine (AZT) treatment and 0 indicating placebo}
 \item{age}{patient age in years}
 \item{race}{binary variable with 1 indicating white and 0 otherwise}
 \item{T4count}{CD4 cell count (cell count per cubicmillimetre of serum)}
-\item{hemtype}{haemophilia factor type. Binary variable with 1 indicating the haemophilia factor type was factor VIII and 0 otherwise}
-\item{mfc}{monoclonal factor concentrate use. Binary variable with 1 indicating the patient used a monoclonal factor concentrate and 0 otherwise}
 }
 }
 \source{
@@ -24,6 +22,6 @@ actg036
 }
 \description{
 A dataset containing the ACTG036 clinical trial data (1991) comparing zidovudine (AZT) with a placebo in asymptomatic patients with hereditary coagulation disorders and HIV infection.
-The ACTG036 trial had the same response variable and had many covariates in common with the ACTG019 study. The ATCG019 data can be used as a historical dataset.
+The ACTG036 trial had the same response variable and covariates as the ACTG019 study. The ATCG019 data can be used as a historical dataset.
 }
 \keyword{datasets}

@@ -82,7 +82,8 @@ The default is 0.1 for all parameter (may not be appropriate for all situations)
 }
 \value{
 Power or type I error is returned, depending on the sampling prior used. If \code{data.type} is "Normal", average posterior means of \eqn{\beta}, \eqn{\tau} and \eqn{a_0} are also returned.
-For all other data types, average posterior means of \eqn{\beta} and \eqn{a_0} are also returned.
+For all other data types, average posterior means of \eqn{\beta} and \eqn{a_0} are also returned. The first element of the average posterior means of \eqn{\beta} is the average posterior mean of the intercept.
+The second element is the average posterior mean of \eqn{\beta_1}, the parameter for the treatment indicator.
 }
 \description{
 Power/type I error calculation using normalized power priors for generalized linear models with random \eqn{a_0}
@@ -107,6 +108,11 @@ and slice width for each parameter.
 
 If a sampling prior with support in the null space is used, the value returned is a Bayesian type I error rate.
 If a sampling prior with support in the alternative space is used, the value returned is a Bayesian power.
+
+Because running \code{power.glm.fixed.a0()} and \code{power.glm.random.a0()} is potentially time-consuming,
+an approximation method based on asymptotic theory has been implemented for the model with fixed \eqn{a_0}.
+In order to attain the exact sample size needed for the desired power, the user can start with the approximation
+to get a rough estimate of the sample size required, using \code{power.glm.fixed.a0()} with \code{approximate=TRUE}.
 }
 \examples{
 

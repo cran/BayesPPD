@@ -2,65 +2,92 @@
 % Please edit documentation in R/main_func.R
 \name{two.grp.fixed.a0}
 \alias{two.grp.fixed.a0}
-\title{Model fitting for two groups (treatment and control group, no covariates) with fixed a0 when outcome follows Normal distribution}
+\title{Model fitting for two groups (treatment and control group, no covariates) with fixed a0}
 \usage{
 two.grp.fixed.a0(
+  data.type,
   y.c,
   n.c,
   v.c,
   historical = matrix(0, 1, 4),
+  prior.mu.c.shape1 = 1,
+  prior.mu.c.shape2 = 1,
   nMC = 10000,
   nBI = 250
 )
 }
 \arguments{
-\item{y.c}{Sum of responses (assumed to follow Normal distribution) for the control group.}
+\item{data.type}{Character string specifying the type of response. The options are "Normal", "Bernoulli", "Poisson" and "Exponential".}
+
+\item{y.c}{Sum of responses for the control group.}
 
 \item{n.c}{Sample size of the control group.}
 
-\item{v.c}{Sample variance of responses for the control group.}
+\item{v.c}{(For normal data only) sample variance of responses for the control group.}
 
-\item{historical}{(Optional) matrix of historical dataset(s) with four columns:
+\item{historical}{(Optional) matrix of historical dataset(s). If \code{data.type} is "Normal", \code{historical} is a matrix with four columns:
 \itemize{
 \item The first column contains the sum of responses for the control group.
 \item The second column contains the sample size of the control group.
 \item The third column contains the sample variance of responses for the control group.
 \item The fourth column contains the discounting parameter value \eqn{a_0} (between 0 and 1).
 }
+For all other data types, \code{historical} is a matrix with three columns:
+\itemize{
+\item The first column contains the sum of responses for the control group.
+\item The second column contains the sample size of the control group.
+\item The third column contains the discounting parameter value \eqn{a_0} (between 0 and 1).
+}
 Each row represents a historical dataset.}
 
-\item{nMC}{Number of iterations (excluding burn-in samples) for the Gibbs sampler. The default is 10,000.}
+\item{prior.mu.c.shape1}{First hyperparameter of the initial prior for \eqn{\mu_c}. The default is 1. Does not apply if \code{data.type} is "Normal".}
 
-\item{nBI}{Number of burn-in samples for the Gibbs sampler. The default is 250.}
+\item{prior.mu.c.shape2}{Second hyperparameter of the initial prior for \eqn{\mu_c}. The default is 1. Does not apply if \code{data.type} is "Normal".}
+
+\item{nMC}{(For normal data only) number of iterations (excluding burn-in samples) for the Gibbs sampler. The default is 10,000.}
+
+\item{nBI}{(For normal data only) number of burn-in samples for the Gibbs sampler. The default is 250.}
 }
 \value{
-Posterior samples of \eqn{\mu_c}, \eqn{\tau} and \eqn{\tau_k}'s (if historical data is given) are returned.
+If \code{data.type} is "Normal", posterior samples of \eqn{\mu_c}, \eqn{\tau} and \eqn{\tau_k}'s (if historical data is given) are returned.
+For all other data types, two scalars, \eqn{c_1} and \eqn{c_2}, are returned, representing the two parameters of the posterior distribution of \eqn{\mu_c}.
+For Bernoulli responses, the posterior distribution of \eqn{\mu_c} is beta(\eqn{c_1}, \eqn{c_2}).
+For Poisson responses, the posterior distribution of \eqn{\mu_c} is Gamma(\eqn{c_1}, \eqn{c_2}) where \eqn{c_2} is the rate parameter.
+For exponential responses, the posterior distribution of \eqn{\mu_c} is Gamma(\eqn{c_1}, \eqn{c_2}) where \eqn{c_2} is the rate parameter.
 }
 \description{
-Model fitting using power priors for two groups (treatment and control group, no covariates) with fixed \eqn{a_0} when outcome follows Normal distribution
+Model fitting using power priors for two groups (treatment and control group, no covariates) with fixed \eqn{a_0}
 }
 \details{
 The power prior is applied on the data of the control group only.
 Therefore, only summaries of the responses of the control group need to be entered.
 
-The responses are assumed to follow \eqn{N(\mu_c, \tau^{-1})} where \eqn{\mu_c} is the mean of responses for the control group
+If \code{data.type} is "Bernoulli", "Poisson" or "Exponential", a single response from the treatment group is assumed to follow Bern(\eqn{\mu_t}), Pois(\eqn{\mu_t}) or Exp(rate=\eqn{\mu_t}), respectively,
+where \eqn{\mu_t} is the mean of responses for the treatment group. The distributional assumptions for the control group data are analogous.
+
+If \code{data.type} is "Bernoulli", the initial prior for \eqn{\mu_t} is beta(\code{prior.mu.t.shape1}, \code{prior.mu.t.shape2}).
+If \code{data.type} is "Poisson", the initial prior for \eqn{\mu_t} is Gamma(\code{prior.mu.t.shape1}, rate=\code{prior.mu.t.shape2}).
+If \code{data.type} is "Exponential", the initial prior for \eqn{\mu_t} is Gamma(\code{prior.mu.t.shape1}, rate=\code{prior.mu.t.shape2}).
+The initial priors used for the control group data are analogous.
+
+If \code{data.type} is "Normal", the responses are assumed to follow \eqn{N(\mu_c, \tau^{-1})} where \eqn{\mu_c} is the mean of responses for the control group
 and \eqn{\tau} is the precision parameter. Each historical dataset \eqn{D_{0k}} is assumed to have a different precision parameter \eqn{\tau_k}.
 The initial prior for \eqn{\tau} is the Jeffery's prior, \eqn{\tau^{-1}}, and the initial prior for \eqn{\tau_k} is \eqn{\tau_k^{-1}}. The initial prior for the \eqn{\mu_c} is the uniform improper prior.
 Posterior samples are obtained through Gibbs sampling.
 }
 \examples{
-y.c <- 200 # The responses are assumed to follow normal distribution
+data.type <- "Bernoulli"
+y.c <- 70
 n.c <- 100
-v.c <- 2
 
 # Simulate three historical datasets
-historical <- matrix(0, ncol=4, nrow=3)
-historical[1,] <- c(200, 100, 2, 0.3)
-historical[2,] <- c(300, 100, 2, 0.5)
-historical[3,] <- c(400, 100, 2, 0.7)
+historical <- matrix(0, ncol=3, nrow=3)
+historical[1,] <- c(70, 100, 0.3)
+historical[2,] <- c(60, 100, 0.5)
+historical[3,] <- c(50, 100, 0.7)
 
 set.seed(1)
-result <- two.grp.fixed.a0(y.c, n.c, v.c, historical, nMC=10000, nBI=250)
+result <- two.grp.fixed.a0(data.type=data.type, y.c=y.c, n.c=n.c, historical=historical) 
 }
 \references{
 Chen, Ming-Hui, et al. "Bayesian design of noninferiority trials for medical devices using historical data." Biometrics 67.3 (2011): 1163-1170.

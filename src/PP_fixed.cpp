@@ -16,7 +16,7 @@ using namespace Numer;
 
 
 
-
+// This class defined the integrand, later used by the numerical integration function. 
 
 class Mintegrand: public Func {
 
@@ -55,7 +55,7 @@ public:
 };
 
 
-
+// This function performs numerical integration for Bernoulli, Poisson and Exponential responses. 
 double num_integrate(std::string dType, double b_c1_post, double b_c2_post, double b_t1_post, double b_t2_post, double delta, double upper_inf){
   Mintegrand f(b_c1_post, b_c2_post, b_t1_post, b_t2_post, delta, upper_inf, dType);
   double err_est;
@@ -74,9 +74,40 @@ double num_integrate(std::string dType, double b_c1_post, double b_c2_post, doub
 }
 
 
+// This function computes the parameters of the posterior distribution of mu_c
+// for Bernoulli, Poisson and Exponential responses.
+// [[Rcpp::export]]
+arma::vec two_grp_fixed_a0(std::string dType, double & y_c, double & n_c,
+                           arma::mat & historical, double b_01, double b_02){
+  double b_c1_post = 0;
+  double b_c2_post = 0;
+  
+  if(dType == "Bernoulli"){
+    
+    b_c1_post = (double) y_c + arma::dot(historical.col(0), historical.col(2)) + b_01;
+    b_c2_post = (double) n_c - (double) y_c +  arma::dot((historical.col(1) - historical.col(0)), historical.col(2)) + b_02;
+  }
+  if(dType == "Poisson"){
+    // y here is the sum of all the individual y's
+    b_c1_post = (double) y_c + arma::dot(historical.col(0), historical.col(2)) + b_01;
+    b_c2_post = (double) n_c + arma::dot(historical.col(1), historical.col(2)) + b_02;
+  }
+  if(dType == "Exponential"){
+    b_c1_post = (double) n_c + arma::dot(historical.col(1), historical.col(2)) + b_01;
+    b_c2_post = (double) y_c + arma::dot(historical.col(0), historical.col(2)) + b_02;
+  }
+  
+  arma::vec result(2);
+  result[0] = b_c1_post;
+  result[1] = b_c2_post;
+  
+  return(result);
+  
+}
 
 
-
+// This function performs sample size determination for Bernoulli, Poisson and Exponential responses.
+// This function calls the num_integrate function for computing the posterior probability. 
 // [[Rcpp::export]]
 Rcpp::List power_two_grp_fixed_a0(std::string dType, double n_t, double n_c,
                                   arma::mat historical,
@@ -145,12 +176,14 @@ Rcpp::List power_two_grp_fixed_a0(std::string dType, double n_t, double n_c,
   double beta = mean(post_samples >= gamma);
 
   return Rcpp::List::create(
-    //Rcpp::Named("post_samples")    = post_samples,
     Rcpp::Named("power/type I error")    = beta);
 }
 
 
-//
+  
+
+// This function generates posterior samples of mu_c, tau, and tau_0k 
+// using Gibbs sampling for normal responses.
 // [[Rcpp::export]]
 Rcpp::List two_grp_fixed_a0_normal(double & y_c, double & n_c, double & v, arma::mat & historical, int & nMC, int & nBI) {
   Rcpp::RNGScope scope;
@@ -208,12 +241,10 @@ Rcpp::List two_grp_fixed_a0_normal(double & y_c, double & n_c, double & v, arma:
   // if no historical data is provided, no tau0 samples are provided
   if(historical(0,1)==0){
     result = Rcpp::List::create(
-      //Rcpp::Named("post_samples")    = post_samples,
       Rcpp::Named("posterior samples of mu_c")    = gibbs_mu_c_sub,
       Rcpp::Named("posterior samples of tau")    = gibbs_tau_sub);
   }else{
     result = Rcpp::List::create(
-      //Rcpp::Named("post_samples")    = post_samples,
       Rcpp::Named("posterior samples of mu_c")    = gibbs_mu_c_sub,
       Rcpp::Named("posterior samples of tau")    = gibbs_tau_sub,
       Rcpp::Named("posterior samples of tau_0")    = gibbs_tau0_sub);
@@ -227,7 +258,8 @@ Rcpp::List two_grp_fixed_a0_normal(double & y_c, double & n_c, double & v, arma:
 
 
 
-
+// This function performs sample size determination for normal responses.
+// This function calls the two_grp_fixed_a0_normal() function to obtain posterior samples of mu_c. 
 // [[Rcpp::export]]
 Rcpp::List power_two_grp_fixed_a0_normal(double n_t, double n_c, arma::mat historical,
                                          NumericVector mu_t_prior_samps,

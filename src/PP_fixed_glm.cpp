@@ -51,12 +51,8 @@ glm::glm(	std::string & dType0, std::string & dLink0, arma::vec & y0, arma::vec 
   dLink = dLink0;
 
   y     = y0;
-  //n = n0;
   if ((dType=="Bernoulli")) {n.resize(y.size()); n.ones();} else {n = n0;}
   x = x0;
-  //arma::vec v(x0.n_rows);
-  //v.ones();
-  //x.insert_cols(0, v);
   historical = historical0;
 
 
@@ -79,7 +75,8 @@ glm::glm(	std::string & dType0, std::string & dLink0, arma::vec & y0, arma::vec 
   m=10;
 }
 
-
+// Define the log likelihood of the posterior using the power prior
+// for GLMs for Bernoulli, Poisson and Exponential responses.
 double glm::logFC(const arma::vec & parm0, const int & p)
 {
   // extract regression parameters;
@@ -112,11 +109,8 @@ double glm::logFC(const arma::vec & parm0, const int & p)
       { 	for (int k=0; (unsigned)k< x.n_rows;k++) { mean[k] = std::min(std::max(mean[k],0.00001),0.99999); }	}
     if (dLink=="Complementary Log-Log")    {  mean = 1 - exp(-exp(mean)); }
 
+    
     // compute current data likelihood
-
-    //if ((dType=="Bernoulli")) {n.resize(y.size()); n.ones();} else {n = n0;}
-
-
     if ((dType=="Bernoulli") | (dType=="Binomial"))	{lp += sum( y % log(mean) + (n-y) % log(1-mean) );}
     if (dType=="Poisson")	{ lp += sum(  y % log(mean) - mean );}
     if (dType=="Exponential")	{ lp += sum(  log(mean) - y % mean );}
@@ -162,6 +156,8 @@ double glm::logFC(const arma::vec & parm0, const int & p)
   return  lp;
 }
 
+
+// slice sampler
 void slice( arma::vec & parms, glm & b)
 {
 
@@ -244,6 +240,9 @@ void slice( arma::vec & parms, glm & b)
   }
 }
 
+
+// This function generates posterior samples of beta using slice sampling 
+// for GLMs with Bernoulli, Poisson and Exponential responses.
 // [[Rcpp::export]]
 arma::mat glm_fixed_a0(std::string & dType0, std::string & dLink0, arma::vec & y0, arma::vec & n0, arma::mat & x0, Rcpp::List & historical0,
                     arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,
@@ -297,7 +296,9 @@ arma::mat glm_fixed_a0(std::string & dType0, std::string & dLink0, arma::vec & y
 }
 
 
-
+// This function generates posterior samples of beta, tau and tau_0 using Gibbs sampling 
+// for the normal linear model.
+// The power prior with fixed a_0 is used. 
 // [[Rcpp::export]]
 Rcpp::List glm_fixed_a0_normal(arma::vec & y, arma::mat & x, Rcpp::List & historical, int & nMC, int & nBI) {
   Rcpp::RNGScope scope;
@@ -376,12 +377,10 @@ Rcpp::List glm_fixed_a0_normal(arma::vec & y, arma::mat & x, Rcpp::List & histor
   Rcpp::List result;
   if(historical.size()==0){
     result = Rcpp::List::create(
-      //Rcpp::Named("post_samples")    = post_samples,
       Rcpp::Named("posterior samples of beta")    = gibbs_beta_sub,
       Rcpp::Named("posterior samples of tau")    = gibbs_tau_sub);
   }else{
     result = Rcpp::List::create(
-      //Rcpp::Named("post_samples")    = post_samples,
       Rcpp::Named("posterior samples of beta")    = gibbs_beta_sub,
       Rcpp::Named("posterior samples of tau")    = gibbs_tau_sub,
       Rcpp::Named("posterior samples of tau_0")    = gibbs_tau0_sub);
@@ -392,7 +391,8 @@ Rcpp::List glm_fixed_a0_normal(arma::vec & y, arma::mat & x, Rcpp::List & histor
 }
 
 
-
+// This function performs sample size determination for all four data types using the power prior with fixed a_0.
+// This function calls glm_fixed_a0() and glm_fixed_a0_normal() to obtain posterior samples of beta. 
 // [[Rcpp::export]]
 Rcpp::List power_glm_fixed_a0(std::string & dType0, std::string & dLink0, double & n_total, arma::vec & n0,
                               Rcpp::List & historical0, arma::mat & x_samps,
@@ -403,8 +403,7 @@ Rcpp::List power_glm_fixed_a0(std::string & dType0, std::string & dLink0, double
 
   NumericVector power(N);
 
-  //arma::mat y_samp(N, n_total);
-  //arma::mat x_samp;
+
   arma::mat beta_mean(N, beta_c_prior_samps.n_cols);
   arma::vec tau_samples(N);
   arma::mat tau0_samples(N, historical0.size());
@@ -469,11 +468,9 @@ Rcpp::List power_glm_fixed_a0(std::string & dType0, std::string & dLink0, double
     }
 
 
-    //y_samp.row(i) = y_s.t();
-    //x_samp = join_cols(x_samp, x_s);
-
     // need to remove intercept column when plugging into following functions
     arma::mat x_sub = x_s.cols(1, x_s.n_cols-1);
+  
 
     arma::mat beta_samps(nMC,x_s.n_cols);
     if(dType0=="Normal")	{
@@ -492,6 +489,7 @@ Rcpp::List power_glm_fixed_a0(std::string & dType0, std::string & dLink0, double
       tau0_samples.row(i) = tau0_vec.t();
 
     }else{
+      
       beta_samps = glm_fixed_a0(dType0, dLink0, y_s, n0, x_sub, historical0,
                              lower_limits0,upper_limits0,slice_widths0,
                              nMC, nBI, dCurrent0);
@@ -537,3 +535,252 @@ Rcpp::List power_glm_fixed_a0(std::string & dType0, std::string & dLink0, double
       Rcpp::Named("power/type I error")    = res);
     }
 }
+
+
+// This function computes the mean and covariance matrix of beta based on asymptotics for normal responses. 
+// This function is later called by power_glm_fixed_a0_approx().
+Rcpp::List glm_fixed_a0_normal_approx(arma::vec & y, arma::mat & x, Rcpp::List & historical, double & delta) {
+  
+  arma::vec v(x.n_rows);
+  v.ones();
+  x.insert_cols(0, v);
+  
+  // compute beta_hat
+  arma::mat xx(x.n_cols,x.n_cols);
+  arma::mat a2xx(x.n_cols,x.n_cols);
+  arma::vec xy(x.n_cols);
+  xx.zeros();
+  xy.zeros();
+  a2xx.zeros();
+  for(int j=0;j<historical.size();j++){
+    Rcpp::List dat = historical[j];
+    arma::vec y_h = dat["y0"];
+    arma::mat x_h = dat["x0"];
+    arma::vec v(x_h.n_rows);
+    v.ones();
+    x_h.insert_cols(0, v); //insert intercept
+    arma::vec ins(x_h.n_rows);
+    ins.zeros();
+    x_h.insert_cols(1, ins); //insert treatment indicator
+    double a0 = dat["a0"];
+    xx = xx + a0 * x_h.t() * x_h;
+    xy = xy + a0 * x_h.t() * y_h;
+    a2xx = a2xx + a0 * a0 * x_h.t() * x_h;
+  }
+  arma::mat A = x.t()*x + xx;
+  arma::vec B = x.t()*y + xy;
+  arma::mat A_i = inv(A);
+  
+  arma::vec beta_hat = A_i*B;
+  
+  // compute tau_hat
+  double ayx = 0;
+  double an = 0;
+  for(int j=0;j<historical.size();j++){
+    Rcpp::List dat = historical[j];
+    arma::vec y_h = dat["y0"];
+    arma::mat x_h = dat["x0"];
+    arma::vec v(x_h.n_rows);
+    v.ones();
+    x_h.insert_cols(0, v); //insert intercept
+    arma::vec ins(x_h.n_rows);
+    ins.zeros();
+    x_h.insert_cols(1, ins); //insert treatment indicator
+    double a0 = dat["a0"];
+    arma::mat m = a0*(y_h-x_h*beta_hat).t() * (y_h-x_h*beta_hat);
+    ayx = ayx + m(0,0);
+    an = an + y_h.size();
+    an = an + a0 * (y_h.size()- x.n_cols);
+  }
+  
+  arma::mat yx = (y-x*beta_hat).t() * (y-x*beta_hat);
+  double tau_hat_inv =  (yx(0,0) + ayx) / (y.size() - x.n_cols + an);
+  
+  arma::mat beta_cov = tau_hat_inv * A_i * (x.t()*x + a2xx) * A_i.t();
+  
+  double prob = R::pnorm(delta, beta_hat(1,0), sqrt(beta_cov(1,1)), TRUE, FALSE);
+  
+  return Rcpp::List::create(
+    Rcpp::Named("coefficient") = beta_hat,
+    Rcpp::Named("covariance") = beta_cov,
+    Rcpp::Named("prob")=prob);
+}
+
+
+
+// This function computes the mean and covariance matrix of beta based on asymptotics using the Newton-Raphson algorithm 
+// for Bernoulli, Poisson and Exponential responses.
+// This function is later called by power_glm_fixed_a0_approx().
+Rcpp::List newton_raphson(std::string & dType, arma::vec & y, arma::mat & x, Rcpp::List & historical, double & delta, int & n, double & tol) {
+  
+  arma::vec v(x.n_rows);
+  v.ones();
+  x.insert_cols(0, v);
+  
+  // extract regression parameters;
+  arma::vec mu, var, dmu;
+  arma::vec beta(x.n_cols);
+  beta.zeros();
+  arma::vec u(x.n_cols);
+  arma::mat H(x.n_cols, x.n_cols);
+  arma::mat H_i(x.n_cols, x.n_cols);
+  
+  for(int k = 0; k < n; k++){
+    
+    u.zeros();
+    H.zeros();
+    
+    arma::vec eta = x*beta;
+
+    
+    if (dType=="Bernoulli") { mu=exp(eta)/(1+exp(eta)); var=mu % (1-mu); dmu=exp(eta)/pow((1+exp(eta)),2); }
+    if (dType=="Poisson") 	{ mu=exp(eta); var=mu; dmu=exp(eta); 	}
+    if (dType=="Exponential")	{ mu=1/eta; var=mu%mu; dmu=-1/(eta%eta); }
+    
+    
+    u += ((((y-mu)/var)%dmu).t() * x).t();
+    
+    
+    arma::mat x1(x.n_rows, x.n_cols);
+    for(int j = 0; j < x.n_cols; j++){
+      x1.col(j) = x.col(j) % (dmu%dmu/var);
+    }
+    H += x1.t() * x;
+
+    // compute historical data likelihood
+    for(int i = 0; i < historical.size(); i++){
+      Rcpp::List dat = historical[i];
+      arma::vec y_h = dat["y0"];
+      arma::mat x_h = dat["x0"];
+      double a0 = dat["a0"];
+      //add intercept
+      arma::vec v(x_h.n_rows);
+      v.ones();
+      x_h.insert_cols(0, v);
+      // add treatment indicator
+      arma::vec v2(x_h.n_rows);
+      v2.zeros();
+      x_h.insert_cols(1, v2);
+      
+      arma:: vec eta_h = x_h*beta;
+      
+      if (dType=="Bernoulli") { mu=exp(eta_h)/(1+exp(eta_h)); var=mu%(1-mu); dmu=exp(eta_h)/pow((1+exp(eta_h)),2); }
+      if (dType=="Poisson") 	{ mu=exp(eta_h); var=mu; dmu=exp(eta_h); 	}
+      if (dType=="Exponential")	{ mu=1/eta_h; var=mu%mu; dmu=-1/(eta_h%eta_h); }
+      
+      u += a0 * ((((y_h-mu)/var)%dmu).t() * x_h).t();
+      
+      arma::mat x2(x_h.n_rows, x_h.n_cols);
+      for(int j = 0; j < x_h.n_cols; j++){
+        x2.col(j) = x_h.col(j) % (dmu%dmu/var);
+      }
+      
+      
+      H += a0 * x2.t() * x_h;
+
+    }
+
+    H_i = inv(H);
+    arma::vec diff = H_i*u;
+
+    if (max(abs(diff)) < tol) {
+      k=n;
+    }else{
+      beta += diff;
+    }
+    
+  }
+  
+  double prob = R::pnorm(delta, beta(1,0), sqrt(H_i(1,1)), TRUE, FALSE);
+  
+  return Rcpp::List::create(
+    Rcpp::Named("coefficient") = beta.col(0),
+    Rcpp::Named("covariance") = H_i,
+    Rcpp::Named("prob")=prob);
+}
+
+
+
+// This function performs approximate sample size determination for all four data types using the power prior with fixed a_0.
+// [[Rcpp::export]]
+double power_glm_fixed_a0_approx(std::string & dType0, double & n_total,
+                              Rcpp::List & historical0, arma::mat & x_samps,
+                              arma::mat & beta_c_prior_samps, arma::vec & var_prior_samps,
+                              double & delta, double & gamma,
+                              int nNR, double tol, int N) {
+
+  NumericVector power(N);
+
+
+  for (int i=0;i<N;i++){
+    
+    // data simulation for the control group
+    int beta_ind = floor(Rcpp::runif(1, 0, beta_c_prior_samps.n_rows)(0));
+    arma::rowvec beta_s = beta_c_prior_samps.row(beta_ind);
+
+    // bootstrap x from historical data
+    arma::mat x_prior_samps;
+
+    if(historical0.size()==0){
+      x_prior_samps = x_samps;
+    }
+
+    for(int j = 0; j < historical0.size(); j++){
+      Rcpp::List dat = historical0[j];
+      arma::mat x_h = dat["x0"];
+      x_prior_samps = join_cols(x_prior_samps, x_h);
+    }
+
+    NumericVector ind = floor(Rcpp::runif(n_total,0,x_prior_samps.n_rows));
+    arma::uvec v = Rcpp::as<arma::uvec>(ind);
+    arma::mat x_s = x_prior_samps.rows(v);
+    arma::vec vect(x_s.n_rows);
+    vect.ones();
+    x_s.insert_cols(0, vect);
+    arma::vec x_trt = Rcpp::rbinom(n_total, 1, 0.7);
+    x_s.insert_cols(1, x_trt);
+
+    arma::vec mean = x_s*beta_s.t();
+    
+
+    // simulate y's
+    arma::vec y_s(n_total);
+
+    if (dType0=="Bernoulli")	{
+      mean = exp(mean) / (1 + exp(mean));
+      for(int k = 0; k < n_total; k++){ y_s[k] = R::rbinom(1, mean(k)); }
+    }
+    if (dType0=="Poisson")	{
+      mean = exp(mean);
+      for(int k = 0; k < n_total; k++){ y_s[k] = R::rpois(mean(k)); }
+    }
+    if (dType0=="Exponential")	{
+      for(int k = 0; k < n_total; k++){ y_s[k] = R::rexp(1/mean(k)); }
+    }
+    if (dType0=="Normal")	{
+      int ind_v = floor(R::runif(0,var_prior_samps.size()));
+      double var = var_prior_samps[ind_v];
+      for(int k = 0; k < n_total; k++){ y_s[k] = R::rnorm(mean(k),sqrt(var)); }
+    }
+
+    // need to remove intercept column when plugging into following functions
+    arma::mat x_sub = x_s.cols(1, x_s.n_cols-1);
+
+
+    double prob = 0;
+    if(dType0 == "Normal"){
+      prob = glm_fixed_a0_normal_approx(y_s, x_sub, historical0, delta)[2];
+    }else{
+      prob = newton_raphson(dType0, y_s, x_sub, historical0, delta, nNR, tol)[2];
+    }
+    power[i] = prob;
+  }
+  
+  double res = mean(power >= gamma);
+
+  return res;
+
+}
+
+  
+
