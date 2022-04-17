@@ -1,11 +1,16 @@
 
-# The following comments appeared in the source code for 
+# The following comments appeared in the source code for
 # Wang YB, Chen MH, Kuo L, Lewis PO (2018). “A New Monte Carlo Method for Estimating Marginal Likelihoods.” Bayesian Analysis, 13(2), 311–333.
 
 library(stats)
-logpowerprior <- function(mcmc, a0){
+logpowerprior <- function(mcmc, a0, historical, data.type, data.link,init_var){
   beta = mcmc
   lp = 0;
+
+  # add independent normal priors for beta
+  for(i in 1:length(beta)){
+    lp = lp + dnorm(beta[i], mean=0, sd=sqrt(init_var[i]), log=TRUE)
+  }
 
   for(i in 1:length(historical)){
       dat = historical[[i]]
@@ -32,7 +37,7 @@ logpowerprior <- function(mcmc, a0){
 
 
 
-      mean = min(max(mean, 10^(-4)), 0.9999)
+      #mean = min(max(mean, 10^(-4)), 0.9999)
       if (data.type=="Bernoulli"|data.type=="Binomial"){
         lp = lp + a0_i * sum(y_h * log(mean) + (n_h - y_h) * log1p(-mean) )
 
@@ -44,6 +49,7 @@ logpowerprior <- function(mcmc, a0){
       if (data.type=="Exponential")	{
         lp = lp + a0_i * sum(log(mean) - y_h * mean)
       }
+
   }
 
 
@@ -73,7 +79,7 @@ denominator_control <- function(ratios)
 #the posterior kernel (log-scale) of the representative point in each ring,
 #and the volume of each ring
 
-LOR_partition_pp <- function(r,nslice,mcmc,a0){
+LOR_partition_pp <- function(r,nslice,mcmc,a0,historical, data.type, data.link,init_var){
   interval <- seq(0, r, length=(nslice+1) )
   rings <- cbind(interval[-(nslice+1)],interval[-1])
   P <- ncol(mcmc)
@@ -86,7 +92,7 @@ LOR_partition_pp <- function(r,nslice,mcmc,a0){
   for (i in 1:nslice ){
     rpp <- means+sds*reprp[i]
     kreprp[i] <- 0
-    kreprp[i] <- kreprp[i] + logpowerprior(rpp, a0) # not plugging in actual mcmc
+    kreprp[i] <- kreprp[i] + logpowerprior(rpp, a0, historical, data.type, data.link,init_var) # not plugging in actual mcmc
 
     kreprp[i] <- kreprp[i] + partjo1
   }

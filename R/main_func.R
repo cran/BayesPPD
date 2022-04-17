@@ -21,20 +21,20 @@
 #' @param nMC (For normal data only) number of iterations (excluding burn-in samples) for the Gibbs sampler. The default is 10,000.
 #' @param nBI (For normal data only) number of burn-in samples for the Gibbs sampler. The default is 250.
 
-#' @inheritParams two.grp.random.a0 
-#' @inheritParams power.two.grp.fixed.a0 
-#' 
+#' @inheritParams two.grp.random.a0
+#' @inheritParams power.two.grp.fixed.a0
+#'
 #' @details The power prior is applied on the data of the control group only.
 #' Therefore, only summaries of the responses of the control group need to be entered.
-#' 
+#'
 #' If \code{data.type} is "Bernoulli", "Poisson" or "Exponential", a single response from the treatment group is assumed to follow Bern(\eqn{\mu_t}), Pois(\eqn{\mu_t}) or Exp(rate=\eqn{\mu_t}), respectively,
 #' where \eqn{\mu_t} is the mean of responses for the treatment group. The distributional assumptions for the control group data are analogous.
-#' 
+#'
 #' If \code{data.type} is "Bernoulli", the initial prior for \eqn{\mu_t} is beta(\code{prior.mu.t.shape1}, \code{prior.mu.t.shape2}).
 #' If \code{data.type} is "Poisson", the initial prior for \eqn{\mu_t} is Gamma(\code{prior.mu.t.shape1}, rate=\code{prior.mu.t.shape2}).
 #' If \code{data.type} is "Exponential", the initial prior for \eqn{\mu_t} is Gamma(\code{prior.mu.t.shape1}, rate=\code{prior.mu.t.shape2}).
 #' The initial priors used for the control group data are analogous.
-#' 
+#'
 #' If \code{data.type} is "Normal", the responses are assumed to follow \eqn{N(\mu_c, \tau^{-1})} where \eqn{\mu_c} is the mean of responses for the control group
 #' and \eqn{\tau} is the precision parameter. Each historical dataset \eqn{D_{0k}} is assumed to have a different precision parameter \eqn{\tau_k}.
 #' The initial prior for \eqn{\tau} is the Jeffery's prior, \eqn{\tau^{-1}}, and the initial prior for \eqn{\tau_k} is \eqn{\tau_k^{-1}}. The initial prior for the \eqn{\mu_c} is the uniform improper prior.
@@ -43,7 +43,7 @@
 #' @return If \code{data.type} is "Normal", posterior samples of \eqn{\mu_c}, \eqn{\tau} and \eqn{\tau_k}'s (if historical data is given) are returned.
 #' For all other data types, two scalars, \eqn{c_1} and \eqn{c_2}, are returned, representing the two parameters of the posterior distribution of \eqn{\mu_c}.
 #' For Bernoulli responses, the posterior distribution of \eqn{\mu_c} is beta(\eqn{c_1}, \eqn{c_2}).
-#' For Poisson responses, the posterior distribution of \eqn{\mu_c} is Gamma(\eqn{c_1}, \eqn{c_2}) where \eqn{c_2} is the rate parameter. 
+#' For Poisson responses, the posterior distribution of \eqn{\mu_c} is Gamma(\eqn{c_1}, \eqn{c_2}) where \eqn{c_2} is the rate parameter.
 #' For exponential responses, the posterior distribution of \eqn{\mu_c} is Gamma(\eqn{c_1}, \eqn{c_2}) where \eqn{c_2} is the rate parameter.
 #' @references Chen, Ming-Hui, et al. "Bayesian design of noninferiority trials for medical devices using historical data." Biometrics 67.3 (2011): 1163-1170.
 #' @seealso \code{\link{power.two.grp.fixed.a0}}
@@ -51,15 +51,15 @@
 #' data.type <- "Bernoulli"
 #' y.c <- 70
 #' n.c <- 100
-#' 
+#'
 #' # Simulate three historical datasets
 #' historical <- matrix(0, ncol=3, nrow=3)
 #' historical[1,] <- c(70, 100, 0.3)
 #' historical[2,] <- c(60, 100, 0.5)
 #' historical[3,] <- c(50, 100, 0.7)
-#' 
+#'
 #' set.seed(1)
-#' result <- two.grp.fixed.a0(data.type=data.type, y.c=y.c, n.c=n.c, historical=historical) 
+#' result <- two.grp.fixed.a0(data.type=data.type, y.c=y.c, n.c=n.c, historical=historical)
 #' @export
 two.grp.fixed.a0 <- function(data.type, y.c, n.c, v.c, historical=matrix(0,1,4), prior.mu.c.shape1=1, prior.mu.c.shape2=1, nMC=10000, nBI=250) {
   if(data.type == "Normal"){
@@ -100,7 +100,7 @@ two.grp.fixed.a0 <- function(data.type, y.c, n.c, v.c, historical=matrix(0,1,4),
 #' @param prior.mu.t.shape2 Second hyperparameter of the initial prior for \eqn{\mu_t}. The default is 1. Does not apply if \code{data.type} is "Normal".
 #' @param prior.mu.c.shape1 First hyperparameter of the initial prior for \eqn{\mu_c}. The default is 1. Does not apply if \code{data.type} is "Normal".
 #' @param prior.mu.c.shape2 Second hyperparameter of the initial prior for \eqn{\mu_c}. The default is 1. Does not apply if \code{data.type} is "Normal".
-#' @inheritParams power.glm.fixed.a0 
+#' @inheritParams power.glm.fixed.a0
 #'
 #'
 #' @details If \code{data.type} is "Bernoulli", "Poisson" or "Exponential", a single response from the treatment group is assumed to follow Bern(\eqn{\mu_t}), Pois(\eqn{\mu_t}) or Exp(rate=\eqn{\mu_t}), respectively,
@@ -193,10 +193,10 @@ power.two.grp.fixed.a0 <- function(data.type, n.t, n.c, historical=matrix(0,1,4)
 #'
 #' @param y Vector of responses.
 #' @param x Matrix of covariates. The first column should be the treatment indicator with 1 indicating treatment group. The number of rows should equal the length of the response vector \code{y}.
-#' @param current.data Logical value indicating whether current data is included. The default is TRUE. If FALSE, only historical data is included in the analysis, 
-#' and the posterior samples can be used as discrete approximation to the sampling prior in 
-#' 
-#' \code{\link{power.glm.fixed.a0}}. 
+#' @param current.data Logical value indicating whether current data is included. The default is TRUE. If FALSE, only historical data is included in the analysis,
+#' and the posterior samples can be used as discrete approximation to the sampling prior in
+#'
+#' \code{\link{power.glm.fixed.a0}}.
 #' @inheritParams power.glm.fixed.a0
 #'
 #' @details If \code{data.type} is "Normal", the response \eqn{y_i} is assumed to follow \eqn{N(x_i'\beta, \tau^{-1})} where \eqn{x_i} is the vector of covariates for subject \eqn{i}.
@@ -204,7 +204,7 @@ power.two.grp.fixed.a0 <- function(data.type, n.t, n.c, historical=matrix(0,1,4)
 #' The initial prior for \eqn{\tau} is the Jeffery's prior, \eqn{\tau^{-1}}, and the initial prior for \eqn{\tau_k} is \eqn{\tau_k^{-1}}.
 #' The initial prior for \eqn{\beta} is the uniform improper prior. Posterior samples are obtained through Gibbs sampling.
 #'
-#' For all other data types, posterior samples are obtained through slice sampling. The initial prior for \eqn{\beta} is the uniform improper prior.
+#' For all other data types, posterior samples are obtained through slice sampling. 
 #' The default lower limits for the parameters are -100. The default upper limits
 #' for the parameters are 100. The default slice widths for the parameters are 1.
 #' The defaults may not be appropriate for all situations, and the user can specify the appropriate limits
@@ -256,7 +256,7 @@ glm.fixed.a0 <- function(data.type, data.link, y=0, n=1, x=matrix(), historical=
   if(data.type == "Normal"){
     return(glm_fixed_a0_normal(y, x, historical, nMC, nBI))
   }else{
-    return(glm_fixed_a0(data.type, data.link, y, n, x, historical, lower.limits, upper.limits, slice.widths, nMC, nBI, current.data))
+    return(glm_fixed_a0(data.type, data.link, y, n, x, historical, 0, lower.limits, upper.limits, slice.widths, nMC, nBI, current.data))
   }
 }
 
@@ -275,11 +275,11 @@ glm.fixed.a0 <- function(data.type, data.link, y=0, n=1, x=matrix(), historical=
 #' \item \code{x0} is a matrix of covariates. \code{x0} should NOT have the treatment indicator. Apart from missing the treatment indicator, \code{x0} should have the same set of covariates in the same order as \code{x}.
 #' \item \code{a0} is a number between 0 and 1 indicating the discounting parameter value for that historical dataset.
 #' }
-#' For binomial data, an additional element \code{n0} is required. 
+#' For binomial data, an additional element \code{n0} is required.
 #' \itemize{
 #' \item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
 #' }
-#' 
+#'
 #' @param x.samples Matrix of possible values of covariates from which covariate vectors are sampled with replacement. Only applies when there is no historical dataset. The matrix should not include the treatment indicator.
 #' @param samp.prior.beta Matrix of possible values of \eqn{\beta} to sample (with replacement) from. Each row is a possible \eqn{\beta} vector (a realization from the sampling prior for \eqn{\beta}), where the first element is the coefficient for the intercept and the second element is the coefficient for the treatment indicator.
 #' The length of the vector should be equal to the total number of parameters, i.e. P+2 where P is the number of columns of \code{x0} in \code{historical}.
@@ -293,10 +293,10 @@ glm.fixed.a0 <- function(data.type, data.link, y=0, n=1, x=matrix(), historical=
 #' @param delta Prespecified constant that defines the boundary of the null hypothesis. The default is zero.
 #' @param gamma Posterior probability threshold for rejecting the null. The null hypothesis is rejected if posterior probability is greater \code{gamma}. The default is 0.95.
 #' @param N Number of simulated datasets to generate. The default is 10,000.
-#' @param approximate Logical value indicating whether the approximation method based on asymptotic theory is used. The default is FALSE. If TRUE, an approximation method based on the Newton-Raphson algorithm (assuming canonical links) is used. 
-#' This feature helps users quickly obtain a rough estimate of the sample size required for the desired level of power or type I error rate. 
-#' @param nNR (Only applies if \code{approximate=TRUE}) number of iterations of the Newton-Raphson algorithm. The default value is 10,000. 
-#' @param tol (Only applies if \code{approximate=TRUE}) absolute tolerance of the Newton-Raphson algorithm. The default value is 0.00001. 
+#' @param approximate Logical value indicating whether the approximation method based on asymptotic theory is used. The default is FALSE. If TRUE, an approximation method based on the Newton-Raphson algorithm (assuming canonical links) is used.
+#' This feature helps users quickly obtain a rough estimate of the sample size required for the desired level of power or type I error rate.
+#' @param nNR (Only applies if \code{approximate=TRUE}) number of iterations of the Newton-Raphson algorithm. The default value is 10,000.
+#' @param tol (Only applies if \code{approximate=TRUE}) absolute tolerance of the Newton-Raphson algorithm. The default value is 0.00001.
 #'
 #' @details If historical datasets are provided, the algorithm samples with replacement from the historical covariates to construct the simulated datasets.
 #' Otherwise, the algorithm samples with replacement from \code{x.samples}. One of the arguments \code{historical} and \code{x.samples} must be provided.
@@ -309,7 +309,7 @@ glm.fixed.a0 <- function(data.type, data.link, y=0, n=1, x=matrix(), historical=
 #' The initial prior for \eqn{\tau} is the Jeffery's prior, \eqn{\tau^{-1}}, and the initial prior for \eqn{\tau_k} is \eqn{\tau_k^{-1}}.
 #' The initial prior for \eqn{\beta} is the uniform improper prior. Posterior samples are obtained through Gibbs sampling.
 #'
-#' For all other data types, posterior samples are obtained through slice sampling. The initial prior for \eqn{\beta} is the uniform improper prior.
+#' For all other data types, posterior samples are obtained through slice sampling. 
 #' The default lower limits for the parameters are -100. The default upper limits
 #' for the parameters are 100. The default slice widths for the parameters are 1.
 #' The defaults may not be appropriate for all situations, and the user can specify the appropriate limits
@@ -317,10 +317,10 @@ glm.fixed.a0 <- function(data.type, data.link, y=0, n=1, x=matrix(), historical=
 #'
 #' If a sampling prior with support in the null space is used, the value returned is a Bayesian type I error rate.
 #' If a sampling prior with support in the alternative space is used, the value returned is a Bayesian power.
-#' 
-#' Because running \code{power.glm.fixed.a0()} and \code{power.glm.random.a0()} is potentially time-consuming, 
-#' an approximation method based on asymptotic theory has been implemented for the model with fixed \eqn{a_0}. 
-#' In order to attain the exact sample size needed for the desired power, the user can start with the approximation 
+#'
+#' Because running \code{power.glm.fixed.a0()} and \code{power.glm.random.a0()} is potentially time-consuming,
+#' an approximation method based on asymptotic theory has been implemented for the model with fixed \eqn{a_0}.
+#' In order to attain the exact sample size needed for the desired power, the user can start with the approximation
 #' to get a rough estimate of the sample size required, using \code{power.glm.fixed.a0()} with \code{approximate=TRUE}.
 #'
 #' @return Power or type I error is returned, depending on the sampling prior used. If \code{data.type} is "Normal", average posterior means of \eqn{\beta}, \eqn{\tau} and \eqn{\tau_k}'s (if historical data is given) are also returned.
@@ -375,7 +375,7 @@ power.glm.fixed.a0 <- function(data.type, data.link="", data.size, n=1, historic
                                      delta, gamma,
                                      nNR, tol, N))
   }else{
-    return(power_glm_fixed_a0(data.type, data.link, data.size, n, historical, x.samples, 
+    return(power_glm_fixed_a0(data.type, data.link, data.size, n, historical, x.samples,
                               samp.prior.beta, samp.prior.var, lower.limits, upper.limits, slice.widths, delta, gamma, nMC, nBI, N, TRUE))
   }
 }
@@ -404,8 +404,8 @@ power.glm.fixed.a0 <- function(data.type, data.link="", data.size, n=1, historic
 #' @param lower.limits Vector of lower limits for parameters to be used by the slice sampler. The length of the vector should be equal to the number of historical datasets. The default is 0 for all parameters (may not be appropriate for all situations).
 #' @param upper.limits Vector of upper limits for parameters to be used by the slice sampler. The length of the vector should be equal to the number of historical datasets. The default is 1 for all parameters (may not be appropriate for all situations).
 #' @param slice.widths Vector of initial slice widths used by the slice sampler. The length of the vector should be equal to the number of historical datasets. The default is 0.1 for all parameter (may not be appropriate for all situations).
-#' @param prior.a0.shape1 First shape parameter of the beta prior for \eqn{a_0}. The default is 1.
-#' @param prior.a0.shape2 Second shape parameter of the beta prior for \eqn{a_0}. The default is 1.
+#' @param prior.a0.shape1 Vector of the first shape parameters of the independent beta priors for \eqn{a_0}. The length of the vector should be equal to the number of historical datasets. The default is a vector of one's.
+#' @param prior.a0.shape2 Vector of the second shape parameters of the independent beta priors for \eqn{a_0}. The length of the vector should be equal to the number of historical datasets. The default is a vector of one's.
 #'
 #' @inheritParams power.two.grp.fixed.a0
 #' @inheritParams power.glm.fixed.a0
@@ -424,7 +424,7 @@ power.glm.fixed.a0 <- function(data.type, data.link="", data.size, n=1, historic
 #' The initial prior for \eqn{\tau} is the Jeffery's prior, \eqn{\tau^{-1}}. The initial prior for the \eqn{\mu_c} is the uniform improper prior.
 #' Posterior samples of \eqn{\mu_c} and \eqn{\tau} are obtained through Gibbs sampling.
 #'
-#' Posterior samples of \eqn{a_0} are obtained through slice sampling. The default lower limits for the parameters are 0. The default upper limits
+#' Independent beta(\code{prior.a0.shape1},\code{prior.a0.shape1}) priors are used for \eqn{a_0}. Posterior samples of \eqn{a_0} are obtained through slice sampling. The default lower limits for the parameters are 0. The default upper limits
 #' for the parameters are 1.  The default slice widths for the parameters are 0.1.
 #' The defaults may not be appropriate for all situations, and the user can specify the appropriate limits
 #' and slice width for each parameter.
@@ -451,7 +451,7 @@ power.glm.fixed.a0 <- function(data.type, data.link="", data.size, n=1, historic
 #' lower.limits <- rep(0, 3) # The dimension is the number of historical datasets
 #' upper.limits <- rep(1, 3)
 #' slice.widths <- rep(0.1, 3)
-#' 
+#'
 #' set.seed(1)
 #' result <- two.grp.random.a0(data.type=data.type, y.c=y.c, n.c=n.c, historical=historical,
 #'                             lower.limits=lower.limits, upper.limits=upper.limits,
@@ -459,7 +459,7 @@ power.glm.fixed.a0 <- function(data.type, data.link="", data.size, n=1, historic
 #' @export
 two.grp.random.a0 <- function(data.type, y.c, n.c, v.c, historical,
                         prior.mu.c.shape1=1,prior.mu.c.shape2=1,
-                        prior.a0.shape1=1,prior.a0.shape2=1,
+                        prior.a0.shape1=rep(1,10),prior.a0.shape2=rep(1,10),
                         lower.limits=rep(0, 10), upper.limits=rep(1, 10),
                         slice.widths=rep(0.1, 10), nMC=10000, nBI=250) {
 
@@ -501,7 +501,7 @@ two.grp.random.a0 <- function(data.type, y.c, n.c, v.c, historical,
 #' The initial prior for \eqn{\tau} is the Jeffery's prior, \eqn{\tau^{-1}}. The initial prior for the \eqn{\mu_c} is the uniform improper prior.
 #' Posterior samples of \eqn{\mu_c} and \eqn{\tau} are obtained through Gibbs sampling.
 #'
-#' Posterior samples of \eqn{a_0} are obtained through slice sampling. The default lower limits for the parameters are 0. The default upper limits
+#' Independent beta(\code{prior.a0.shape1},\code{prior.a0.shape1}) priors are used for \eqn{a_0}. Posterior samples of \eqn{a_0} are obtained through slice sampling. The default lower limits for the parameters are 0. The default upper limits
 #' for the parameters are 1.  The default slice widths for the parameters are 0.1.
 #' The defaults may not be appropriate for all situations, and the user can specify the appropriate limits
 #' and slice width for each parameter.
@@ -553,7 +553,7 @@ power.two.grp.random.a0 <- function(data.type, n.t, n.c, historical,
                               samp.prior.var.t=0, samp.prior.var.c=0,
                               prior.mu.t.shape1=1,prior.mu.t.shape2=1,
                               prior.mu.c.shape1=1,prior.mu.c.shape2=1,
-                              prior.a0.shape1=1,prior.a0.shape2=1,
+                              prior.a0.shape1=rep(1,10),prior.a0.shape2=rep(1,10),
                               lower.limits=rep(0, 10), upper.limits=rep(1, 10),
                               slice.widths=rep(0.1, 10), delta=0, gamma=0.95,
                               nMC=10000, nBI=250, N=10000) {
@@ -580,10 +580,11 @@ power.two.grp.random.a0 <- function(data.type, n.t, n.c, historical,
 #' \item \code{y0} is a vector of responses.
 #' \item \code{x0} is a matrix of covariates. \code{x0} should NOT have the treatment indicator. Apart from missing the treatent/control indicator, \code{x0} should have the same set of covariates in the same order as \code{x}.
 #' }
-#' For binomial data, an additional element \code{n0} is required. 
+#' For binomial data, an additional element \code{n0} is required.
 #' \itemize{
 #' \item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
 #' }
+#' @param prior.beta.var Vector of variances of the independent normal initial priors on \eqn{\beta} with mean zero. The length of the vector should be equal to the length of \eqn{\beta}. The default variance is 10.   
 #' @param lower.limits Vector of lower limits for parameters to be used by the slice sampler. If \code{data.type} is "Normal", slice sampling is used for \eqn{a_0}, and the length of the vector should be equal to the number of historical datasets.
 #' For all other data types, slice sampling is used for \eqn{\beta} and \eqn{a_0}. The first P+1 elements apply to the sampling of \eqn{\beta} and the rest apply to the sampling of \eqn{a_0}.
 #' The length of the vector should be equal to the sum of the total number of parameters (i.e. P+1 where P is the number of covariates) and the number of historical datasets.
@@ -608,10 +609,10 @@ power.two.grp.random.a0 <- function(data.type, n.t, n.c, historical,
 #' If \code{data.type} is "Normal", the response \eqn{y_i} is assumed to follow \eqn{N(x_i'\beta, \tau^{-1})} where \eqn{x_i} is the vector of covariates for subject \eqn{i}.
 #' Historical datasets are assumed to have the same precision parameter as the current dataset for computational simplicity.
 #' The initial prior for \eqn{\tau} is the Jeffery's prior, \eqn{\tau^{-1}}.
-#' The initial prior for \eqn{\beta} is the uniform improper prior. Posterior samples for \eqn{\beta} and \eqn{\tau} are obtained through Gibbs sampling.
-#' Posterior samples for \eqn{a_0} are obtained through slice sampling.
+#' Independent normal priors with mean zero and variance \code{prior.beta.var} are used for \eqn{\beta}. Posterior samples for \eqn{\beta} and \eqn{\tau} are obtained through Gibbs sampling.
+#' Independent beta(\code{prior.a0.shape1}, \code{prior.a0.shape1}) priors are used for \eqn{a_0}. Posterior samples for \eqn{a_0} are obtained through slice sampling.
 #'
-#' For all other data types, posterior samples are obtained through slice sampling. The initial prior for \eqn{\beta} is the uniform improper prior.
+#' For all other data types, posterior samples are obtained through slice sampling.
 #' The default lower limits for the parameters are -100. The default upper limits
 #' for the parameters are 100. The default slice widths for the parameters are 0.1.
 #' The defaults may not be appropriate for all situations, and the user can specify the appropriate limits
@@ -619,8 +620,8 @@ power.two.grp.random.a0 <- function(data.type, n.t, n.c, historical,
 #'
 #'
 #' @return If \code{data.type} is "Normal", posterior samples of \eqn{\beta}, \eqn{\tau} and \eqn{a_0} are returned.
-#' For all other data types, posterior samples of \eqn{\beta} and \eqn{a_0} are returned. 
-#' The first column of the matrix of posterior samples of \eqn{\beta} contains posterior samples of the intercept. 
+#' For all other data types, posterior samples of \eqn{\beta} and \eqn{a_0} are returned.
+#' The first column of the matrix of posterior samples of \eqn{\beta} contains posterior samples of the intercept.
 #' The second column contains posterior samples of \eqn{\beta_1}, the parameter for the treatment indicator.
 #' @references Neal, Radford M. Slice sampling. Ann. Statist. 31 (2003), no. 3, 705--767.
 #' @seealso \code{\link{normalizing.constant}} and \code{\link{power.glm.random.a0}}
@@ -646,14 +647,14 @@ power.two.grp.random.a0 <- function(data.type, n.t, n.c, historical,
 #'                         x0=matrix(rnorm(p*n_total),ncol=p,nrow=n_total)))
 #'
 #' # Please see function "normalizing.constant" for how to obtain a0.coefficients
-#' # Here, suppose one-degree polynomial regression is chosen by the "normalizing.constant" 
-#' # function. The coefficients are obtained for the intercept, a0_1 and a0_2. 
+#' # Here, suppose one-degree polynomial regression is chosen by the "normalizing.constant"
+#' # function. The coefficients are obtained for the intercept, a0_1 and a0_2.
 #' a0.coefficients <- c(1, 0.5, -1)
 #'
 #' # Set parameters of the slice sampler
-#' # The dimension is the number of columns of x plus 1 (intercept) 
+#' # The dimension is the number of columns of x plus 1 (intercept)
 #' # plus the number of historical datasets
-#' lower.limits <- rep(-100, 7) 
+#' lower.limits <- rep(-100, 7)
 #' upper.limits <- rep(100, 7)
 #' slice.widths <- rep(0.1, 7)
 #'
@@ -665,15 +666,15 @@ power.two.grp.random.a0 <- function(data.type, n.t, n.c, historical,
 #'                         slice.widths=slice.widths, nMC=nMC, nBI=nBI)
 #'
 #' @export
-glm.random.a0 <- function(data.type, data.link, y, n=1, x, historical,
-                         prior.a0.shape1=1, prior.a0.shape2=1, a0.coefficients,
+glm.random.a0 <- function(data.type, data.link, y, n=1, x, historical, prior.beta.var=rep(10,50),
+                         prior.a0.shape1=rep(1,10), prior.a0.shape2=rep(1,10), a0.coefficients,
                          lower.limits=rep(-100, 50), upper.limits=rep(100, 50),
                          slice.widths=rep(0.1, 50), nMC=10000, nBI=250) {
 
   if(data.type == "Normal"){
     return(glm_random_a0_normal(y, x, historical, prior.a0.shape1, prior.a0.shape2, lower.limits, upper.limits, slice.widths, nMC, nBI))
   }else{
-    return(glm_random_a0(data.type, data.link, y, n, x, historical,
+    return(glm_random_a0(data.type, data.link, y, n, x, historical, prior.beta.var, 
                          prior.a0.shape1, prior.a0.shape2, a0.coefficients,
                          lower.limits, upper.limits,
                          slice.widths, nMC, nBI))
@@ -697,10 +698,10 @@ glm.random.a0 <- function(data.type, data.link, y, n=1, x, historical,
 #' If \code{data.type} is "Normal", the response \eqn{y_i} is assumed to follow \eqn{N(x_i'\beta, \tau^{-1})} where \eqn{x_i} is the vector of covariates for subject \eqn{i}.
 #' Historical datasets are assumed to have the same precision parameter as the current dataset for computational simplicity.
 #' The initial prior for \eqn{\tau} is the Jeffery's prior, \eqn{\tau^{-1}}.
-#' The initial prior for \eqn{\beta} is the uniform improper prior. Posterior samples for \eqn{\beta} and \eqn{\tau} are obtained through Gibbs sampling.
-#' Posterior samples for \eqn{a_0} are obtained through slice sampling.
+#' Independent normal priors with mean zero and variance \code{prior.beta.var} are used for \eqn{\beta}. Posterior samples for \eqn{\beta} and \eqn{\tau} are obtained through Gibbs sampling.
+#' Independent beta(\code{prior.a0.shape1}, \code{prior.a0.shape1}) priors are used for \eqn{a_0}. Posterior samples for \eqn{a_0} are obtained through slice sampling.
 #'
-#' For all other data types, posterior samples are obtained through slice sampling. The initial prior for \eqn{\beta} is the uniform improper prior.
+#' For all other data types, posterior samples are obtained through slice sampling. 
 #' The default lower limits for the parameters are -100. The default upper limits
 #' for the parameters are 100. The default slice widths for the parameters are 0.1.
 #' The defaults may not be appropriate for all situations, and the user can specify the appropriate limits
@@ -709,13 +710,13 @@ glm.random.a0 <- function(data.type, data.link, y, n=1, x, historical,
 #' If a sampling prior with support in the null space is used, the value returned is a Bayesian type I error rate.
 #' If a sampling prior with support in the alternative space is used, the value returned is a Bayesian power.
 #'
-#' Because running \code{power.glm.fixed.a0()} and \code{power.glm.random.a0()} is potentially time-consuming, 
-#' an approximation method based on asymptotic theory has been implemented for the model with fixed \eqn{a_0}. 
-#' In order to attain the exact sample size needed for the desired power, the user can start with the approximation 
+#' Because running \code{power.glm.fixed.a0()} and \code{power.glm.random.a0()} is potentially time-consuming,
+#' an approximation method based on asymptotic theory has been implemented for the model with fixed \eqn{a_0}.
+#' In order to attain the exact sample size needed for the desired power, the user can start with the approximation
 #' to get a rough estimate of the sample size required, using \code{power.glm.fixed.a0()} with \code{approximate=TRUE}.
-#' 
+#'
 #' @return Power or type I error is returned, depending on the sampling prior used. If \code{data.type} is "Normal", average posterior means of \eqn{\beta}, \eqn{\tau} and \eqn{a_0} are also returned.
-#' For all other data types, average posterior means of \eqn{\beta} and \eqn{a_0} are also returned. The first element of the average posterior means of \eqn{\beta} is the average posterior mean of the intercept. 
+#' For all other data types, average posterior means of \eqn{\beta} and \eqn{a_0} are also returned. The first element of the average posterior means of \eqn{\beta} is the average posterior mean of the intercept.
 #' The second element is the average posterior mean of \eqn{\beta_1}, the parameter for the treatment indicator.
 #' @references Chen, Ming-Hui, et al. "Bayesian design of noninferiority trials for medical devices using historical data." Biometrics 67.3 (2011): 1163-1170.
 #'
@@ -745,8 +746,8 @@ glm.random.a0 <- function(data.type, data.link, y, n=1, x, historical,
 #' samp.prior.beta <- cbind(rnorm(100), samp.prior.beta1, matrix(rnorm(100*p), 100, p))
 #'
 #' # Please see function "normalizing.constant" for how to obtain a0.coefficients
-#' # Here, suppose one-degree polynomial regression is chosen by the "normalizing.constant" 
-#' # function. The coefficients are obtained for the intercept, a0_1 and a0_2. 
+#' # Here, suppose one-degree polynomial regression is chosen by the "normalizing.constant"
+#' # function. The coefficients are obtained for the intercept, a0_1 and a0_2.
 #' a0.coefficients <- c(1, 0.5, -1)
 #'
 #' nMC <- 100 # nMC should be larger in practice
@@ -759,8 +760,8 @@ glm.random.a0 <- function(data.type, data.link, y, n=1, x, historical,
 #'
 #' @export
 power.glm.random.a0 <- function(data.type, data.link, data.size, n=1, historical,
-                                samp.prior.beta, samp.prior.var,
-                                prior.a0.shape1=1, prior.a0.shape2=1, a0.coefficients,
+                                samp.prior.beta, samp.prior.var, prior.beta.var=rep(10,50),
+                                prior.a0.shape1=rep(1,10), prior.a0.shape2=rep(1,10), a0.coefficients,
                                 lower.limits=rep(-100, 50), upper.limits=rep(100, 50),slice.widths=rep(0.1, 50),
                                 delta=0, gamma=0.95, nMC=10000, nBI=250, N=10000) {
 
@@ -772,7 +773,7 @@ power.glm.random.a0 <- function(data.type, data.link, data.size, n=1, historical
                                       delta, gamma, nMC, nBI, N))
   }else{
     return(power_glm_random_a0(data.type, data.link, data.size, n, historical,
-                               samp.prior.beta, prior.a0.shape1, prior.a0.shape2,
+                               samp.prior.beta, prior.beta.var, prior.a0.shape1, prior.a0.shape2,
                                a0.coefficients, lower.limits, upper.limits, slice.widths,
                                delta, gamma, nMC, nBI, N))
   }

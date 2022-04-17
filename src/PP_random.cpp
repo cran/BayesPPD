@@ -26,8 +26,8 @@ using namespace Rcpp;
     double b_01;
     double b_02;
     // beta prior for a_0 hyperparameters;
-    double c_1;
-    double c_2;
+    arma::vec c_1;
+    arma::vec c_2;
 
     // slice sampling containers;
     arma::vec lower_limits;
@@ -41,7 +41,7 @@ using namespace Rcpp;
     random_a0(std::string dType0, double y0, double n0, double v0, arma::vec y_normal0,
               arma::mat x_normal0, arma::mat historical0,
               Rcpp::List historical_normal0,
-              double b_010, double b_020, double c_10, double c_20,
+              double b_010, double b_020, arma::vec c_10, arma::vec c_20,
               arma::vec & lower_limits0, arma::vec & upper_limits0,
               arma::vec & slice_widths0);
 
@@ -55,7 +55,7 @@ using namespace Rcpp;
 random_a0::random_a0(std::string dType0, double y0, double n0, double v0,
                      arma::vec y_normal0, arma::mat x_normal0, arma::mat historical0,
                      Rcpp::List historical_normal0,
-                     double b_010, double b_020, double c_10, double c_20,
+                     double b_010, double b_020, arma::vec c_10, arma::vec c_20,
                      arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0)
 {
 
@@ -195,7 +195,7 @@ double random_a0::logFC(const arma::vec & parm0, const int & p)
 
   }
 
-  return log_C_1 - log_C_0 + (c_1-1)*log(parm0[p]) + (c_2-1)*log(1-parm0[p]);
+  return log_C_1 - log_C_0 + (c_1[p]-1)*log(parm0[p]) + (c_2[p]-1)*log(1-parm0[p]);
 
 }
 
@@ -296,7 +296,7 @@ double random_a0::logFC(const arma::vec & parm0, const int & p)
 // and mu_c (the distribution of mu_c given a_0 has closed form solutions) for Bernoulli, Poisson and Exponential responses.
 // [[Rcpp::export]]
 Rcpp::List two_grp_random_a0(std::string & dType0, double & y0, double & n0, arma::mat & historical0,
-                            double & b_010, double & b_020, double & c_10, double & c_20,
+                            double & b_010, double & b_020, arma::vec & c_10, arma::vec & c_20,
                             arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,
                             int nMC, int nBI)
 {
@@ -372,7 +372,7 @@ Rcpp::List two_grp_random_a0(std::string & dType0, double & y0, double & n0, arm
 // [[Rcpp::export]]
 Rcpp::List two_grp_random_a0_normal(double y0, double n0, double v0,
                                     arma::mat historical0,
-                                    double & c_10, double & c_20,
+                                    arma::vec & c_10, arma::vec & c_20,
                                     arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,
                                     int nMC, int nBI) {
   Rcpp::RNGScope scope;
@@ -469,7 +469,7 @@ Rcpp::List two_grp_random_a0_normal(double y0, double n0, double v0,
 // [[Rcpp::export]]
 Rcpp::List glm_random_a0_normal(arma::vec y_normal0, arma::mat x_normal0,
                                 Rcpp::List historical_normal0,
-                                double & c_10, double & c_20,
+                                arma::vec & c_10, arma::vec & c_20,
                                 arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,
                                 int nMC, int nBI) {
   Rcpp::RNGScope scope;
@@ -587,7 +587,7 @@ Rcpp::List glm_random_a0_normal(arma::vec y_normal0, arma::mat x_normal0,
 // [[Rcpp::export]]
 Rcpp::List power_two_grp_random_a0(std::string & dType0, double & n_t, double & n0, arma::mat & historical0,
                                    arma::vec & mu_t_prior_samps, arma::vec & mu_c_prior_samps, arma::vec & var_t_prior_samps, arma::vec & var_c_prior_samps,
-                                   double & b_t1, double & b_t2, double & b_010, double & b_020, double & c_10, double & c_20,
+                                   double & b_t1, double & b_t2, double & b_010, double & b_020, arma::vec & c_10, arma::vec & c_20,
                                    arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,
                                    double & delta, double & gamma,
                                    int & nMC, int & nBI, int & N) {
@@ -754,7 +754,7 @@ Rcpp::List power_two_grp_random_a0(std::string & dType0, double & n_t, double & 
 // [[Rcpp::export]]
 Rcpp::List power_glm_random_a0_normal(double & n_total, Rcpp::List & historical0,
                                       arma::mat & beta_c_prior_samps, arma::vec & var_prior_samps,
-                                      double & c_10, double & c_20,
+                                      arma::vec & c_10, arma::vec & c_20,
                                       arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,
                                       double & delta, double & gamma,
                                       int nMC, int nBI, int N) {

@@ -9,6 +9,7 @@ normalizing.constant(
   historical,
   data.type,
   data.link,
+  prior.beta.var = rep(10, 50),
   lower.limits = rep(-100, 50),
   upper.limits = rep(100, 50),
   slice.widths = rep(1, 50),
@@ -29,9 +30,11 @@ For binomial data, an additional element \code{n0} is required.
 \item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
 }}
 
-\item{data.type}{Character string specifying the type of response. The options are "Normal", "Bernoulli", "Binomial", "Poisson" and "Exponential".}
+\item{data.type}{Character string specifying the type of response. The options are "Bernoulli", "Binomial", "Poisson" and "Exponential".}
 
 \item{data.link}{Character string specifying the link function. The options are "Logistic", "Probit", "Log", "Identity-Positive", "Identity-Probability" and "Complementary Log-Log". Does not apply if \code{data.type} is "Normal".}
+
+\item{prior.beta.var}{Vector of variances of the independent normal initial priors on \eqn{\beta} with mean zero. The length of the vector should be equal to the length of \eqn{\beta}. The default variance is 10.}
 
 \item{lower.limits}{Vector of lower limits for parameters to be used by the slice sampler. The length of the vector should be equal to the total number of parameters, i.e. P+1 where P is the number of covariates. The default is -100 for all parameters (may not be appropriate for all situations). Does not apply if \code{data.type} is "Normal".}
 

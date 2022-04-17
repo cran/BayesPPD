@@ -27,11 +27,12 @@ public:
   int P;
 
 
+  arma::vec init_var;
   arma::vec coef;
 
   // beta prior for a_0 hyperparameters;
-  double c_1;
-  double c_2;
+  arma::vec c_1;
+  arma::vec c_2;
 
 
   arma::vec                lower_limits;
@@ -41,14 +42,16 @@ public:
 
   // public member functions;
   random_a0_glm(std::string & dType0, std::string & dLink0, arma::vec & y0, arma::vec & n0, arma::mat & x0, Rcpp::List & historical0,
-           double & c_1,double & c_2,arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0, arma::vec & coef0);
+           arma::vec init_var, arma::vec & c_1, arma::vec & c_2,arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0, arma::vec & coef0);
+
 
   double logFC(const arma::vec & parm0, const int & p);
 
 };
 
 random_a0_glm::random_a0_glm(	std::string & dType0, std::string & dLink0, arma::vec & y0, arma::vec & n0, arma::mat & x0, Rcpp::List & historical0,
-                    double & c_10,double & c_20, arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0, arma::vec & coef0)
+                              arma::vec init_var0, arma::vec & c_10, arma::vec & c_20, arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0, arma::vec & coef0)
+
 {
 
   dType = dType0;
@@ -65,6 +68,7 @@ random_a0_glm::random_a0_glm(	std::string & dType0, std::string & dLink0, arma::
 
   coef = coef0;
 
+  init_var = init_var0;
   c_1 = c_10;
   c_2 = c_20;
 
@@ -85,6 +89,8 @@ double random_a0_glm::logFC(const arma::vec & parm0, const int & p)
   arma::vec beta0 = parm0.subvec(0,P-1);
   arma::vec mean;
   arma::vec a0_vec = parm0.subvec(P, parm0.size()-1);
+  
+  
 
   arma::uvec ind;
   ind << 0;
@@ -109,9 +115,13 @@ double random_a0_glm::logFC(const arma::vec & parm0, const int & p)
   // compute likelihood contribution;
   double lp = 0;
 
-  if ((dType=="Bernoulli") | (dType=="Binomial"))	{lp += sum( y % log(mean) + (n-y) % log(1-mean) );}
+  if ((dType=="Bernoulli") || (dType=="Binomial"))	{lp += sum( y % log(mean) + (n-y) % log(1-mean) );}
   if (dType=="Poisson")	{ lp += sum(  y % log(mean) - mean );}
   if (dType=="Exponential")	{ lp += sum(  log(mean) - y % mean );}
+
+  // add prior
+  lp +=  R::dnorm(beta0[p], 0, sqrt(init_var[p]), TRUE);
+
 
 
 
@@ -126,7 +136,7 @@ double random_a0_glm::logFC(const arma::vec & parm0, const int & p)
       double a0 = a0_vec[i];
       arma::vec n_h;
       n_h.zeros();
-      if (dType=="Bernoulli") {n_h.resize(y_h.size()); n_h.ones();} 
+      if (dType=="Bernoulli") {n_h.resize(y_h.size()); n_h.ones();}
       if (dType=="Binomial") {n_h = Rcpp::as<arma::vec>(dat["n0"]);}
 
 
@@ -144,7 +154,7 @@ double random_a0_glm::logFC(const arma::vec & parm0, const int & p)
 
 
 
-      if ((dType=="Bernoulli") | (dType=="Binomial")) {lp += a0 * sum( y_h % log(mean_h) + (n_h - y_h) % log(1-mean_h) );}
+      if ((dType=="Bernoulli") || (dType=="Binomial")) {lp += a0 * sum( y_h % log(mean_h) + (n_h - y_h) % log(1-mean_h) );}
       if (dType=="Poisson")	{ lp += a0 * sum( y_h % log(mean_h) - mean_h );}
       if (dType=="Exponential")	{lp += a0 * sum( log(mean_h) - y_h % mean_h );}
 
@@ -164,7 +174,7 @@ double random_a0_glm::logFC(const arma::vec & parm0, const int & p)
 
     double f_a0 = sum(vec % coef);
 
-    lp += (c_1-1)*log(parm0[p]) + (c_2-1)*log(1-parm0[p]) - f_a0;
+    lp += (c_1[p-P]-1)*log(parm0[p]) + (c_2[p-P]-1)*log(1-parm0[p]) - f_a0;
 
   }
 
@@ -255,12 +265,12 @@ void slice( arma::vec & parms, random_a0_glm & b)
   }
 }
 
-// This function generates posterior samples of beta, and a_0 
+// This function generates posterior samples of beta, and a_0
 // using slice sampling for GLMs with Bernoulli, Poisson and Exponential responses.
 // The normalized power prior is used.
 // [[Rcpp::export]]
 Rcpp::List glm_random_a0(std::string & dType0, std::string & dLink0, arma::vec & y0, arma::vec & n0, arma::mat & x0, Rcpp::List & historical0,
-                   double & c_10,double & c_20, arma::vec & coef0, arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,
+                   arma::vec & init_var0, arma::vec & c_10, arma::vec & c_20, arma::vec & coef0, arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,
                    int nMC, int nBI)
 {
 
@@ -274,7 +284,7 @@ Rcpp::List glm_random_a0(std::string & dType0, std::string & dLink0, arma::vec &
   int P = x0.n_cols;
 
   // declare regression object and set values;
-  random_a0_glm b(dType0,dLink0,y0,n0,x0,historical0,c_10,c_20,lower_limits0,upper_limits0,slice_widths0,coef0);
+  random_a0_glm b(dType0,dLink0,y0,n0,x0,historical0,init_var0,c_10,c_20,lower_limits0,upper_limits0,slice_widths0,coef0);
 
   // sample betas and alphas;
   arma::mat samples(nMC, P+historical0.size());
@@ -307,10 +317,10 @@ Rcpp::List glm_random_a0(std::string & dType0, std::string & dLink0, arma::vec &
 
 // This function performs sample size determination for GLMs using the normalized power prior
 // for Bernoulli, Poisson and Exponential responses.
-// This function calls glm_random_a0() to obtain posterior samples of a_0 and beta. 
+// This function calls glm_random_a0() to obtain posterior samples of a_0 and beta.
 // [[Rcpp::export]]
 Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, double & n_total, arma::vec & n0, Rcpp::List & historical0,
-                               arma::mat & beta_c_prior_samps, double & c_10, double & c_20, arma::vec & coef0,
+                               arma::mat & beta_c_prior_samps, arma::vec & init_var0, arma::vec & c_10, arma::vec & c_20, arma::vec & coef0,
                                arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,
                               double & delta, double & gamma,
                               int nMC, int nBI, int N) {
@@ -374,7 +384,7 @@ Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, doubl
 
     arma::mat beta_samps(nMC,x_s.n_cols);
 
-    Rcpp::List lis = glm_random_a0(dType0, dLink0, y_s, n0, x_sub, historical0, c_10, c_20, coef0,
+    Rcpp::List lis = glm_random_a0(dType0, dLink0, y_s, n0, x_sub, historical0, init_var0, c_10, c_20, coef0,
                                      lower_limits0, upper_limits0, slice_widths0,
                                      nMC, nBI);
 
@@ -422,4 +432,7 @@ Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, doubl
     Rcpp::Named("power/type I error")    = res
   );
 }
+
+
+
 

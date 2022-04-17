@@ -11,8 +11,9 @@ glm.random.a0(
   n = 1,
   x,
   historical,
-  prior.a0.shape1 = 1,
-  prior.a0.shape2 = 1,
+  prior.beta.var = rep(10, 50),
+  prior.a0.shape1 = rep(1, 10),
+  prior.a0.shape2 = rep(1, 10),
   a0.coefficients,
   lower.limits = rep(-100, 50),
   upper.limits = rep(100, 50),
@@ -42,9 +43,11 @@ For binomial data, an additional element \code{n0} is required.
 \item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
 }}
 
-\item{prior.a0.shape1}{First shape parameter of the beta prior for \eqn{a_0}. The default is 1.}
+\item{prior.beta.var}{Vector of variances of the independent normal initial priors on \eqn{\beta} with mean zero. The length of the vector should be equal to the length of \eqn{\beta}. The default variance is 10.}
 
-\item{prior.a0.shape2}{Second shape parameter of the beta prior for \eqn{a_0}. The default is 1.}
+\item{prior.a0.shape1}{Vector of the first shape parameters of the independent beta priors for \eqn{a_0}. The length of the vector should be equal to the number of historical datasets. The default is a vector of one's.}
+
+\item{prior.a0.shape2}{Vector of the second shape parameters of the independent beta priors for \eqn{a_0}. The length of the vector should be equal to the number of historical datasets. The default is a vector of one's.}
 
 \item{a0.coefficients}{Vector of coefficients for \eqn{a_0} returned by the function \code{\link{normalizing.constant}}. This is necessary for estimating the normalizing constant for the normalized power prior. Does not apply if \code{data.type} is "Normal".}
 
@@ -82,10 +85,10 @@ The user should use the function \code{\link{normalizing.constant}} to obtain \c
 If \code{data.type} is "Normal", the response \eqn{y_i} is assumed to follow \eqn{N(x_i'\beta, \tau^{-1})} where \eqn{x_i} is the vector of covariates for subject \eqn{i}.
 Historical datasets are assumed to have the same precision parameter as the current dataset for computational simplicity.
 The initial prior for \eqn{\tau} is the Jeffery's prior, \eqn{\tau^{-1}}.
-The initial prior for \eqn{\beta} is the uniform improper prior. Posterior samples for \eqn{\beta} and \eqn{\tau} are obtained through Gibbs sampling.
-Posterior samples for \eqn{a_0} are obtained through slice sampling.
+Independent normal priors with mean zero and variance \code{prior.beta.var} are used for \eqn{\beta}. Posterior samples for \eqn{\beta} and \eqn{\tau} are obtained through Gibbs sampling.
+Independent beta(\code{prior.a0.shape1}, \code{prior.a0.shape1}) priors are used for \eqn{a_0}. Posterior samples for \eqn{a_0} are obtained through slice sampling.
 
-For all other data types, posterior samples are obtained through slice sampling. The initial prior for \eqn{\beta} is the uniform improper prior.
+For all other data types, posterior samples are obtained through slice sampling.
 The default lower limits for the parameters are -100. The default upper limits
 for the parameters are 100. The default slice widths for the parameters are 0.1.
 The defaults may not be appropriate for all situations, and the user can specify the appropriate limits
@@ -113,14 +116,14 @@ historical <- list(list(y0=rbinom(n_total,size=1,prob=0.2),
                         x0=matrix(rnorm(p*n_total),ncol=p,nrow=n_total)))
 
 # Please see function "normalizing.constant" for how to obtain a0.coefficients
-# Here, suppose one-degree polynomial regression is chosen by the "normalizing.constant" 
-# function. The coefficients are obtained for the intercept, a0_1 and a0_2. 
+# Here, suppose one-degree polynomial regression is chosen by the "normalizing.constant"
+# function. The coefficients are obtained for the intercept, a0_1 and a0_2.
 a0.coefficients <- c(1, 0.5, -1)
 
 # Set parameters of the slice sampler
-# The dimension is the number of columns of x plus 1 (intercept) 
+# The dimension is the number of columns of x plus 1 (intercept)
 # plus the number of historical datasets
-lower.limits <- rep(-100, 7) 
+lower.limits <- rep(-100, 7)
 upper.limits <- rep(100, 7)
 slice.widths <- rep(0.1, 7)
 

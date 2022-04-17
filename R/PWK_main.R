@@ -3,10 +3,10 @@
 # Wang YB, Chen MH, Kuo L, Lewis PO (2018). “A New Monte Carlo Method for Estimating Marginal Likelihoods.” Bayesian Analysis, 13(2), 311–333.
 
 
-globalVariables(c("historical", "data.type", "data.link"))
 
 
-calc_marg_l <- function(a0, mcmc){
+
+calc_marg_l <- function(a0, mcmc, historical, data.type, data.link,init_var){
 
   sds <- apply(mcmc, 2, stats::sd)
   means <- apply(mcmc, 2, mean)
@@ -22,7 +22,7 @@ calc_marg_l <- function(a0, mcmc){
   c_est_pp <- 0
 
   #Forming the partition subsets for the PWK estimation of c_0
-  rings_pp <- LOR_partition_pp(r=rcover, nslice=ncutslice, mcmc=mcmc, a0=a0)
+  rings_pp <- LOR_partition_pp(r=rcover, nslice=ncutslice, mcmc=mcmc, a0=a0, historical, data.type, data.link,init_var)
   #Estimate c_0
   t1 <- dim(mcmc_scaled)[1]
   val <- rep(NA, t1)
@@ -35,7 +35,7 @@ calc_marg_l <- function(a0, mcmc){
       partjo1 <- log(prod(sds))# log of jacobian
 
       kreprp[j] <- 0
-      kreprp[j] <- kreprp[j] + logpowerprior(mcmc[j,], a0) + partjo1
+      kreprp[j] <- kreprp[j] + logpowerprior(mcmc[j,], a0, historical, data.type, data.link,init_var) + partjo1
       val[j] <- rings_pp[ring_position, 3] - kreprp[j]
 
     }
@@ -53,7 +53,7 @@ calc_marg_l <- function(a0, mcmc){
 
 # This function computes the normalizing constant for a given a_0 value. 
 calc_a0_func <- function(a0, historical, data.type, data.link,
-                         lower_limits,upper_limits,slice_widths,nMC,nBI){
+                         init_var,lower_limits,upper_limits,slice_widths,nMC,nBI){
   dCurrent <- FALSE
   historical2 <- list()
   for(i in 1:length(historical)){
@@ -64,9 +64,9 @@ calc_a0_func <- function(a0, historical, data.type, data.link,
   y <- rep(0,1)
   x <- matrix(0, nrow=1, ncol=1)
   n <- rep(0, 1)
-  samples <- glm_fixed_a0(data.type,data.link,y,n,x,historical2,lower_limits,upper_limits,slice_widths,nMC,nBI,dCurrent)
+  samples <- glm_fixed_a0(data.type,data.link,y,n,x,historical2,init_var,lower_limits,upper_limits,slice_widths,nMC,nBI,dCurrent)
 
-  marg_l <- calc_marg_l(a0, samples)
+  marg_l <- calc_marg_l(a0, samples, historical, data.type, data.link,init_var)
 
 
   return(marg_l)
@@ -92,7 +92,10 @@ calc_a0_func <- function(a0, historical, data.type, data.link,
 #' \itemize{
 #' \item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
 #' }
+#' @param data.type Character string specifying the type of response. The options are "Bernoulli", "Binomial", "Poisson" and "Exponential".
+#' 
 #' @inheritParams power.glm.fixed.a0
+#' @inheritParams glm.random.a0
 #'
 #' @details
 #'
@@ -150,15 +153,15 @@ calc_a0_func <- function(a0, historical, data.type, data.link,
 #' result <- normalizing.constant(grid=grid, historical=historical,
 #'                                data.type=data.type, data.link=data.link,
 #'                                nMC=nMC, nBI=nBI)
-#' @importFrom stats sd qchisq pnorm lm
+#' @importFrom stats sd qchisq pnorm dnorm lm
 #' @export
 normalizing.constant <- function(grid, historical, data.type, data.link,
-                                 lower.limits=rep(-100, 50), upper.limits=rep(100, 50), slice.widths=rep(1, 50),
+                                 prior.beta.var=rep(10,50), lower.limits=rep(-100, 50), upper.limits=rep(100, 50), slice.widths=rep(1, 50),
                                  nMC=10000, nBI=250){
 
 
   d <- apply(grid, 1, calc_a0_func, historical, data.type, data.link,
-             lower.limits,upper.limits,slice.widths,nMC,nBI) # not a number when a0 too low
+             prior.beta.var,lower.limits,upper.limits,slice.widths,nMC,nBI) # not a number when a0 too low
 
   m <- as.matrix(grid)
   r2 <- 0
@@ -178,9 +181,10 @@ normalizing.constant <- function(grid, historical, data.type, data.link,
       stop("some coefficients not defined because of singularities. Please adjust the grid.")
     }
   }
+  
+  result <- fit$coefficients
 
-  return(fit$coefficients)
+  #return(list("coef"=result, "logc"=d))
+  return(result)
 }
-
-
 

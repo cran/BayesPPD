@@ -87,7 +87,7 @@ historical[2,] <- c(60, 100, 0.5)
 historical[3,] <- c(50, 100, 0.7)
 
 set.seed(1)
-result <- two.grp.fixed.a0(data.type=data.type, y.c=y.c, n.c=n.c, historical=historical) 
+result <- two.grp.fixed.a0(data.type=data.type, y.c=y.c, n.c=n.c, historical=historical)
 }
 \references{
 Chen, Ming-Hui, et al. "Bayesian design of noninferiority trials for medical devices using historical data." Biometrics 67.3 (2011): 1163-1170.

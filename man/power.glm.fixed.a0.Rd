@@ -95,7 +95,7 @@ Each historical dataset \eqn{D_{0k}} is assumed to have a different precision pa
 The initial prior for \eqn{\tau} is the Jeffery's prior, \eqn{\tau^{-1}}, and the initial prior for \eqn{\tau_k} is \eqn{\tau_k^{-1}}.
 The initial prior for \eqn{\beta} is the uniform improper prior. Posterior samples are obtained through Gibbs sampling.
 
-For all other data types, posterior samples are obtained through slice sampling. The initial prior for \eqn{\beta} is the uniform improper prior.
+For all other data types, posterior samples are obtained through slice sampling.
 The default lower limits for the parameters are -100. The default upper limits
 for the parameters are 100. The default slice widths for the parameters are 1.
 The defaults may not be appropriate for all situations, and the user can specify the appropriate limits

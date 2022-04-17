@@ -17,8 +17,8 @@ power_two_grp_fixed_a0_normal <- function(n_t, n_c, historical, mu_t_prior_samps
     .Call(`_BayesPPD_power_two_grp_fixed_a0_normal`, n_t, n_c, historical, mu_t_prior_samps, mu_c_prior_samps, var_t_prior_samps, var_c_prior_samps, delta, gamma, nMC, nBI, N)
 }
 
-glm_fixed_a0 <- function(dType0, dLink0, y0, n0, x0, historical0, lower_limits0, upper_limits0, slice_widths0, nMC, nBI, dCurrent0) {
-    .Call(`_BayesPPD_glm_fixed_a0`, dType0, dLink0, y0, n0, x0, historical0, lower_limits0, upper_limits0, slice_widths0, nMC, nBI, dCurrent0)
+glm_fixed_a0 <- function(dType0, dLink0, y0, n0, x0, historical0, init_var0, lower_limits0, upper_limits0, slice_widths0, nMC, nBI, dCurrent0) {
+    .Call(`_BayesPPD_glm_fixed_a0`, dType0, dLink0, y0, n0, x0, historical0, init_var0, lower_limits0, upper_limits0, slice_widths0, nMC, nBI, dCurrent0)
 }
 
 glm_fixed_a0_normal <- function(y, x, historical, nMC, nBI) {
@@ -53,11 +53,11 @@ power_glm_random_a0_normal <- function(n_total, historical0, beta_c_prior_samps,
     .Call(`_BayesPPD_power_glm_random_a0_normal`, n_total, historical0, beta_c_prior_samps, var_prior_samps, c_10, c_20, lower_limits0, upper_limits0, slice_widths0, delta, gamma, nMC, nBI, N)
 }
 
-glm_random_a0 <- function(dType0, dLink0, y0, n0, x0, historical0, c_10, c_20, coef0, lower_limits0, upper_limits0, slice_widths0, nMC, nBI) {
-    .Call(`_BayesPPD_glm_random_a0`, dType0, dLink0, y0, n0, x0, historical0, c_10, c_20, coef0, lower_limits0, upper_limits0, slice_widths0, nMC, nBI)
+glm_random_a0 <- function(dType0, dLink0, y0, n0, x0, historical0, init_var0, c_10, c_20, coef0, lower_limits0, upper_limits0, slice_widths0, nMC, nBI) {
+    .Call(`_BayesPPD_glm_random_a0`, dType0, dLink0, y0, n0, x0, historical0, init_var0, c_10, c_20, coef0, lower_limits0, upper_limits0, slice_widths0, nMC, nBI)
 }
 
-power_glm_random_a0 <- function(dType0, dLink0, n_total, n0, historical0, beta_c_prior_samps, c_10, c_20, coef0, lower_limits0, upper_limits0, slice_widths0, delta, gamma, nMC, nBI, N) {
-    .Call(`_BayesPPD_power_glm_random_a0`, dType0, dLink0, n_total, n0, historical0, beta_c_prior_samps, c_10, c_20, coef0, lower_limits0, upper_limits0, slice_widths0, delta, gamma, nMC, nBI, N)
+power_glm_random_a0 <- function(dType0, dLink0, n_total, n0, historical0, beta_c_prior_samps, init_var0, c_10, c_20, coef0, lower_limits0, upper_limits0, slice_widths0, delta, gamma, nMC, nBI, N) {
+    .Call(`_BayesPPD_power_glm_random_a0`, dType0, dLink0, n_total, n0, historical0, beta_c_prior_samps, init_var0, c_10, c_20, coef0, lower_limits0, upper_limits0, slice_widths0, delta, gamma, nMC, nBI, N)
 }
 

@@ -17,8 +17,8 @@ power.two.grp.random.a0(
   prior.mu.t.shape2 = 1,
   prior.mu.c.shape1 = 1,
   prior.mu.c.shape2 = 1,
-  prior.a0.shape1 = 1,
-  prior.a0.shape2 = 1,
+  prior.a0.shape1 = rep(1, 10),
+  prior.a0.shape2 = rep(1, 10),
   lower.limits = rep(0, 10),
   upper.limits = rep(1, 10),
   slice.widths = rep(0.1, 10),
@@ -65,9 +65,9 @@ Each row represents a historical dataset.}
 
 \item{prior.mu.c.shape2}{Second hyperparameter of the initial prior for \eqn{\mu_c}. The default is 1. Does not apply if \code{data.type} is "Normal".}
 
-\item{prior.a0.shape1}{First shape parameter of the beta prior for \eqn{a_0}. The default is 1.}
+\item{prior.a0.shape1}{Vector of the first shape parameters of the independent beta priors for \eqn{a_0}. The length of the vector should be equal to the number of historical datasets. The default is a vector of one's.}
 
-\item{prior.a0.shape2}{Second shape parameter of the beta prior for \eqn{a_0}. The default is 1.}
+\item{prior.a0.shape2}{Vector of the second shape parameters of the independent beta priors for \eqn{a_0}. The length of the vector should be equal to the number of historical datasets. The default is a vector of one's.}
 
 \item{lower.limits}{Vector of lower limits for parameters to be used by the slice sampler. The length of the vector should be equal to the number of historical datasets. The default is 0 for all parameters (may not be appropriate for all situations).}
 
@@ -109,7 +109,7 @@ If \code{data.type} is "Normal", historical datasets are assumed to have the sam
 The initial prior for \eqn{\tau} is the Jeffery's prior, \eqn{\tau^{-1}}. The initial prior for the \eqn{\mu_c} is the uniform improper prior.
 Posterior samples of \eqn{\mu_c} and \eqn{\tau} are obtained through Gibbs sampling.
 
-Posterior samples of \eqn{a_0} are obtained through slice sampling. The default lower limits for the parameters are 0. The default upper limits
+Independent beta(\code{prior.a0.shape1},\code{prior.a0.shape1}) priors are used for \eqn{a_0}. Posterior samples of \eqn{a_0} are obtained through slice sampling. The default lower limits for the parameters are 0. The default upper limits
 for the parameters are 1.  The default slice widths for the parameters are 0.1.
 The defaults may not be appropriate for all situations, and the user can specify the appropriate limits
 and slice width for each parameter.
