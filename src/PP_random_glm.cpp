@@ -120,10 +120,9 @@ double random_a0_glm::logFC(const arma::vec & parm0, const int & p)
   if (dType=="Exponential")	{ lp += sum(  log(mean) - y % mean );}
 
   // add prior
-  lp +=  R::dnorm(beta0[p], 0, sqrt(init_var[p]), TRUE);
-
-
-
+  for(int j = 0; j < P; j++){
+      lp +=  R::dnorm(beta0[j], 0, sqrt(init_var[j]), TRUE);
+  }
 
   for(int i = 0; i < historical.size(); i++){
       Rcpp::List dat = historical[i];

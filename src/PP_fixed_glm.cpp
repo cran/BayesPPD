@@ -121,7 +121,9 @@ double glm::logFC(const arma::vec & parm0, const int & p)
 
   }else{ // here the sampler is used for computing the normalizing constant
         // then a proper initial prior is needed
-    lp +=  R::dnorm(beta_h[p], 0, sqrt(init_var[p]), TRUE);
+    for(int j = 0; j < P; j++){
+        lp +=  R::dnorm(beta_h[j], 0, sqrt(init_var[j]), TRUE);
+    }
   }
 
 

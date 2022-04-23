@@ -1,4 +1,4 @@
-66de26d5d097a878d7fd9286168f1cdd *DESCRIPTION
+e5f498fdd4570440473ad99275a94019 *DESCRIPTION
 a8021ea3d10e59a13c5cb76a320536cf *NAMESPACE
 591656d1eb2d6d71af4e491c823ece45 *R/BayesPPD-package.R
 5682e515c3e95d354402c1ed891331ba *R/PWK_helper.R
@@ -23,7 +23,7 @@ ee429df54c46516eb38cb22b13364f0e *man/two.grp.fixed.a0.Rd
 e4a9a47c4a3aca98677ab8b16336e5de *src/Makevars
 e4a9a47c4a3aca98677ab8b16336e5de *src/Makevars.win
 9b4558838414af1fe927a64f4fbc2a06 *src/PP_fixed.cpp
-edb3dc2e3612a1d4c86577320938a248 *src/PP_fixed_glm.cpp
+b2c008c34400c5d5baa62d2e4d1b309b *src/PP_fixed_glm.cpp
 fa13ef4930964129c4a09d7b9d74ecf0 *src/PP_random.cpp
-5afb3cfe2f9b75d21fc43170790e9211 *src/PP_random_glm.cpp
+83fefdf8544f5960f15128e93898380c *src/PP_random_glm.cpp
 2e4a0a7700ab0e1704d1ef9393d5c25a *src/RcppExports.cpp
