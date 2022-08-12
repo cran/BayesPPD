@@ -92,6 +92,7 @@ two.grp.fixed.a0 <- function(data.type, y.c, n.c, v.c, historical=matrix(0,1,4),
 #' \item The third column contains the discounting parameter value \eqn{a_0} (between 0 and 1).
 #' }
 #' Each row represents a historical dataset.
+#' @param nullspace.ineq Character string specifying the inequality of the null hypothesis. The options are ">" and "<". If ">" is specified, the null hypothesis (for non-exponential data) is \eqn{H_0}: \eqn{\mu_t} - \eqn{\mu_c} \eqn{\ge} \eqn{\delta}. If "<" is specified, the null hypothesis is \eqn{H_0}: \eqn{\mu_t} - \eqn{\mu_c} \eqn{\le} \eqn{\delta}. The default choice is ">".
 #' @param samp.prior.mu.t Vector of possible values of \eqn{\mu_t} to sample (with replacement) from. The vector contains realizations from the sampling prior (e.g. normal distribution) for \eqn{\mu_t}.
 #' @param samp.prior.mu.c Vector of possible values of \eqn{\mu_c} to sample (with replacement) from. The vector contains realizations from the sampling prior (e.g. normal distribution) for \eqn{\mu_c}.
 #' @param samp.prior.var.t Vector of possible values of \eqn{\sigma^2_t} to sample (with replacement) from. Only applies if \code{data.type} is "Normal". The vector contains realizations from the sampling prior (e.g. inverse-gamma distribution) for \eqn{\sigma^2_t}.
@@ -165,16 +166,16 @@ two.grp.fixed.a0 <- function(data.type, y.c, n.c, v.c, historical=matrix(0,1,4),
 #'                                  delta=0, N=N)
 #'
 #' @export
-power.two.grp.fixed.a0 <- function(data.type, n.t, n.c, historical=matrix(0,1,4), samp.prior.mu.t,
+power.two.grp.fixed.a0 <- function(data.type, n.t, n.c, historical=matrix(0,1,4), nullspace.ineq=">", samp.prior.mu.t,
                                    samp.prior.mu.c, samp.prior.var.t, samp.prior.var.c, prior.mu.t.shape1=1,
-                                   prior.mu.t.shape2=1, prior.mu.c.shape1=1, prior.mu.c.shape2=1, delta=0,
+                                   prior.mu.t.shape2=1, prior.mu.c.shape1=1, prior.mu.c.shape2=1, delta=0, 
                                    gamma=0.95, nMC=10000, nBI=250, N=10000) {
 
   if(data.type == "Normal"){
-    return(power_two_grp_fixed_a0_normal(n.t, n.c, historical, samp.prior.mu.t, samp.prior.mu.c,
+    return(power_two_grp_fixed_a0_normal(n.t, n.c, historical, nullspace.ineq, samp.prior.mu.t, samp.prior.mu.c,
                                          samp.prior.var.t, samp.prior.var.c, delta, gamma, nMC, nBI, N))
   }else{
-    return(power_two_grp_fixed_a0(data.type, n.t, n.c, historical, samp.prior.mu.t, samp.prior.mu.c,
+    return(power_two_grp_fixed_a0(data.type, n.t, n.c, historical, nullspace.ineq, samp.prior.mu.t, samp.prior.mu.c,
                                   prior.mu.t.shape1, prior.mu.t.shape2, prior.mu.c.shape1,
                                   prior.mu.c.shape2, delta, gamma, N, Inf))
   }
@@ -279,7 +280,7 @@ glm.fixed.a0 <- function(data.type, data.link, y=0, n=1, x=matrix(), historical=
 #' \itemize{
 #' \item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
 #' }
-#'
+#' @param nullspace.ineq Character string specifying the inequality of the null hypothesis. The options are ">" and "<". If ">" is specified, the null hypothesis is \eqn{H_0}: \eqn{\beta_1} \eqn{\ge} \eqn{\delta}. If "<" is specified, the null hypothesis is \eqn{H_0}: \eqn{\beta_1} \eqn{\le} \eqn{\delta}. The default choice is ">".
 #' @param x.samples Matrix of possible values of covariates from which covariate vectors are sampled with replacement. Only applies when there is no historical dataset. The matrix should not include the treatment indicator.
 #' @param samp.prior.beta Matrix of possible values of \eqn{\beta} to sample (with replacement) from. Each row is a possible \eqn{\beta} vector (a realization from the sampling prior for \eqn{\beta}), where the first element is the coefficient for the intercept and the second element is the coefficient for the treatment indicator.
 #' The length of the vector should be equal to the total number of parameters, i.e. P+2 where P is the number of columns of \code{x0} in \code{historical}.
@@ -362,20 +363,20 @@ glm.fixed.a0 <- function(data.type, data.link, y=0, n=1, x=matrix(), historical=
 #'                              delta=0, nMC=nMC, nBI=nBI, N=N)
 #'
 #' @export
-power.glm.fixed.a0 <- function(data.type, data.link="", data.size, n=1, historical=list(), x.samples=matrix(),
-                               samp.prior.beta, samp.prior.var=0,
+power.glm.fixed.a0 <- function(data.type, data.link="", data.size, n=1, historical=list(), nullspace.ineq=">", 
+                               x.samples=matrix(), samp.prior.beta, samp.prior.var=0,
                                lower.limits=rep(-100, 50), upper.limits=rep(100, 50),
                                slice.widths=rep(1, 50),
                                delta=0, gamma=0.95, nMC=10000, nBI=250, N=10000, approximate=FALSE, nNR=10000, tol=0.00001) {
 
   if(approximate==TRUE){
     return(power_glm_fixed_a0_approx(data.type, data.size,
-                                     historical, x.samples,
+                                     historical, nullspace.ineq, x.samples,
                                      samp.prior.beta, samp.prior.var,
                                      delta, gamma,
                                      nNR, tol, N))
   }else{
-    return(power_glm_fixed_a0(data.type, data.link, data.size, n, historical, x.samples,
+    return(power_glm_fixed_a0(data.type, data.link, data.size, n, historical, nullspace.ineq, x.samples,
                               samp.prior.beta, samp.prior.var, lower.limits, upper.limits, slice.widths, delta, gamma, nMC, nBI, N, TRUE))
   }
 }
@@ -548,7 +549,7 @@ two.grp.random.a0 <- function(data.type, y.c, n.c, v.c, historical,
 #'                                   samp.prior.mu.t=samp.prior.mu.t, samp.prior.mu.c=samp.prior.mu.c,
 #'                                   delta=0, nMC=10000, nBI=250, N=N)
 #' @export
-power.two.grp.random.a0 <- function(data.type, n.t, n.c, historical,
+power.two.grp.random.a0 <- function(data.type, n.t, n.c, historical,nullspace.ineq=">",
                               samp.prior.mu.t, samp.prior.mu.c,
                               samp.prior.var.t=0, samp.prior.var.c=0,
                               prior.mu.t.shape1=1,prior.mu.t.shape2=1,
@@ -558,7 +559,7 @@ power.two.grp.random.a0 <- function(data.type, n.t, n.c, historical,
                               slice.widths=rep(0.1, 10), delta=0, gamma=0.95,
                               nMC=10000, nBI=250, N=10000) {
 
-  return(power_two_grp_random_a0(data.type, n.t, n.c, historical,
+  return(power_two_grp_random_a0(data.type, n.t, n.c, historical,nullspace.ineq,
                                  samp.prior.mu.t, samp.prior.mu.c,
                                  samp.prior.var.t, samp.prior.var.c,
                                  prior.mu.t.shape1, prior.mu.t.shape2,
@@ -759,20 +760,20 @@ glm.random.a0 <- function(data.type, data.link, y, n=1, x, historical, prior.bet
 #'                               delta=0, nMC=nMC, nBI=nBI, N=N)
 #'
 #' @export
-power.glm.random.a0 <- function(data.type, data.link, data.size, n=1, historical,
+power.glm.random.a0 <- function(data.type, data.link, data.size, n=1, historical,nullspace.ineq=">",
                                 samp.prior.beta, samp.prior.var, prior.beta.var=rep(10,50),
                                 prior.a0.shape1=rep(1,10), prior.a0.shape2=rep(1,10), a0.coefficients,
                                 lower.limits=rep(-100, 50), upper.limits=rep(100, 50),slice.widths=rep(0.1, 50),
                                 delta=0, gamma=0.95, nMC=10000, nBI=250, N=10000) {
 
   if(data.type == "Normal"){
-    return(power_glm_random_a0_normal(data.size, historical,
+    return(power_glm_random_a0_normal(data.size, historical,nullspace.ineq,
                                       samp.prior.beta, samp.prior.var,
                                       prior.a0.shape1, prior.a0.shape2,
                                       lower.limits, upper.limits, slice.widths,
                                       delta, gamma, nMC, nBI, N))
   }else{
-    return(power_glm_random_a0(data.type, data.link, data.size, n, historical,
+    return(power_glm_random_a0(data.type, data.link, data.size, n, historical,nullspace.ineq,
                                samp.prior.beta, prior.beta.var, prior.a0.shape1, prior.a0.shape2,
                                a0.coefficients, lower.limits, upper.limits, slice.widths,
                                delta, gamma, nMC, nBI, N))

@@ -585,7 +585,7 @@ Rcpp::List glm_random_a0_normal(arma::vec y_normal0, arma::mat x_normal0,
 // This function performs sample size determination for all four data types using the normalized power prior.
 // This function calls two_grp_random_a0() and two_grp_random_a0_normal() to obtain posterior samples of a_0 and mu_c. 
 // [[Rcpp::export]]
-Rcpp::List power_two_grp_random_a0(std::string & dType0, double & n_t, double & n0, arma::mat & historical0,
+Rcpp::List power_two_grp_random_a0(std::string & dType0, double & n_t, double & n0, arma::mat & historical0, std::string ns,
                                    arma::vec & mu_t_prior_samps, arma::vec & mu_c_prior_samps, arma::vec & var_t_prior_samps, arma::vec & var_c_prior_samps,
                                    double & b_t1, double & b_t2, double & b_010, double & b_020, arma::vec & c_10, arma::vec & c_20,
                                    arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,
@@ -632,7 +632,12 @@ Rcpp::List power_two_grp_random_a0(std::string & dType0, double & n_t, double & 
       double alpha_t = (double) y_t + b_t1;
       double beta_t = (double) n_t - (double) y_t + b_t2;
       mu_t_post = Rcpp::rbeta(a0_mat.n_rows, alpha_t, beta_t);
-      post_probs[i] = mean(mu_t_post - mu_c_post < delta);
+      
+      if(ns == ">"){
+        post_probs[i] = mean(mu_t_post - mu_c_post < delta);
+      }else{
+        post_probs[i] = mean(mu_t_post - mu_c_post > delta);
+      }
 
     }
     if(dType0 == "Poisson"){
@@ -652,7 +657,12 @@ Rcpp::List power_two_grp_random_a0(std::string & dType0, double & n_t, double & 
       double alpha_t = (double) y_t + b_t1;
       double beta_t = (double) n_t + b_t2;
       mu_t_post = Rcpp::rgamma(a0_mat.n_rows, alpha_t, 1/beta_t);
-      post_probs[i] = mean(mu_t_post - mu_c_post < delta);
+      
+      if(ns == ">"){
+        post_probs[i] = mean(mu_t_post - mu_c_post < delta);
+      }else{
+        post_probs[i] = mean(mu_t_post - mu_c_post > delta);
+      }
 
 
     }
@@ -674,7 +684,12 @@ Rcpp::List power_two_grp_random_a0(std::string & dType0, double & n_t, double & 
       double alpha_t = (double) n_t + b_t1;
       double beta_t = (double) y_t + b_t2;
       mu_t_post = Rcpp::rgamma(a0_mat.n_rows, alpha_t, 1/beta_t);
-      post_probs[i] = mean(mu_t_post/mu_c_post < delta);
+      
+      if(ns == ">"){
+        post_probs[i] = mean(mu_t_post/mu_c_post < delta);
+      }else{
+        post_probs[i] = mean(mu_t_post/mu_c_post > delta);
+      }
 
     }
     if(dType0 == "Normal"){
@@ -700,8 +715,11 @@ Rcpp::List power_two_grp_random_a0(std::string & dType0, double & n_t, double & 
       NumericVector tau_post = lis[1];
       tau_samples[i] = mean(tau_post);
 
-
-      post_probs[i] = mean(mu_t_post - mu_c_post < delta);
+      if(ns == ">"){
+        post_probs[i] = mean(mu_t_post - mu_c_post < delta);
+      }else{
+        post_probs[i] = mean(mu_t_post - mu_c_post > delta);
+      }
 
     }
 
@@ -752,7 +770,7 @@ Rcpp::List power_two_grp_random_a0(std::string & dType0, double & n_t, double & 
 // This function performs sample size determination for the normal linear model using the normalized power prior.
 // This function calls glm_random_a0_normal() to obtain posterior samples of a_0, tau and beta. 
 // [[Rcpp::export]]
-Rcpp::List power_glm_random_a0_normal(double & n_total, Rcpp::List & historical0,
+Rcpp::List power_glm_random_a0_normal(double & n_total, Rcpp::List & historical0, std::string ns,
                                       arma::mat & beta_c_prior_samps, arma::vec & var_prior_samps,
                                       arma::vec & c_10, arma::vec & c_20,
                                       arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,
@@ -828,7 +846,12 @@ Rcpp::List power_glm_random_a0_normal(double & n_total, Rcpp::List & historical0
     }
 
     arma::vec beta1 = beta_samps.col(1);
-    arma::vec beta_sub = beta1.elem( find( beta1 < delta ) );
+    arma::vec beta_sub;
+    if(ns == ">"){
+      beta_sub = beta1.elem( find( beta1 < delta ) );
+    }else{
+      beta_sub = beta1.elem( find( beta1 > delta ) );
+    }
     double r = beta_sub.size()/double(beta1.size());
 
     power[i] = r;

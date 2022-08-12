@@ -19,9 +19,9 @@ where \eqn{a_0 = (a_{01},\cdots,a_{0K})'}, \eqn{0\le a_{0k} \le 1} for \eqn{k=1,
 \eqn{\pi_0(\mu_c)} is an initial prior, and \eqn{C(a_0)=\int \prod_{k=1}^K [L(\mu_c|D_{0k})^{a_{0k}}]\pi_0(\mu_c)d\mu_c}. When \eqn{a_0} is fixed,
 the normalized power prior is equivalent to the power prior
 \deqn{\pi(\mu_c|D_0,a_0) = \prod_{k=1}^K \left[L(\mu_c|D_{0k})^{a_{0k}}\right]\pi_0(\mu_c).}
-The power/type I error calculation algorithm assumes the null and alternative hypotheses are given by
+By default, the power/type I error calculation algorithm assumes the null and alternative hypotheses are given by
 \deqn{H_0: \mu_t - \mu_c \ge \delta} and \deqn{H_1: \mu_t - \mu_c < \delta,} where \eqn{\delta} is a prespecified constant. To test hypotheses of
-the opposite direction, i.e., \eqn{H_0: \mu_t - \mu_c \le \delta} and \eqn{H_1: \mu_t - \mu_c > \delta} , one can recode the responses for the treatment and control groups.
+the opposite direction, i.e., \eqn{H_0: \mu_t - \mu_c \le \delta} and \eqn{H_1: \mu_t - \mu_c > \delta} , one can set the parameter \code{nullspace.ineq} to "<".
 To determine Bayesian sample size, we estimate the quantity \deqn{\beta_{sj}^{(n)}=E_s[I\{P(\mu_t-\mu_c<\delta|y^{(n)}, \pi^{(f)})\ge \gamma\}]}
 where \eqn{\gamma > 0} is a prespecified posterior probability threshold for rejecting the null hypothesis (e.g., \eqn{0.975}), the probability is computed with respect to the posterior distribution given the data
 \eqn{y^{(n)}} and the fitting prior \eqn{\pi^{(f)}}, and the expectation is taken with respect to the marginal distribution of \eqn{y^{(n)}}

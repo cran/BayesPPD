@@ -162,8 +162,6 @@ double glm::logFC(const arma::vec & parm0, const int & p)
 
   }
 
-  
-  
   return  lp;
 }
 
@@ -406,7 +404,7 @@ Rcpp::List glm_fixed_a0_normal(arma::vec & y, arma::mat & x, Rcpp::List & histor
 // This function calls glm_fixed_a0() and glm_fixed_a0_normal() to obtain posterior samples of beta.
 // [[Rcpp::export]]
 Rcpp::List power_glm_fixed_a0(std::string & dType0, std::string & dLink0, double & n_total, arma::vec & n0,
-                              Rcpp::List & historical0, arma::mat & x_samps,
+                              Rcpp::List & historical0, std::string ns, arma::mat & x_samps,
                               arma::mat & beta_c_prior_samps, arma::vec & var_prior_samps,
                           arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,
                           double & delta, double & gamma,
@@ -513,7 +511,12 @@ Rcpp::List power_glm_fixed_a0(std::string & dType0, std::string & dLink0, double
 
 
     arma::vec beta1 = beta_samps.col(1);
-    arma::vec beta_sub = beta1.elem( find( beta1 < delta ) );
+    arma::vec beta_sub;
+    if(ns == ">"){
+      beta_sub = beta1.elem( find( beta1 < delta ) );
+    }else{
+      beta_sub = beta1.elem( find( beta1 > delta ) );
+    }
     double r = beta_sub.size()/double(beta1.size());
 
     power[i] = r;
@@ -550,7 +553,7 @@ Rcpp::List power_glm_fixed_a0(std::string & dType0, std::string & dLink0, double
 
 // This function computes the mean and covariance matrix of beta based on asymptotics for normal responses.
 // This function is later called by power_glm_fixed_a0_approx().
-Rcpp::List glm_fixed_a0_normal_approx(arma::vec & y, arma::mat & x, Rcpp::List & historical, double & delta) {
+Rcpp::List glm_fixed_a0_normal_approx(arma::vec & y, arma::mat & x, Rcpp::List & historical, std::string ns, double & delta) {
 
   arma::vec v(x.n_rows);
   v.ones();
@@ -609,7 +612,12 @@ Rcpp::List glm_fixed_a0_normal_approx(arma::vec & y, arma::mat & x, Rcpp::List &
 
   arma::mat beta_cov = tau_hat_inv * A_i * (x.t()*x + a2xx) * A_i.t();
 
-  double prob = R::pnorm(delta, beta_hat(1,0), sqrt(beta_cov(1,1)), TRUE, FALSE);
+  double prob;
+  if(ns == ">"){
+    prob = R::pnorm(delta, beta_hat(1,0), sqrt(beta_cov(1,1)), TRUE, FALSE);
+  }else{
+    prob = 1 - R::pnorm(delta, beta_hat(1,0), sqrt(beta_cov(1,1)), TRUE, FALSE);
+  }
 
   return Rcpp::List::create(
     Rcpp::Named("coefficient") = beta_hat,
@@ -622,7 +630,7 @@ Rcpp::List glm_fixed_a0_normal_approx(arma::vec & y, arma::mat & x, Rcpp::List &
 // This function computes the mean and covariance matrix of beta based on asymptotics using the Newton-Raphson algorithm
 // for Bernoulli, Poisson and Exponential responses.
 // This function is later called by power_glm_fixed_a0_approx().
-Rcpp::List newton_raphson(std::string & dType, arma::vec & y, arma::mat & x, Rcpp::List & historical, double & delta, int & n, double & tol) {
+Rcpp::List newton_raphson(std::string & dType, arma::vec & y, arma::mat & x, Rcpp::List & historical, std::string ns, double & delta, int & n, double & tol) {
 
   arma::vec v(x.n_rows);
   v.ones();
@@ -702,7 +710,12 @@ Rcpp::List newton_raphson(std::string & dType, arma::vec & y, arma::mat & x, Rcp
 
   }
 
-  double prob = R::pnorm(delta, beta(1,0), sqrt(H_i(1,1)), TRUE, FALSE);
+  double prob;
+  if(ns == ">"){
+    prob = R::pnorm(delta, beta(1,0), sqrt(H_i(1,1)), TRUE, FALSE);
+  }else{
+    prob = 1 - R::pnorm(delta, beta(1,0), sqrt(H_i(1,1)), TRUE, FALSE);
+  }
 
   return Rcpp::List::create(
     Rcpp::Named("coefficient") = beta.col(0),
@@ -715,7 +728,7 @@ Rcpp::List newton_raphson(std::string & dType, arma::vec & y, arma::mat & x, Rcp
 // This function performs approximate sample size determination for all four data types using the power prior with fixed a_0.
 // [[Rcpp::export]]
 double power_glm_fixed_a0_approx(std::string & dType0, double & n_total,
-                              Rcpp::List & historical0, arma::mat & x_samps,
+                              Rcpp::List & historical0, std::string ns, arma::mat & x_samps,
                               arma::mat & beta_c_prior_samps, arma::vec & var_prior_samps,
                               double & delta, double & gamma,
                               int nNR, double tol, int N) {
@@ -780,9 +793,9 @@ double power_glm_fixed_a0_approx(std::string & dType0, double & n_total,
 
     double prob = 0;
     if(dType0 == "Normal"){
-      prob = glm_fixed_a0_normal_approx(y_s, x_sub, historical0, delta)[2];
+      prob = glm_fixed_a0_normal_approx(y_s, x_sub, historical0, ns, delta)[2];
     }else{
-      prob = newton_raphson(dType0, y_s, x_sub, historical0, delta, nNR, tol)[2];
+      prob = newton_raphson(dType0, y_s, x_sub, historical0, ns, delta, nNR, tol)[2];
     }
     power[i] = prob;
   }

@@ -318,7 +318,7 @@ Rcpp::List glm_random_a0(std::string & dType0, std::string & dLink0, arma::vec &
 // for Bernoulli, Poisson and Exponential responses.
 // This function calls glm_random_a0() to obtain posterior samples of a_0 and beta.
 // [[Rcpp::export]]
-Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, double & n_total, arma::vec & n0, Rcpp::List & historical0,
+Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, double & n_total, arma::vec & n0, Rcpp::List & historical0, std::string ns,
                                arma::mat & beta_c_prior_samps, arma::vec & init_var0, arma::vec & c_10, arma::vec & c_20, arma::vec & coef0,
                                arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,
                               double & delta, double & gamma,
@@ -398,7 +398,12 @@ Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, doubl
     }
 
     arma::vec beta1 = beta_samps.col(1);
-    arma::vec beta_sub = beta1.elem( find( beta1 < delta ) );
+    arma::vec beta_sub;
+    if(ns == ">"){
+      beta_sub = beta1.elem( find( beta1 < delta ) );
+    }else{
+      beta_sub = beta1.elem( find( beta1 > delta ) );
+    }
     double r = beta_sub.size()/double(beta1.size());
 
     power[i] = r;

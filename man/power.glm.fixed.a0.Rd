@@ -10,6 +10,7 @@ power.glm.fixed.a0(
   data.size,
   n = 1,
   historical = list(),
+  nullspace.ineq = ">",
   x.samples = matrix(),
   samp.prior.beta,
   samp.prior.var = 0,
@@ -45,6 +46,8 @@ For binomial data, an additional element \code{n0} is required.
 \itemize{
 \item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
 }}
+
+\item{nullspace.ineq}{Character string specifying the inequality of the null hypothesis. The options are ">" and "<". If ">" is specified, the null hypothesis is \eqn{H_0}: \eqn{\beta_1} \eqn{\ge} \eqn{\delta}. If "<" is specified, the null hypothesis is \eqn{H_0}: \eqn{\beta_1} \eqn{\le} \eqn{\delta}. The default choice is ">".}
 
 \item{x.samples}{Matrix of possible values of covariates from which covariate vectors are sampled with replacement. Only applies when there is no historical dataset. The matrix should not include the treatment indicator.}
 

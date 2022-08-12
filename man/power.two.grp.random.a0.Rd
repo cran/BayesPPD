@@ -9,6 +9,7 @@ power.two.grp.random.a0(
   n.t,
   n.c,
   historical,
+  nullspace.ineq = ">",
   samp.prior.mu.t,
   samp.prior.mu.c,
   samp.prior.var.t = 0,
@@ -48,6 +49,8 @@ For all other data types, \code{historical} is a matrix with two columns:
 \item The second column contains the sample size of the control group.
 }
 Each row represents a historical dataset.}
+
+\item{nullspace.ineq}{Character string specifying the inequality of the null hypothesis. The options are ">" and "<". If ">" is specified, the null hypothesis (for non-exponential data) is \eqn{H_0}: \eqn{\mu_t} - \eqn{\mu_c} \eqn{\ge} \eqn{\delta}. If "<" is specified, the null hypothesis is \eqn{H_0}: \eqn{\mu_t} - \eqn{\mu_c} \eqn{\le} \eqn{\delta}. The default choice is ">".}
 
 \item{samp.prior.mu.t}{Vector of possible values of \eqn{\mu_t} to sample (with replacement) from. The vector contains realizations from the sampling prior (e.g. normal distribution) for \eqn{\mu_t}.}
 

@@ -10,6 +10,7 @@ power.glm.random.a0(
   data.size,
   n = 1,
   historical,
+  nullspace.ineq = ">",
   samp.prior.beta,
   samp.prior.var,
   prior.beta.var = rep(10, 50),
@@ -44,6 +45,8 @@ For binomial data, an additional element \code{n0} is required.
 \itemize{
 \item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
 }}
+
+\item{nullspace.ineq}{Character string specifying the inequality of the null hypothesis. The options are ">" and "<". If ">" is specified, the null hypothesis is \eqn{H_0}: \eqn{\beta_1} \eqn{\ge} \eqn{\delta}. If "<" is specified, the null hypothesis is \eqn{H_0}: \eqn{\beta_1} \eqn{\le} \eqn{\delta}. The default choice is ">".}
 
 \item{samp.prior.beta}{Matrix of possible values of \eqn{\beta} to sample (with replacement) from. Each row is a possible \eqn{\beta} vector (a realization from the sampling prior for \eqn{\beta}), where the first element is the coefficient for the intercept and the second element is the coefficient for the treatment indicator.
 The length of the vector should be equal to the total number of parameters, i.e. P+2 where P is the number of columns of \code{x0} in \code{historical}.}

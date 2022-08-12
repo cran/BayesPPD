@@ -10,7 +10,7 @@ NULL
 #' functions for Bayesian power/type I error calculation and functions for model fitting.
 #' Supported distributions include normal, binary (Bernoulli/binomial), Poisson and exponential.
 #' The power parameter \eqn{a_0} can be fixed or modeled as random using a normalized power prior.
-#'
+#' 
 #' @details
 #' Following Chen et al.(2011), for two group models (i.e., treatment and control group with no covariates), denote the parameter for the treatment group by \eqn{\mu_t}
 #' and the parameter for the control group by \eqn{\mu_c}. Suppose there are \eqn{K} historical datasets \eqn{D_0 = (D_{01},\cdots, D_{0K})'}. We consider the following normalized power prior
@@ -20,9 +20,9 @@ NULL
 #' \eqn{\pi_0(\mu_c)} is an initial prior, and \eqn{C(a_0)=\int \prod_{k=1}^K [L(\mu_c|D_{0k})^{a_{0k}}]\pi_0(\mu_c)d\mu_c}. When \eqn{a_0} is fixed,
 #' the normalized power prior is equivalent to the power prior
 #' \deqn{\pi(\mu_c|D_0,a_0) = \prod_{k=1}^K \left[L(\mu_c|D_{0k})^{a_{0k}}\right]\pi_0(\mu_c).}
-#' The power/type I error calculation algorithm assumes the null and alternative hypotheses are given by
+#' By default, the power/type I error calculation algorithm assumes the null and alternative hypotheses are given by
 #' \deqn{H_0: \mu_t - \mu_c \ge \delta} and \deqn{H_1: \mu_t - \mu_c < \delta,} where \eqn{\delta} is a prespecified constant. To test hypotheses of
-#' the opposite direction, i.e., \eqn{H_0: \mu_t - \mu_c \le \delta} and \eqn{H_1: \mu_t - \mu_c > \delta} , one can recode the responses for the treatment and control groups.
+#' the opposite direction, i.e., \eqn{H_0: \mu_t - \mu_c \le \delta} and \eqn{H_1: \mu_t - \mu_c > \delta} , one can set the parameter \code{nullspace.ineq} to "<".
 #' To determine Bayesian sample size, we estimate the quantity \deqn{\beta_{sj}^{(n)}=E_s[I\{P(\mu_t-\mu_c<\delta|y^{(n)}, \pi^{(f)})\ge \gamma\}]}
 #' where \eqn{\gamma > 0} is a prespecified posterior probability threshold for rejecting the null hypothesis (e.g., \eqn{0.975}), the probability is computed with respect to the posterior distribution given the data
 #' \eqn{y^{(n)}} and the fitting prior \eqn{\pi^{(f)}}, and the expectation is taken with respect to the marginal distribution of \eqn{y^{(n)}}

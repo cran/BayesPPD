@@ -26,38 +26,50 @@ private:
   const double b_t1_post;
   const double b_t2_post;
   const double delta;
+  const std::string ns;
   const double upper_inf;
   const std::string dType;
 
 public:
-  Mintegrand(double b_c1_post_, double b_c2_post_, double b_t1_post_, double b_t2_post_, double delta_, double upper_inf_, std::string dType_) :
-  b_c1_post(b_c1_post_), b_c2_post(b_c2_post_), b_t1_post(b_t1_post_), b_t2_post(b_t2_post_), delta(delta_), upper_inf(upper_inf_), dType(dType_){}
+  Mintegrand(double b_c1_post_, double b_c2_post_, double b_t1_post_, double b_t2_post_, double delta_, std::string ns_, double upper_inf_, std::string dType_) :
+  b_c1_post(b_c1_post_), b_c2_post(b_c2_post_), b_t1_post(b_t1_post_), b_t2_post(b_t2_post_), delta(delta_), ns(ns_), upper_inf(upper_inf_), dType(dType_){}
 
 
 
   double operator()(const double& x) const{
 
     double res= 0;
-    if(dType == "Bernoulli"){
-      res = R::dbeta(x, b_c1_post, b_c2_post,FALSE) * R::pbeta(x+delta, b_t1_post, b_t2_post, TRUE, FALSE);
+    if(ns == ">"){
+      if(dType == "Bernoulli"){
+        res = R::dbeta(x, b_c1_post, b_c2_post,FALSE) * R::pbeta(x+delta, b_t1_post, b_t2_post, TRUE, FALSE);
+      }
+      if(dType == "Poisson"){
+        res = R::dgamma(x, b_c1_post, 1/b_c2_post,FALSE) * R::pgamma(x+delta, b_t1_post, 1/b_t2_post, TRUE, FALSE);
+      }
+      if(dType == "Exponential"){
+        res = R::dgamma(x, b_c1_post, 1/b_c2_post,FALSE) * R::pgamma(x*delta, b_t1_post, 1/b_t2_post, TRUE, FALSE);
+      }
+    }else{
+      if(dType == "Bernoulli"){
+        res = R::dbeta(x, b_c1_post, b_c2_post,FALSE) * (1 - R::pbeta(x+delta, b_t1_post, b_t2_post, TRUE, FALSE));
+      }
+      if(dType == "Poisson"){
+        res = R::dgamma(x, b_c1_post, 1/b_c2_post,FALSE) * (1 - R::pgamma(x+delta, b_t1_post, 1/b_t2_post, TRUE, FALSE));
+      }
+      if(dType == "Exponential"){
+        res = R::dgamma(x, b_c1_post, 1/b_c2_post,FALSE) * (1 - R::pgamma(x*delta, b_t1_post, 1/b_t2_post, TRUE, FALSE));
+      }
     }
-    if(dType == "Poisson"){
-      res = R::dgamma(x, b_c1_post, 1/b_c2_post,FALSE) * R::pgamma(x+delta, b_t1_post, 1/b_t2_post, TRUE, FALSE);
-    }
-    if(dType == "Exponential"){
-      res = R::dgamma(x, b_c1_post, 1/b_c2_post,FALSE) * R::pgamma(x*delta, b_t1_post, 1/b_t2_post, TRUE, FALSE);
-    }
+    
     return(res);
   }
-
-
 
 };
 
 
 // This function performs numerical integration for Bernoulli, Poisson and Exponential responses. 
-double num_integrate(std::string dType, double b_c1_post, double b_c2_post, double b_t1_post, double b_t2_post, double delta, double upper_inf){
-  Mintegrand f(b_c1_post, b_c2_post, b_t1_post, b_t2_post, delta, upper_inf, dType);
+double num_integrate(std::string dType, double b_c1_post, double b_c2_post, double b_t1_post, double b_t2_post, double delta, std::string ns, double upper_inf){
+  Mintegrand f(b_c1_post, b_c2_post, b_t1_post, b_t2_post, delta, ns, upper_inf, dType);
   double err_est;
   int err_code;
   double result = 0;
@@ -110,7 +122,7 @@ arma::vec two_grp_fixed_a0(std::string dType, double & y_c, double & n_c,
 // This function calls the num_integrate function for computing the posterior probability. 
 // [[Rcpp::export]]
 Rcpp::List power_two_grp_fixed_a0(std::string dType, double n_t, double n_c,
-                                  arma::mat historical,
+                                  arma::mat historical, std::string ns,
                                   NumericVector p_t_prior_samps,
                                   NumericVector p_c_prior_samps,
                                   double b_t1, double b_t2, double b_01,
@@ -166,7 +178,7 @@ Rcpp::List power_two_grp_fixed_a0(std::string dType, double n_t, double n_c,
       b_c2_post = (double) y_c + arma::dot(historical.col(0), historical.col(2)) + b_02;
     }
 
-    double post_result = num_integrate(dType, b_c1_post, b_c2_post, b_t1_post, b_t2_post, delta, upper_inf);
+    double post_result = num_integrate(dType, b_c1_post, b_c2_post, b_t1_post, b_t2_post, delta, ns, upper_inf);
 
 
     post_samples[i] = post_result;
@@ -261,7 +273,7 @@ Rcpp::List two_grp_fixed_a0_normal(double & y_c, double & n_c, double & v, arma:
 // This function performs sample size determination for normal responses.
 // This function calls the two_grp_fixed_a0_normal() function to obtain posterior samples of mu_c. 
 // [[Rcpp::export]]
-Rcpp::List power_two_grp_fixed_a0_normal(double n_t, double n_c, arma::mat historical,
+Rcpp::List power_two_grp_fixed_a0_normal(double n_t, double n_c, arma::mat historical, std::string ns,
                                          NumericVector mu_t_prior_samps,
                                          NumericVector mu_c_prior_samps,
                                          NumericVector var_t_prior_samps,
@@ -323,8 +335,12 @@ Rcpp::List power_two_grp_fixed_a0_normal(double n_t, double n_c, arma::mat histo
     }
 
 
-
-    post_samples[i] = mean(mu_t_post - mu_c_post < delta);
+    if(ns == ">"){
+      post_samples[i] = mean(mu_t_post - mu_c_post < delta);
+    }else{
+      post_samples[i] = mean(mu_t_post - mu_c_post > delta);
+    }
+    
 
   }
 
