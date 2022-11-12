@@ -64,7 +64,7 @@ calc_a0_func <- function(a0, historical, data.type, data.link,
   y <- rep(0,1)
   x <- matrix(0, nrow=1, ncol=1)
   n <- rep(0, 1)
-  samples <- glm_fixed_a0(data.type,data.link,y,n,x,historical2,init_var,lower_limits,upper_limits,slice_widths,nMC,nBI,dCurrent)
+  samples <- glm_fixed_a0(data.type,data.link,y,n,x,FALSE,historical2,init_var,lower_limits,upper_limits,slice_widths,nMC,nBI,dCurrent)
 
   marg_l <- calc_marg_l(a0, samples, historical, data.type, data.link,init_var)
 
@@ -86,7 +86,7 @@ calc_a0_func <- function(a0, historical, data.type, data.link,
 #' @param historical List of historical dataset(s). East historical dataset is stored in a list which constains two \emph{named} elements: \code{y0} and \code{x0}.
 #' \itemize{
 #' \item \code{y0} is a vector of responses.
-#' \item \code{x0} is a matrix of covariates. \code{x0} should NOT have the treatment/control group indicator. Apart from missing the treatent/control indicator, \code{x0} should have the same set of covariates in the same order as \code{x}.
+#' \item \code{x0} is a matrix of covariates.
 #' }
 #' For binomial data, an additional element \code{n0} is required. 
 #' \itemize{
@@ -117,10 +117,11 @@ calc_a0_func <- function(a0, historical, data.type, data.link,
 #' When a row of the \code{grid} contains elements that are close to zero, the resulting power prior will be flat and estimates of normalizing constants may be inaccurate.
 #' Therefore, it is recommended that \code{grid} values should be at least 0.05.
 #'
-#' If one encounters the error message "some coefficients not defined because of singularities",
+#' If one encounters the error message "some coefficients are not defined because of singularities",
 #' it could be due to the following factors: number of \code{grid} rows too large or too small, insufficient sample size of the historical data, insufficient number of iterations for the slice sampler,
 #' or near-zero \code{grid} values.
 #'
+#' Note that due to computational intensity, the \code{normalizing.constant} function has not been evaluated for accuracy for high dimensional \eqn{\beta} (e.g., dimension > 10) or high dimensional \eqn{a_0} (e.g., dimension > 5). 
 #'
 #' @return Vector of coefficients for \eqn{a_0} that defines a function \eqn{f(a_0)} that approximates the normalizing constant, necessary for functions \code{\link{glm.random.a0}} and \code{\link{power.glm.random.a0}}.
 #' The length of the vector is equal to 1+K*L where K is the number of historical datasets and L is the degree of the polynomial regression determined by the algorithm. 
@@ -178,7 +179,7 @@ normalizing.constant <- function(grid, historical, data.type, data.link,
     r2 <- summary(fit)$r.squared
 
     if(NA %in% fit$coefficients){
-      stop("some coefficients not defined because of singularities. Please adjust the grid.")
+      stop("Some coefficients are not defined because of singularities. Potential causes include number of grid rows too large or too small, insufficient sample size of the historical data, insufficient number of iterations for the slice sampler, or near-zero grid values.")
     }
   }
   

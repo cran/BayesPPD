@@ -35,7 +35,7 @@ NULL
 #' We compute \eqn{n_{\alpha_0} = \min\{n: \beta_{s0}^{(n)} \le \alpha_0\}} and \eqn{n_{\alpha_1} = \min\{n: \beta_{s1}^{(n)} \ge 1-\alpha_1\}}.
 #' Then Bayesian sample size is max\eqn{\{n_{\alpha_0}, n_{\alpha_1}\}}. Choosing \eqn{\alpha_0=0.05} and \eqn{\alpha_1=0.2}
 #' guarantees that the Bayesian type I error rate is at most \eqn{0.05} and the Bayesian power is at least \eqn{0.8}.
-
+#' 
 #' To compute \eqn{\beta_{sj}^{(n)}}, the following algorithm is used:
 #' \describe{
 #' \item{Step 1:}{Generate \eqn{\theta \sim \pi_j^{(s)}(\theta)}}
@@ -55,7 +55,11 @@ NULL
 #' and the corresponding parameter is \eqn{\beta_1}, which, for example, corresponds to a difference in means for the linear regression model and a log hazard ratio for the exponential regression model.
 #' The hypotheses are given by
 #' \deqn{H_0: \beta_1 \ge \delta} and \deqn{H_1: \beta_1 < \delta.}
-#' The definition of \eqn{\beta_{sj}^{(n)}} and the algorithm change accordingly.
+#' The definition of \eqn{\beta_{sj}^{(n)}} and the algorithm change accordingly. 
+#' 
+#' By default, the package assumes the historical data is
+#' composed of control group subjects only. If the user wants to use historical data to inform treatment effect, one can set \code{borrow.treat=TRUE} 
+#' and include the treatment indicator in the historical covariate matrix. 
 #'
 #' This implementation of the method does not assume any particular distribution for the sampling priors.
 #' The user is allowed to specify a vector or matrix of samples for \eqn{\theta} (matrix if \eqn{\theta} is of dimension >1) from any distribution, and the algorithm samples with replacement

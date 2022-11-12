@@ -1,0 +1,320 @@
+---
+title: "Bayesian Sample Size Determination for Two Group Models (Binary and Normal Outcomes)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{bayesppd-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+header-includes:
+- \usepackage{caption}
+---
+
+For two group models (i.e., treatment and control group with no covariates), we denote the parameter for the treatment group by $\mu_t$ and the parameter for the control group by $\mu_c$. The default null and alternative hypotheses are given by $$H_0: \mu_t - \mu_c \ge \delta$$ and $$H_1: \mu_t - \mu_c < \delta,$$ where $\delta$ is a prespecified constant.
+
+We use the following definition of Bayesian power / type I error rate. 
+
+Let $\Theta_0$ and $\Theta_1$ denote the parameter spaces corresponding to $H_0$ and $H_1$. Let $y^{(n)}$ denote the simulated current data associated with a sample size of $n$ and let $\theta=(\mu_t, \mu_c, \tau_c)$ denote the model parameters. Let $\pi^{(s)}(\theta)$ denote the sampling prior and let $\pi^{(f)}(\theta)$ denote the fitting prior. The sampling prior is used to generate the hypothetical data while the fitting prior is used to fit the model after the data is generated. Let $\pi_0^{(s)}(\theta)$ denote a sampling prior that only puts mass in the null region, i.e., $\theta \subset \Theta_0$. Let $\pi_1^{(s)}(\theta)$ denote a sampling prior that only puts mass in the alternative region, i.e., $\theta \subset \Theta_1$. To determine Bayesian sample size, we estimate the quantity $$\beta_{sj}^{(n)}=E_s[I\{P(\mu_t-\mu_c<\delta|y^{(n)}, \pi^{(f)})\ge \gamma\}]$$ where $j=0$ or $1$, corresponding to the expectation taken with respect to $\pi_0^{(s)}(\theta)$ or $\pi_1^{(s)}(\theta)$. The constant $\gamma > 0$ is a prespecified posterior probability threshold for rejecting the null hypothesis (e.g., $0.975$). The probability is computed with respect to the posterior distribution given the simulated data $y^{(n)}$ and the fitting prior $\pi^{(f)}(\theta)$, and the expectation is taken with respect to the marginal distribution of $y^{(n)}$ defined based on the sampling prior $\pi^{(s)}(\theta)$. Then $\beta_{s0}^{(n)}$ corresponding to $\pi^{(s)}(\theta)=\pi_0^{(s)}(\theta)$ is the Bayesian type I error rate, while $\beta_{s1}^{(n)}$ corresponding to $\pi^{(s)}(\theta)=\pi_1^{(s)}(\theta)$ is the Bayesian power.
+
+# 1. Two Group Cases with Binary Outcomes
+We first demonstrate a model for binary outcomes for treatment and control groups with no covariates. 
+
+We consider the non-inferiority design application of Chen et al. (2011). The goal was to design a trial to evaluate a new generation of drug-eluting stent (DES) (“test device”) with the first generation of DES (“control device”). The primary endpoint is the 12-month Target Lesion Failure (TLF) (binary).
+
+Historical information can be borrowed from two previously conducted trials involving the first generation of DES. The table below summarizes the historical data. 
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r, echo=FALSE}
+library(kableExtra)
+df <- data.frame(Cat = c("Historical Trial 1", "Historical Trial 2"), 
+                 Sad = c("8.2% (44/535)", "10.9% (33/304)"))
+kable(df, col.names = c("", "% TLF (# of failure/sample size)"), escape = F, caption = "Summary of the historical data.") %>%
+  kable_styling(latex_options = "hold_position")
+
+```
+
+Let $\textbf{y}_t^{(n_t)}=(y_{t1},\cdots, y_{tn_t})$ and $\textbf{y}_c^{(n_c)}=(y_{c1},\cdots, y_{cn_c})$ denote the responses from the current trial for the test device and the control device, respectively. The total sample size is $n=n_t+n_c$. 
+
+We assume the $i$-th observation from the test group $y_{ti}$ follows Bern($\mu_t$), and the $i$-th observation from the control group $y_{ci}$ follows Bern($\mu_c$). 
+
+We will illustrate Bayesian sample size determination (SSD) incorporating historical data using the power prior with fixed $a_0$ and the normalized power for $a_0$ modeled as random. 
+
+The hypotheses for non-inferiority testing are $$H_0: \mu_t - \mu_c \ge \delta$$ and $$H_1: \mu_t - \mu_c < \delta,$$ where $\delta$ is a prespecified non-inferiority margin. We set $\delta=4.1\%$. 
+
+We choose beta$(10^{-4}, 10^{-4})$ for the initial prior for $\mu_c$, which performs similarly to the uniform improper initial prior for $\log\left(\frac{\mu_c}{1-\mu_c}\right)$ used in Chen et al. (2011) in terms of operating characteristics. 
+
+Power is computed under the assumption that $\mu_t=\mu_c$ and type I error rate is computed under the assumption that ${\mu_t=\mu_c+\delta}$. 
+
+For sampling priors, a point mass prior at $\mu_c = 9.2\%$ is used for $\pi^{(s)}(\mu_c)$ where $9.2\%$ is the pooled proportion for the two historical control datasets, and a point mass prior at $\mu_t = \mu_c$ is used for $\pi^{(s)}(\mu_t)$. 
+
+For all computations, we use $N=10,000$, $\frac{n_t}{n_c} = 3$, and $\gamma=0.95$. 
+
+
+## 1.1 Power Prior with Fixed $a_0$
+
+When $a_0$ is fixed, the *historical* matrix is defined where each row represents a historical dataset, and the three columns represent the sum of responses, sample size and $a_0$, respectively, of the historical control data. We use $a_{01}=a_{02}=0.3$. 
+```{r, eval=TRUE}
+
+historical <- matrix(0, ncol=3, nrow=2)
+historical[1,] <- c(44, 535, 0.3)
+historical[2,] <- c(33, 304, 0.3)
+
+```
+
+
+We consider $n_t$ values ranging from $600$ to $1000$ to achieve the desired power of $0.8$. 
+
+ Since point mass sampling priors are used for $\mu_t$ and $\mu_c$, *samp.prior.mu.t* and *samp.prior.mu.c* are both scalars. 
+ 
+ For Bernoulli outcomes, beta initial priors are used for $\mu_t$ and $\mu_c$, with hyperparameters specified by *prior.mu.t.shape1*, *prior.mu.t.shape2*, *prior.mu.c.shape1* and *prior.mu.c.shape2*. 
+
+```{r, eval=TRUE}
+
+library(BayesPPD)
+
+set.seed(1)
+n.t_vals <- seq(from=600, to=1000, by=50)
+powers <- NULL
+
+for(i in 1:length(n.t_vals)){
+  n.t <- n.t_vals[i]
+  results <- power.two.grp.fixed.a0(data.type="Bernoulli", 
+      n.t=n.t, n.c=round(n.t/3), historical=historical,
+      samp.prior.mu.t=0.092, samp.prior.mu.c=0.092,
+      prior.mu.t.shape1=0.0001, prior.mu.t.shape2=0.0001, 
+      prior.mu.c.shape1=0.0001,prior.mu.c.shape2=0.0001,
+      delta=0.041, N=10000)
+  power <- results$`power/type I error`
+  powers <- c(powers, power)
+}
+
+powers
+
+
+
+```
+We can see that a sample size of $650$ is required to achieve a power of at least $0.8$.
+
+A power curve is plotted below for sample sizes ranging from $600$ to $1000$.
+
+```{r, eval=TRUE}
+library(ggplot2)
+
+df <- data.frame(sample_size=n.t_vals, power=powers)
+ggplot(data=df, aes(x=sample_size, y=powers)) +
+  geom_smooth(method = lm, formula = y ~ x, se = FALSE) +
+  geom_point() +
+  xlab("Sample Size") +
+  ylab("Power")
+
+```
+
+
+
+We then compute the type I error rate for these sample sizes. 
+
+Since the type I error rate is computed under the assumption that ${\mu_t=\mu_c+\delta}$, we use a point mass at $\mu_c = 9.2\%$ for the sampling prior for $\mu_c$, and a point mass at $\mu_t = 9.2\% + 4.1\%$ for the sampling prior for $\mu_t$. 
+
+The following type I error rate calculations match the results given in Table 2 of Chen et al. (2011). 
+
+```{r, eval=TRUE}
+TIEs <- NULL
+
+for(i in 1:length(n.t_vals)){
+  n.t <- n.t_vals[i]
+  results <- power.two.grp.fixed.a0(data.type="Bernoulli", 
+      n.t=n.t, n.c=round(n.t/3), historical=historical,
+      samp.prior.mu.t=0.092+0.041, samp.prior.mu.c=0.092,
+      prior.mu.t.shape1=0.0001, prior.mu.t.shape2=0.0001, 
+      prior.mu.c.shape1=0.0001,prior.mu.c.shape2=0.0001,
+      delta=0.041, N=10000)
+  TIE <- results$`power/type I error`
+  TIEs <- c(TIEs, TIE)
+}
+
+TIEs
+
+```
+
+
+
+## 1.2 Normalized Power Prior ($a_0$ Modeled as Random)
+
+When $a_0$ is modeled as random, the normalized power prior is used and the priors for $a_{01}$ and $a_{02}$ are beta(1,1), as in Chen et al. (2011). We run 10,000 iterations of the slice sampler. We use the default settings for the upper limits, lower limits and slice widths for $a_{01}$ and $a_{02}$. The same initial priors and sampling priors are used as in the fixed $a_0$ case. 
+
+When $a_0$ is modeled as random, the *historical* matrix is defined where each row represents a historical dataset, and the two columns represent the sum of the responses and the sample size, respectively. 
+```{r, eval=FALSE}
+historical <- matrix(0, ncol=2, nrow=2)
+historical[1,] <- c(44, 535)
+historical[2,] <- c(33, 304)
+```
+
+The code below computes the power when $n_t=750$.
+```{r, eval=FALSE}
+n.t <- 750
+results <- power.two.grp.random.a0(data.type="Bernoulli", 
+      n.t=n.t, n.c=round(n.t/3),historical=historical,
+      samp.prior.mu.t=0.092, samp.prior.mu.c=0.092,
+      prior.mu.t.shape1=0.0001, prior.mu.t.shape2=0.0001, 
+      prior.mu.c.shape1=0.0001,prior.mu.c.shape2=0.0001,
+      prior.a0.shape1=1,prior.a0.shape2=1,
+      delta=0.041, gamma=0.95,
+      nMC=10000, nBI=250, N=10000)
+summary(results)
+```
+
+# 2. Two Group Cases with Normally Distributed Outcomes
+
+We now demonstrate a model for normally distributed outcomes for treatment and control groups with no covariates. We use simulated data for this example.
+
+We assume the $i$-th observation from the treatment group $y_{ti}$ follows N($\mu_t$, $\tau^{-1}$) and the $i$-th observation from the control group $y_{ci}$ follows N($\mu_c$, $\tau^{-1}$), where $\tau$ is the precision parameter for the current data. 
+
+The null hypothesis is $H_0: \mu_t - \mu_c \ge \delta$. We set $\delta=0$.
+
+We assume the treatment group sample size ($n_t$) and the control group sample size ($n_c$) are both $100$. 
+
+## 2.1 Power Prior with Fixed $a_0$
+
+First, we assume $a_0$ is fixed. We simulate three historical datasets. For normally distributed data, the *historical* matrix is defined where each row represents a historical dataset, and the four columns represent the sum of the responses, the sample size, the sample variance and $a_0$, respectively.
+
+```{r, eval=TRUE}
+data.type <- "Normal"
+n.t <- 100
+n.c <- 100
+
+# Simulate three historical datasets
+K <- 3
+historical <- matrix(0, ncol=4, nrow=K)
+# The columns are the sum of the responses, the sample size, the sample variance and a_0
+historical[1,] <- c(50, 50, 1, 0.3)
+historical[2,] <- c(30, 50, 1, 0.5)
+historical[3,] <- c(20, 50, 1, 0.7)
+```
+
+
+To calculate power, we can provide the sampling prior of $\mu_t$ and $\mu_c$ such that the mass of $\mu_t - \mu_c < 0$. We generate the sampling prior for the variance parameter from a Gamma(1, 1) distribution. 
+
+```{r, eval=TRUE}
+# Generate sampling priors
+set.seed(1)
+samp.prior.mu.t <- rnorm(50000)
+samp.prior.mu.c <- rnorm(50000)
+
+sub_ind <- which(samp.prior.mu.t < samp.prior.mu.c) 
+# Here, mass is put on the alternative region, so power is calculated. 
+samp.prior.mu.t <- samp.prior.mu.t[sub_ind]
+samp.prior.mu.c <- samp.prior.mu.c[sub_ind]
+samp.prior.var.t <- rgamma(100, 1, 1)
+samp.prior.var.c <- rgamma(100, 1, 1)
+
+```
+
+We run $10,000$ iterations of the Gibbs sampler for $N=100$ simulated datasets. Note that $N$ should be larger in practice. 
+
+```{r, eval=TRUE}
+set.seed(1)
+results <- power.two.grp.fixed.a0(data.type=data.type, n.t=n.t, n.c=n.t, historical=historical,  
+           samp.prior.mu.t=samp.prior.mu.t, samp.prior.mu.c=samp.prior.mu.c, 
+           samp.prior.var.t=samp.prior.var.t, samp.prior.var.c=samp.prior.var.c,
+           delta=0, nMC=10000, nBI=250, N=100) 
+
+summary(results)
+```
+Next, to calculate type I error, we can provide the sampling prior of $\mu_t$ and $\mu_c$ such that the mass of $\mu_t - \mu_c >= 0$.
+
+```{r, eval=TRUE}
+# Generate sampling priors
+set.seed(1)
+samp.prior.mu.t <- rnorm(50000)
+samp.prior.mu.c <- rnorm(50000)
+
+sub_ind <- which(samp.prior.mu.t >= samp.prior.mu.c) 
+# Here, mass is put on the null region, so type I error rate is calculated. 
+samp.prior.mu.t <- samp.prior.mu.t[sub_ind]
+samp.prior.mu.c <- samp.prior.mu.c[sub_ind]
+
+set.seed(1)
+results <- power.two.grp.fixed.a0(data.type=data.type, n.t=n.t, n.c=n.t, historical=historical,  
+           samp.prior.mu.t=samp.prior.mu.t, samp.prior.mu.c=samp.prior.mu.c, 
+           samp.prior.var.t=samp.prior.var.t, samp.prior.var.c=samp.prior.var.c,
+           delta=0, nMC=10000, nBI=250, N=100) 
+
+summary(results)
+```
+
+## 2.2 Normalized Power Prior ($a_0$ Modeled as Random)
+
+Next, we model $a_0$ as random with the normalized power prior. We simulate three historical datasets. Here, the *historical* matrix is defined where each row represents a historical dataset, and the three columns represent the sum of the responses, the sample size, and the sample variance, respectively.
+
+```{r, eval=TRUE}
+data.type <- "Normal"
+n.t <- 100
+n.c <- 100
+
+# Simulate three historical datasets
+K <- 3
+historical <- matrix(0, ncol=3, nrow=K)
+# The columns are the sum of the responses, the sample size, and the sample variance 
+historical[1,] <- c(50, 50, 1)
+historical[2,] <- c(30, 50, 1)
+historical[3,] <- c(20, 50, 1)
+```
+
+
+To calculate power, we can provide the sampling prior of $\mu_t$ and $\mu_c$ such that the mass of $\mu_t - \mu_c < 0$. We generate the sampling prior for the variance parameter from a Gamma(1, 1) distribution. 
+
+```{r, eval=TRUE}
+# Generate sampling priors
+set.seed(1)
+samp.prior.mu.t <- rnorm(50000)
+samp.prior.mu.c <- rnorm(50000)
+
+sub_ind <- which(samp.prior.mu.t < samp.prior.mu.c) 
+# Here, mass is put on the alternative region, so power is calculated. 
+samp.prior.mu.t <- samp.prior.mu.t[sub_ind]
+samp.prior.mu.c <- samp.prior.mu.c[sub_ind]
+samp.prior.var.t <- rgamma(100, 1, 1)
+samp.prior.var.c <- rgamma(100, 1, 1)
+
+```
+
+We use the default prior on $a_0$, the uniform prior. The average posterior means of $a_0$ and $\tau$ are also returned below. We run $10,000$ iterations of the Gibbs sampler (for $\mu_c$) and the slice sampler (for $a_0$) for $N=100$ simulated datasets. Note that $N$ should be larger in practice. 
+
+```{r, eval=TRUE}
+set.seed(1)
+results <- power.two.grp.random.a0(data.type=data.type, n.t=n.t, n.c=n.t, historical=historical,  
+           samp.prior.mu.t=samp.prior.mu.t, samp.prior.mu.c=samp.prior.mu.c, 
+           samp.prior.var.t=samp.prior.var.t, samp.prior.var.c=samp.prior.var.c,
+           delta=0, nMC=10000, nBI=250, N=100) 
+
+summary(results)
+results$`average posterior means of a0`
+results$`average posterior mean of tau`
+```
+Next, to calculate type I error, we can provide the sampling prior of $\mu_t$ and $\mu_c$ such that the mass of $\mu_t - \mu_c >= 0$.
+
+```{r, eval=TRUE}
+# Generate sampling priors
+set.seed(1)
+samp.prior.mu.t <- rnorm(50000)
+samp.prior.mu.c <- rnorm(50000)
+
+sub_ind <- which(samp.prior.mu.t >= samp.prior.mu.c) 
+# Here, mass is put on the null region, so type I error rate is calculated. 
+samp.prior.mu.t <- samp.prior.mu.t[sub_ind]
+samp.prior.mu.c <- samp.prior.mu.c[sub_ind]
+
+set.seed(1)
+results <- power.two.grp.random.a0(data.type=data.type, n.t=n.t, n.c=n.t, historical=historical,  
+           samp.prior.mu.t=samp.prior.mu.t, samp.prior.mu.c=samp.prior.mu.c, 
+           samp.prior.var.t=samp.prior.var.t, samp.prior.var.c=samp.prior.var.c,
+           delta=0, nMC=10000, nBI=250, N=100) 
+
+summary(results)
+```

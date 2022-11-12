@@ -134,6 +134,10 @@ Rcpp::List power_two_grp_fixed_a0(std::string dType, double n_t, double n_c,
 
 
   NumericVector post_samples(N);
+  
+  arma::vec post_mu_t(N);
+  arma::vec post_mu_c(N);
+  
 
   for (int i=0;i<N;i++){
 
@@ -147,6 +151,8 @@ Rcpp::List power_two_grp_fixed_a0(std::string dType, double n_t, double n_c,
     double b_t2_post = 0;
     double b_c1_post = 0;
     double b_c2_post = 0;
+    double post_mean_mu_t = 0;
+    double post_mean_mu_c = 0;
 
     if(dType == "Bernoulli"){
 
@@ -158,6 +164,9 @@ Rcpp::List power_two_grp_fixed_a0(std::string dType, double n_t, double n_c,
       b_t2_post = (double) n_t - (double) y_t + b_t2;
       b_c1_post = (double) y_c + arma::dot(historical.col(0), historical.col(2)) + b_01;
       b_c2_post = (double) n_c - (double) y_c +  arma::dot((historical.col(1) - historical.col(0)), historical.col(2)) + b_02;
+      post_mean_mu_t = b_t1_post / (b_t1_post + b_t2_post);
+      post_mean_mu_c = b_c1_post / (b_c1_post + b_c2_post);
+      
     }
     if(dType == "Poisson"){
       int y_t = R::rpois(p_t*n_t); // y here is the sum of all the individual y's
@@ -167,6 +176,8 @@ Rcpp::List power_two_grp_fixed_a0(std::string dType, double n_t, double n_c,
       b_t2_post = (double) n_t + b_t2;
       b_c1_post = (double) y_c + arma::dot(historical.col(0), historical.col(2)) + b_01;
       b_c2_post = (double) n_c + arma::dot(historical.col(1), historical.col(2)) + b_02;
+      post_mean_mu_t = b_t1_post / b_t2_post;
+      post_mean_mu_c = b_c1_post / b_c2_post;
     }
     if(dType == "Exponential"){
       double y_t = R::rgamma(n_t, 1/p_t);
@@ -176,7 +187,14 @@ Rcpp::List power_two_grp_fixed_a0(std::string dType, double n_t, double n_c,
       b_t2_post = (double) y_t + b_t2;
       b_c1_post = (double) n_c + arma::dot(historical.col(1), historical.col(2)) + b_01;
       b_c2_post = (double) y_c + arma::dot(historical.col(0), historical.col(2)) + b_02;
+      post_mean_mu_t = b_t1_post / b_t2_post;
+      post_mean_mu_c = b_c1_post / b_c2_post;
     }
+    
+    post_mu_t[i] = post_mean_mu_t;
+    post_mu_c[i] = post_mean_mu_c;
+
+    
 
     double post_result = num_integrate(dType, b_c1_post, b_c2_post, b_t1_post, b_t2_post, delta, ns, upper_inf);
 
@@ -186,9 +204,28 @@ Rcpp::List power_two_grp_fixed_a0(std::string dType, double n_t, double n_c,
   }
 
   double beta = mean(post_samples >= gamma);
+  double mut_mean = mean(post_mu_t);
+  double muc_mean = mean(post_mu_c);
+  
+  double prior_mean_mut = mean(p_t_prior_samps);
+  double prior_mean_muc = mean(p_c_prior_samps);
+  
+  double bias_mut = mut_mean - prior_mean_mut;
+  double bias_muc = muc_mean - prior_mean_muc;
+
+  std::string alt;
+  if(ns == ">"){ alt = " < ";} else { alt = " > ";}
+  std::string name_alt("posterior probabilities of P(mu_t - mu_c");
+  name_alt += alt;
+  name_alt += "delta)";
 
   return Rcpp::List::create(
-    Rcpp::Named("power/type I error")    = beta);
+    Rcpp::Named("power/type I error")    = beta,
+    Rcpp::Named(name_alt)    = post_samples,
+    Rcpp::Named("average posterior mean of mu_t")    = mut_mean,
+    Rcpp::Named("average posterior mean of mu_c")    = muc_mean,
+    Rcpp::Named("bias of the average posterior mean of mu_t")    = bias_mut,
+    Rcpp::Named("bias of the average posterior mean of mu_c")    = bias_muc);
 }
 
 
@@ -347,6 +384,12 @@ Rcpp::List power_two_grp_fixed_a0_normal(double n_t, double n_c, arma::mat histo
   double mean_mu_t = mean(mu_t_samples);
   double mean_mu_c = mean(mu_c_samples);
   double mean_tau = mean(tau_samples);
+  
+  double prior_mean_mut = mean(mu_t_prior_samps);
+  double prior_mean_muc = mean(mu_c_prior_samps);
+  
+  double bias_mut = mean_mu_t - prior_mean_mut;
+  double bias_muc = mean_mu_c - prior_mean_muc;
 
   // calculate average posterior means of tau0
   arma::vec final_tau0_vec(tau0_samples.n_cols);
@@ -357,20 +400,32 @@ Rcpp::List power_two_grp_fixed_a0_normal(double n_t, double n_c, arma::mat histo
   }
 
   double power = mean(post_samples >= gamma);
+  
+  std::string alt;
+  if(ns == ">"){ alt = " < ";} else { alt = " > ";}
+  std::string name_alt("posterior probabilities of P(mu_t - mu_c");
+  name_alt += alt;
+  name_alt += "delta)";
 
   if(historical(0,1)==0){
     return Rcpp::List::create(
+      Rcpp::Named("power/type I error")    = power,
+      Rcpp::Named(name_alt)    = post_samples,
       Rcpp::Named("average posterior mean of mu_t")  = mean_mu_t,
       Rcpp::Named("average posterior mean of mu_c")  = mean_mu_c,
       Rcpp::Named("average posterior mean of tau")  = mean_tau,
-      Rcpp::Named("power/type I error")    = power);
+      Rcpp::Named("bias of the average posterior mean of mu_t")    = bias_mut,
+      Rcpp::Named("bias of the average posterior mean of mu_c")    = bias_muc);
   }else{
     return Rcpp::List::create(
+      Rcpp::Named("power/type I error")    = power,
+      Rcpp::Named(name_alt)    = post_samples,
       Rcpp::Named("average posterior mean of mu_t")  = mean_mu_t,
       Rcpp::Named("average posterior mean of mu_c")  = mean_mu_c,
       Rcpp::Named("average posterior mean of tau")  = mean_tau,
       Rcpp::Named("average posterior mean of tau0")  = final_tau0_vec,
-      Rcpp::Named("power/type I error")    = power);
+      Rcpp::Named("bias of the average posterior mean of mu_t")    = bias_mut,
+      Rcpp::Named("bias of the average posterior mean of mu_c")    = bias_muc);
   }
 }
 

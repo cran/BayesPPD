@@ -93,8 +93,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // glm_fixed_a0
-arma::mat glm_fixed_a0(std::string& dType0, std::string& dLink0, arma::vec& y0, arma::vec& n0, arma::mat& x0, Rcpp::List& historical0, arma::vec& init_var0, arma::vec& lower_limits0, arma::vec& upper_limits0, arma::vec& slice_widths0, int nMC, int nBI, bool& dCurrent0);
-RcppExport SEXP _BayesPPD_glm_fixed_a0(SEXP dType0SEXP, SEXP dLink0SEXP, SEXP y0SEXP, SEXP n0SEXP, SEXP x0SEXP, SEXP historical0SEXP, SEXP init_var0SEXP, SEXP lower_limits0SEXP, SEXP upper_limits0SEXP, SEXP slice_widths0SEXP, SEXP nMCSEXP, SEXP nBISEXP, SEXP dCurrent0SEXP) {
+arma::mat glm_fixed_a0(std::string& dType0, std::string& dLink0, arma::vec& y0, arma::vec& n0, arma::mat& x0, bool& borrow_treat0, Rcpp::List& historical0, arma::vec& init_var0, arma::vec& lower_limits0, arma::vec& upper_limits0, arma::vec& slice_widths0, int nMC, int nBI, bool& dCurrent0);
+RcppExport SEXP _BayesPPD_glm_fixed_a0(SEXP dType0SEXP, SEXP dLink0SEXP, SEXP y0SEXP, SEXP n0SEXP, SEXP x0SEXP, SEXP borrow_treat0SEXP, SEXP historical0SEXP, SEXP init_var0SEXP, SEXP lower_limits0SEXP, SEXP upper_limits0SEXP, SEXP slice_widths0SEXP, SEXP nMCSEXP, SEXP nBISEXP, SEXP dCurrent0SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -103,6 +103,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec& >::type y0(y0SEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type n0(n0SEXP);
     Rcpp::traits::input_parameter< arma::mat& >::type x0(x0SEXP);
+    Rcpp::traits::input_parameter< bool& >::type borrow_treat0(borrow_treat0SEXP);
     Rcpp::traits::input_parameter< Rcpp::List& >::type historical0(historical0SEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type init_var0(init_var0SEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type lower_limits0(lower_limits0SEXP);
@@ -111,28 +112,29 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type nMC(nMCSEXP);
     Rcpp::traits::input_parameter< int >::type nBI(nBISEXP);
     Rcpp::traits::input_parameter< bool& >::type dCurrent0(dCurrent0SEXP);
-    rcpp_result_gen = Rcpp::wrap(glm_fixed_a0(dType0, dLink0, y0, n0, x0, historical0, init_var0, lower_limits0, upper_limits0, slice_widths0, nMC, nBI, dCurrent0));
+    rcpp_result_gen = Rcpp::wrap(glm_fixed_a0(dType0, dLink0, y0, n0, x0, borrow_treat0, historical0, init_var0, lower_limits0, upper_limits0, slice_widths0, nMC, nBI, dCurrent0));
     return rcpp_result_gen;
 END_RCPP
 }
 // glm_fixed_a0_normal
-Rcpp::List glm_fixed_a0_normal(arma::vec& y, arma::mat& x, Rcpp::List& historical, int& nMC, int& nBI);
-RcppExport SEXP _BayesPPD_glm_fixed_a0_normal(SEXP ySEXP, SEXP xSEXP, SEXP historicalSEXP, SEXP nMCSEXP, SEXP nBISEXP) {
+Rcpp::List glm_fixed_a0_normal(arma::vec& y, arma::mat& x, bool& borrow_treat, Rcpp::List& historical, int& nMC, int& nBI);
+RcppExport SEXP _BayesPPD_glm_fixed_a0_normal(SEXP ySEXP, SEXP xSEXP, SEXP borrow_treatSEXP, SEXP historicalSEXP, SEXP nMCSEXP, SEXP nBISEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::vec& >::type y(ySEXP);
     Rcpp::traits::input_parameter< arma::mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< bool& >::type borrow_treat(borrow_treatSEXP);
     Rcpp::traits::input_parameter< Rcpp::List& >::type historical(historicalSEXP);
     Rcpp::traits::input_parameter< int& >::type nMC(nMCSEXP);
     Rcpp::traits::input_parameter< int& >::type nBI(nBISEXP);
-    rcpp_result_gen = Rcpp::wrap(glm_fixed_a0_normal(y, x, historical, nMC, nBI));
+    rcpp_result_gen = Rcpp::wrap(glm_fixed_a0_normal(y, x, borrow_treat, historical, nMC, nBI));
     return rcpp_result_gen;
 END_RCPP
 }
 // power_glm_fixed_a0
-Rcpp::List power_glm_fixed_a0(std::string& dType0, std::string& dLink0, double& n_total, arma::vec& n0, Rcpp::List& historical0, std::string ns, arma::mat& x_samps, arma::mat& beta_c_prior_samps, arma::vec& var_prior_samps, arma::vec& lower_limits0, arma::vec& upper_limits0, arma::vec& slice_widths0, double& delta, double& gamma, int nMC, int nBI, int N, bool& dCurrent0);
-RcppExport SEXP _BayesPPD_power_glm_fixed_a0(SEXP dType0SEXP, SEXP dLink0SEXP, SEXP n_totalSEXP, SEXP n0SEXP, SEXP historical0SEXP, SEXP nsSEXP, SEXP x_sampsSEXP, SEXP beta_c_prior_sampsSEXP, SEXP var_prior_sampsSEXP, SEXP lower_limits0SEXP, SEXP upper_limits0SEXP, SEXP slice_widths0SEXP, SEXP deltaSEXP, SEXP gammaSEXP, SEXP nMCSEXP, SEXP nBISEXP, SEXP NSEXP, SEXP dCurrent0SEXP) {
+Rcpp::List power_glm_fixed_a0(std::string& dType0, std::string& dLink0, double& n_total, arma::vec& n0, double& prob_treat0, bool& borrow_treat0, Rcpp::List& historical0, std::string ns, arma::mat& x_samps, arma::mat& beta_c_prior_samps, arma::vec& var_prior_samps, arma::vec& lower_limits0, arma::vec& upper_limits0, arma::vec& slice_widths0, double& delta, double& gamma, int nMC, int nBI, int N, bool& dCurrent0);
+RcppExport SEXP _BayesPPD_power_glm_fixed_a0(SEXP dType0SEXP, SEXP dLink0SEXP, SEXP n_totalSEXP, SEXP n0SEXP, SEXP prob_treat0SEXP, SEXP borrow_treat0SEXP, SEXP historical0SEXP, SEXP nsSEXP, SEXP x_sampsSEXP, SEXP beta_c_prior_sampsSEXP, SEXP var_prior_sampsSEXP, SEXP lower_limits0SEXP, SEXP upper_limits0SEXP, SEXP slice_widths0SEXP, SEXP deltaSEXP, SEXP gammaSEXP, SEXP nMCSEXP, SEXP nBISEXP, SEXP NSEXP, SEXP dCurrent0SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -140,6 +142,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::string& >::type dLink0(dLink0SEXP);
     Rcpp::traits::input_parameter< double& >::type n_total(n_totalSEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type n0(n0SEXP);
+    Rcpp::traits::input_parameter< double& >::type prob_treat0(prob_treat0SEXP);
+    Rcpp::traits::input_parameter< bool& >::type borrow_treat0(borrow_treat0SEXP);
     Rcpp::traits::input_parameter< Rcpp::List& >::type historical0(historical0SEXP);
     Rcpp::traits::input_parameter< std::string >::type ns(nsSEXP);
     Rcpp::traits::input_parameter< arma::mat& >::type x_samps(x_sampsSEXP);
@@ -154,18 +158,20 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type nBI(nBISEXP);
     Rcpp::traits::input_parameter< int >::type N(NSEXP);
     Rcpp::traits::input_parameter< bool& >::type dCurrent0(dCurrent0SEXP);
-    rcpp_result_gen = Rcpp::wrap(power_glm_fixed_a0(dType0, dLink0, n_total, n0, historical0, ns, x_samps, beta_c_prior_samps, var_prior_samps, lower_limits0, upper_limits0, slice_widths0, delta, gamma, nMC, nBI, N, dCurrent0));
+    rcpp_result_gen = Rcpp::wrap(power_glm_fixed_a0(dType0, dLink0, n_total, n0, prob_treat0, borrow_treat0, historical0, ns, x_samps, beta_c_prior_samps, var_prior_samps, lower_limits0, upper_limits0, slice_widths0, delta, gamma, nMC, nBI, N, dCurrent0));
     return rcpp_result_gen;
 END_RCPP
 }
 // power_glm_fixed_a0_approx
-double power_glm_fixed_a0_approx(std::string& dType0, double& n_total, Rcpp::List& historical0, std::string ns, arma::mat& x_samps, arma::mat& beta_c_prior_samps, arma::vec& var_prior_samps, double& delta, double& gamma, int nNR, double tol, int N);
-RcppExport SEXP _BayesPPD_power_glm_fixed_a0_approx(SEXP dType0SEXP, SEXP n_totalSEXP, SEXP historical0SEXP, SEXP nsSEXP, SEXP x_sampsSEXP, SEXP beta_c_prior_sampsSEXP, SEXP var_prior_sampsSEXP, SEXP deltaSEXP, SEXP gammaSEXP, SEXP nNRSEXP, SEXP tolSEXP, SEXP NSEXP) {
+double power_glm_fixed_a0_approx(std::string& dType0, double& n_total, double& prob_treat, bool& borrow_treat, Rcpp::List& historical0, std::string ns, arma::mat& x_samps, arma::mat& beta_c_prior_samps, arma::vec& var_prior_samps, double& delta, double& gamma, int nNR, double tol, int N);
+RcppExport SEXP _BayesPPD_power_glm_fixed_a0_approx(SEXP dType0SEXP, SEXP n_totalSEXP, SEXP prob_treatSEXP, SEXP borrow_treatSEXP, SEXP historical0SEXP, SEXP nsSEXP, SEXP x_sampsSEXP, SEXP beta_c_prior_sampsSEXP, SEXP var_prior_sampsSEXP, SEXP deltaSEXP, SEXP gammaSEXP, SEXP nNRSEXP, SEXP tolSEXP, SEXP NSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::string& >::type dType0(dType0SEXP);
     Rcpp::traits::input_parameter< double& >::type n_total(n_totalSEXP);
+    Rcpp::traits::input_parameter< double& >::type prob_treat(prob_treatSEXP);
+    Rcpp::traits::input_parameter< bool& >::type borrow_treat(borrow_treatSEXP);
     Rcpp::traits::input_parameter< Rcpp::List& >::type historical0(historical0SEXP);
     Rcpp::traits::input_parameter< std::string >::type ns(nsSEXP);
     Rcpp::traits::input_parameter< arma::mat& >::type x_samps(x_sampsSEXP);
@@ -176,7 +182,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type nNR(nNRSEXP);
     Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
     Rcpp::traits::input_parameter< int >::type N(NSEXP);
-    rcpp_result_gen = Rcpp::wrap(power_glm_fixed_a0_approx(dType0, n_total, historical0, ns, x_samps, beta_c_prior_samps, var_prior_samps, delta, gamma, nNR, tol, N));
+    rcpp_result_gen = Rcpp::wrap(power_glm_fixed_a0_approx(dType0, n_total, prob_treat, borrow_treat, historical0, ns, x_samps, beta_c_prior_samps, var_prior_samps, delta, gamma, nNR, tol, N));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -225,13 +231,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // glm_random_a0_normal
-Rcpp::List glm_random_a0_normal(arma::vec y_normal0, arma::mat x_normal0, Rcpp::List historical_normal0, arma::vec& c_10, arma::vec& c_20, arma::vec& lower_limits0, arma::vec& upper_limits0, arma::vec& slice_widths0, int nMC, int nBI);
-RcppExport SEXP _BayesPPD_glm_random_a0_normal(SEXP y_normal0SEXP, SEXP x_normal0SEXP, SEXP historical_normal0SEXP, SEXP c_10SEXP, SEXP c_20SEXP, SEXP lower_limits0SEXP, SEXP upper_limits0SEXP, SEXP slice_widths0SEXP, SEXP nMCSEXP, SEXP nBISEXP) {
+Rcpp::List glm_random_a0_normal(arma::vec y_normal0, arma::mat x_normal0, bool borrow_treat0, Rcpp::List historical_normal0, arma::vec& c_10, arma::vec& c_20, arma::vec& lower_limits0, arma::vec& upper_limits0, arma::vec& slice_widths0, int nMC, int nBI);
+RcppExport SEXP _BayesPPD_glm_random_a0_normal(SEXP y_normal0SEXP, SEXP x_normal0SEXP, SEXP borrow_treat0SEXP, SEXP historical_normal0SEXP, SEXP c_10SEXP, SEXP c_20SEXP, SEXP lower_limits0SEXP, SEXP upper_limits0SEXP, SEXP slice_widths0SEXP, SEXP nMCSEXP, SEXP nBISEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::vec >::type y_normal0(y_normal0SEXP);
     Rcpp::traits::input_parameter< arma::mat >::type x_normal0(x_normal0SEXP);
+    Rcpp::traits::input_parameter< bool >::type borrow_treat0(borrow_treat0SEXP);
     Rcpp::traits::input_parameter< Rcpp::List >::type historical_normal0(historical_normal0SEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type c_10(c_10SEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type c_20(c_20SEXP);
@@ -240,7 +247,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec& >::type slice_widths0(slice_widths0SEXP);
     Rcpp::traits::input_parameter< int >::type nMC(nMCSEXP);
     Rcpp::traits::input_parameter< int >::type nBI(nBISEXP);
-    rcpp_result_gen = Rcpp::wrap(glm_random_a0_normal(y_normal0, x_normal0, historical_normal0, c_10, c_20, lower_limits0, upper_limits0, slice_widths0, nMC, nBI));
+    rcpp_result_gen = Rcpp::wrap(glm_random_a0_normal(y_normal0, x_normal0, borrow_treat0, historical_normal0, c_10, c_20, lower_limits0, upper_limits0, slice_widths0, nMC, nBI));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -278,12 +285,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // power_glm_random_a0_normal
-Rcpp::List power_glm_random_a0_normal(double& n_total, Rcpp::List& historical0, std::string ns, arma::mat& beta_c_prior_samps, arma::vec& var_prior_samps, arma::vec& c_10, arma::vec& c_20, arma::vec& lower_limits0, arma::vec& upper_limits0, arma::vec& slice_widths0, double& delta, double& gamma, int nMC, int nBI, int N);
-RcppExport SEXP _BayesPPD_power_glm_random_a0_normal(SEXP n_totalSEXP, SEXP historical0SEXP, SEXP nsSEXP, SEXP beta_c_prior_sampsSEXP, SEXP var_prior_sampsSEXP, SEXP c_10SEXP, SEXP c_20SEXP, SEXP lower_limits0SEXP, SEXP upper_limits0SEXP, SEXP slice_widths0SEXP, SEXP deltaSEXP, SEXP gammaSEXP, SEXP nMCSEXP, SEXP nBISEXP, SEXP NSEXP) {
+Rcpp::List power_glm_random_a0_normal(double& n_total, double& prob_treat0, bool& borrow_treat0, Rcpp::List& historical0, std::string ns, arma::mat& beta_c_prior_samps, arma::vec& var_prior_samps, arma::vec& c_10, arma::vec& c_20, arma::vec& lower_limits0, arma::vec& upper_limits0, arma::vec& slice_widths0, double& delta, double& gamma, int nMC, int nBI, int N);
+RcppExport SEXP _BayesPPD_power_glm_random_a0_normal(SEXP n_totalSEXP, SEXP prob_treat0SEXP, SEXP borrow_treat0SEXP, SEXP historical0SEXP, SEXP nsSEXP, SEXP beta_c_prior_sampsSEXP, SEXP var_prior_sampsSEXP, SEXP c_10SEXP, SEXP c_20SEXP, SEXP lower_limits0SEXP, SEXP upper_limits0SEXP, SEXP slice_widths0SEXP, SEXP deltaSEXP, SEXP gammaSEXP, SEXP nMCSEXP, SEXP nBISEXP, SEXP NSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< double& >::type n_total(n_totalSEXP);
+    Rcpp::traits::input_parameter< double& >::type prob_treat0(prob_treat0SEXP);
+    Rcpp::traits::input_parameter< bool& >::type borrow_treat0(borrow_treat0SEXP);
     Rcpp::traits::input_parameter< Rcpp::List& >::type historical0(historical0SEXP);
     Rcpp::traits::input_parameter< std::string >::type ns(nsSEXP);
     Rcpp::traits::input_parameter< arma::mat& >::type beta_c_prior_samps(beta_c_prior_sampsSEXP);
@@ -298,13 +307,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type nMC(nMCSEXP);
     Rcpp::traits::input_parameter< int >::type nBI(nBISEXP);
     Rcpp::traits::input_parameter< int >::type N(NSEXP);
-    rcpp_result_gen = Rcpp::wrap(power_glm_random_a0_normal(n_total, historical0, ns, beta_c_prior_samps, var_prior_samps, c_10, c_20, lower_limits0, upper_limits0, slice_widths0, delta, gamma, nMC, nBI, N));
+    rcpp_result_gen = Rcpp::wrap(power_glm_random_a0_normal(n_total, prob_treat0, borrow_treat0, historical0, ns, beta_c_prior_samps, var_prior_samps, c_10, c_20, lower_limits0, upper_limits0, slice_widths0, delta, gamma, nMC, nBI, N));
     return rcpp_result_gen;
 END_RCPP
 }
 // glm_random_a0
-Rcpp::List glm_random_a0(std::string& dType0, std::string& dLink0, arma::vec& y0, arma::vec& n0, arma::mat& x0, Rcpp::List& historical0, arma::vec& init_var0, arma::vec& c_10, arma::vec& c_20, arma::vec& coef0, arma::vec& lower_limits0, arma::vec& upper_limits0, arma::vec& slice_widths0, int nMC, int nBI);
-RcppExport SEXP _BayesPPD_glm_random_a0(SEXP dType0SEXP, SEXP dLink0SEXP, SEXP y0SEXP, SEXP n0SEXP, SEXP x0SEXP, SEXP historical0SEXP, SEXP init_var0SEXP, SEXP c_10SEXP, SEXP c_20SEXP, SEXP coef0SEXP, SEXP lower_limits0SEXP, SEXP upper_limits0SEXP, SEXP slice_widths0SEXP, SEXP nMCSEXP, SEXP nBISEXP) {
+Rcpp::List glm_random_a0(std::string& dType0, std::string& dLink0, arma::vec& y0, arma::vec& n0, arma::mat& x0, bool& borrow_treat0, Rcpp::List& historical0, arma::vec& init_var0, arma::vec& c_10, arma::vec& c_20, arma::vec& coef0, arma::vec& lower_limits0, arma::vec& upper_limits0, arma::vec& slice_widths0, int nMC, int nBI);
+RcppExport SEXP _BayesPPD_glm_random_a0(SEXP dType0SEXP, SEXP dLink0SEXP, SEXP y0SEXP, SEXP n0SEXP, SEXP x0SEXP, SEXP borrow_treat0SEXP, SEXP historical0SEXP, SEXP init_var0SEXP, SEXP c_10SEXP, SEXP c_20SEXP, SEXP coef0SEXP, SEXP lower_limits0SEXP, SEXP upper_limits0SEXP, SEXP slice_widths0SEXP, SEXP nMCSEXP, SEXP nBISEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -313,6 +322,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec& >::type y0(y0SEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type n0(n0SEXP);
     Rcpp::traits::input_parameter< arma::mat& >::type x0(x0SEXP);
+    Rcpp::traits::input_parameter< bool& >::type borrow_treat0(borrow_treat0SEXP);
     Rcpp::traits::input_parameter< Rcpp::List& >::type historical0(historical0SEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type init_var0(init_var0SEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type c_10(c_10SEXP);
@@ -323,13 +333,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec& >::type slice_widths0(slice_widths0SEXP);
     Rcpp::traits::input_parameter< int >::type nMC(nMCSEXP);
     Rcpp::traits::input_parameter< int >::type nBI(nBISEXP);
-    rcpp_result_gen = Rcpp::wrap(glm_random_a0(dType0, dLink0, y0, n0, x0, historical0, init_var0, c_10, c_20, coef0, lower_limits0, upper_limits0, slice_widths0, nMC, nBI));
+    rcpp_result_gen = Rcpp::wrap(glm_random_a0(dType0, dLink0, y0, n0, x0, borrow_treat0, historical0, init_var0, c_10, c_20, coef0, lower_limits0, upper_limits0, slice_widths0, nMC, nBI));
     return rcpp_result_gen;
 END_RCPP
 }
 // power_glm_random_a0
-Rcpp::List power_glm_random_a0(std::string& dType0, std::string& dLink0, double& n_total, arma::vec& n0, Rcpp::List& historical0, std::string ns, arma::mat& beta_c_prior_samps, arma::vec& init_var0, arma::vec& c_10, arma::vec& c_20, arma::vec& coef0, arma::vec& lower_limits0, arma::vec& upper_limits0, arma::vec& slice_widths0, double& delta, double& gamma, int nMC, int nBI, int N);
-RcppExport SEXP _BayesPPD_power_glm_random_a0(SEXP dType0SEXP, SEXP dLink0SEXP, SEXP n_totalSEXP, SEXP n0SEXP, SEXP historical0SEXP, SEXP nsSEXP, SEXP beta_c_prior_sampsSEXP, SEXP init_var0SEXP, SEXP c_10SEXP, SEXP c_20SEXP, SEXP coef0SEXP, SEXP lower_limits0SEXP, SEXP upper_limits0SEXP, SEXP slice_widths0SEXP, SEXP deltaSEXP, SEXP gammaSEXP, SEXP nMCSEXP, SEXP nBISEXP, SEXP NSEXP) {
+Rcpp::List power_glm_random_a0(std::string& dType0, std::string& dLink0, double& n_total, arma::vec& n0, double& prob_treat0, bool& borrow_treat0, Rcpp::List& historical0, std::string ns, arma::mat& beta_c_prior_samps, arma::vec& init_var0, arma::vec& c_10, arma::vec& c_20, arma::vec& coef0, arma::vec& lower_limits0, arma::vec& upper_limits0, arma::vec& slice_widths0, double& delta, double& gamma, int nMC, int nBI, int N);
+RcppExport SEXP _BayesPPD_power_glm_random_a0(SEXP dType0SEXP, SEXP dLink0SEXP, SEXP n_totalSEXP, SEXP n0SEXP, SEXP prob_treat0SEXP, SEXP borrow_treat0SEXP, SEXP historical0SEXP, SEXP nsSEXP, SEXP beta_c_prior_sampsSEXP, SEXP init_var0SEXP, SEXP c_10SEXP, SEXP c_20SEXP, SEXP coef0SEXP, SEXP lower_limits0SEXP, SEXP upper_limits0SEXP, SEXP slice_widths0SEXP, SEXP deltaSEXP, SEXP gammaSEXP, SEXP nMCSEXP, SEXP nBISEXP, SEXP NSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -337,6 +347,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::string& >::type dLink0(dLink0SEXP);
     Rcpp::traits::input_parameter< double& >::type n_total(n_totalSEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type n0(n0SEXP);
+    Rcpp::traits::input_parameter< double& >::type prob_treat0(prob_treat0SEXP);
+    Rcpp::traits::input_parameter< bool& >::type borrow_treat0(borrow_treat0SEXP);
     Rcpp::traits::input_parameter< Rcpp::List& >::type historical0(historical0SEXP);
     Rcpp::traits::input_parameter< std::string >::type ns(nsSEXP);
     Rcpp::traits::input_parameter< arma::mat& >::type beta_c_prior_samps(beta_c_prior_sampsSEXP);
@@ -352,7 +364,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type nMC(nMCSEXP);
     Rcpp::traits::input_parameter< int >::type nBI(nBISEXP);
     Rcpp::traits::input_parameter< int >::type N(NSEXP);
-    rcpp_result_gen = Rcpp::wrap(power_glm_random_a0(dType0, dLink0, n_total, n0, historical0, ns, beta_c_prior_samps, init_var0, c_10, c_20, coef0, lower_limits0, upper_limits0, slice_widths0, delta, gamma, nMC, nBI, N));
+    rcpp_result_gen = Rcpp::wrap(power_glm_random_a0(dType0, dLink0, n_total, n0, prob_treat0, borrow_treat0, historical0, ns, beta_c_prior_samps, init_var0, c_10, c_20, coef0, lower_limits0, upper_limits0, slice_widths0, delta, gamma, nMC, nBI, N));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -362,17 +374,17 @@ static const R_CallMethodDef CallEntries[] = {
     {"_BayesPPD_power_two_grp_fixed_a0", (DL_FUNC) &_BayesPPD_power_two_grp_fixed_a0, 15},
     {"_BayesPPD_two_grp_fixed_a0_normal", (DL_FUNC) &_BayesPPD_two_grp_fixed_a0_normal, 6},
     {"_BayesPPD_power_two_grp_fixed_a0_normal", (DL_FUNC) &_BayesPPD_power_two_grp_fixed_a0_normal, 13},
-    {"_BayesPPD_glm_fixed_a0", (DL_FUNC) &_BayesPPD_glm_fixed_a0, 13},
-    {"_BayesPPD_glm_fixed_a0_normal", (DL_FUNC) &_BayesPPD_glm_fixed_a0_normal, 5},
-    {"_BayesPPD_power_glm_fixed_a0", (DL_FUNC) &_BayesPPD_power_glm_fixed_a0, 18},
-    {"_BayesPPD_power_glm_fixed_a0_approx", (DL_FUNC) &_BayesPPD_power_glm_fixed_a0_approx, 12},
+    {"_BayesPPD_glm_fixed_a0", (DL_FUNC) &_BayesPPD_glm_fixed_a0, 14},
+    {"_BayesPPD_glm_fixed_a0_normal", (DL_FUNC) &_BayesPPD_glm_fixed_a0_normal, 6},
+    {"_BayesPPD_power_glm_fixed_a0", (DL_FUNC) &_BayesPPD_power_glm_fixed_a0, 20},
+    {"_BayesPPD_power_glm_fixed_a0_approx", (DL_FUNC) &_BayesPPD_power_glm_fixed_a0_approx, 14},
     {"_BayesPPD_two_grp_random_a0", (DL_FUNC) &_BayesPPD_two_grp_random_a0, 13},
     {"_BayesPPD_two_grp_random_a0_normal", (DL_FUNC) &_BayesPPD_two_grp_random_a0_normal, 11},
-    {"_BayesPPD_glm_random_a0_normal", (DL_FUNC) &_BayesPPD_glm_random_a0_normal, 10},
+    {"_BayesPPD_glm_random_a0_normal", (DL_FUNC) &_BayesPPD_glm_random_a0_normal, 11},
     {"_BayesPPD_power_two_grp_random_a0", (DL_FUNC) &_BayesPPD_power_two_grp_random_a0, 23},
-    {"_BayesPPD_power_glm_random_a0_normal", (DL_FUNC) &_BayesPPD_power_glm_random_a0_normal, 15},
-    {"_BayesPPD_glm_random_a0", (DL_FUNC) &_BayesPPD_glm_random_a0, 15},
-    {"_BayesPPD_power_glm_random_a0", (DL_FUNC) &_BayesPPD_power_glm_random_a0, 19},
+    {"_BayesPPD_power_glm_random_a0_normal", (DL_FUNC) &_BayesPPD_power_glm_random_a0_normal, 17},
+    {"_BayesPPD_glm_random_a0", (DL_FUNC) &_BayesPPD_glm_random_a0, 16},
+    {"_BayesPPD_power_glm_random_a0", (DL_FUNC) &_BayesPPD_power_glm_random_a0, 21},
     {NULL, NULL, 0}
 };
 

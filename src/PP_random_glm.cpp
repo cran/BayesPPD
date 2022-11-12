@@ -16,6 +16,9 @@ public:
   arma::vec y;  // outcome data
   arma::vec n;  // number of trials (for binomial data)
   arma::mat x;  // covariates
+  
+  bool borrow_treat; // whether borrowing on treatment effect parameter
+  
   Rcpp::List historical; // historical data
 
 
@@ -41,7 +44,7 @@ public:
   int m;
 
   // public member functions;
-  random_a0_glm(std::string & dType0, std::string & dLink0, arma::vec & y0, arma::vec & n0, arma::mat & x0, Rcpp::List & historical0,
+  random_a0_glm(std::string & dType0, std::string & dLink0, arma::vec & y0, arma::vec & n0, arma::mat & x0, bool borrow_treat0, Rcpp::List & historical0,
            arma::vec init_var, arma::vec & c_1, arma::vec & c_2,arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0, arma::vec & coef0);
 
 
@@ -49,7 +52,7 @@ public:
 
 };
 
-random_a0_glm::random_a0_glm(	std::string & dType0, std::string & dLink0, arma::vec & y0, arma::vec & n0, arma::mat & x0, Rcpp::List & historical0,
+random_a0_glm::random_a0_glm(	std::string & dType0, std::string & dLink0, arma::vec & y0, arma::vec & n0, arma::mat & x0, bool borrow_treat0, Rcpp::List & historical0,
                               arma::vec init_var0, arma::vec & c_10, arma::vec & c_20, arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0, arma::vec & coef0)
 
 {
@@ -60,6 +63,8 @@ random_a0_glm::random_a0_glm(	std::string & dType0, std::string & dLink0, arma::
   y = y0;
   if ((dType=="Bernoulli")) {n.resize(y.size()); n.ones();} else {n = n0;}
   x     = x0;
+  
+  borrow_treat = borrow_treat0;
   historical = historical0;
 
 
@@ -94,8 +99,14 @@ double random_a0_glm::logFC(const arma::vec & parm0, const int & p)
 
   arma::uvec ind;
   ind << 0;
-  arma::vec beta_h = join_cols(parm0.elem(ind), parm0.subvec(2,P-1));
-
+  
+  // if not borrowing for treatment effect, the historical data doesn't have the treatment indicator
+  arma::vec beta_h;
+  if(borrow_treat==FALSE){
+    beta_h = join_cols(parm0.elem(ind), parm0.subvec(2,P-1));
+  }else{
+    beta_h = beta0;
+  }
 
   // compute mean parameter;
   mean = x*beta0;
@@ -268,7 +279,7 @@ void slice( arma::vec & parms, random_a0_glm & b)
 // using slice sampling for GLMs with Bernoulli, Poisson and Exponential responses.
 // The normalized power prior is used.
 // [[Rcpp::export]]
-Rcpp::List glm_random_a0(std::string & dType0, std::string & dLink0, arma::vec & y0, arma::vec & n0, arma::mat & x0, Rcpp::List & historical0,
+Rcpp::List glm_random_a0(std::string & dType0, std::string & dLink0, arma::vec & y0, arma::vec & n0, arma::mat & x0, bool & borrow_treat0, Rcpp::List & historical0,
                    arma::vec & init_var0, arma::vec & c_10, arma::vec & c_20, arma::vec & coef0, arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,
                    int nMC, int nBI)
 {
@@ -283,7 +294,7 @@ Rcpp::List glm_random_a0(std::string & dType0, std::string & dLink0, arma::vec &
   int P = x0.n_cols;
 
   // declare regression object and set values;
-  random_a0_glm b(dType0,dLink0,y0,n0,x0,historical0,init_var0,c_10,c_20,lower_limits0,upper_limits0,slice_widths0,coef0);
+  random_a0_glm b(dType0,dLink0,y0,n0,x0,borrow_treat0,historical0,init_var0,c_10,c_20,lower_limits0,upper_limits0,slice_widths0,coef0);
 
   // sample betas and alphas;
   arma::mat samples(nMC, P+historical0.size());
@@ -318,7 +329,8 @@ Rcpp::List glm_random_a0(std::string & dType0, std::string & dLink0, arma::vec &
 // for Bernoulli, Poisson and Exponential responses.
 // This function calls glm_random_a0() to obtain posterior samples of a_0 and beta.
 // [[Rcpp::export]]
-Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, double & n_total, arma::vec & n0, Rcpp::List & historical0, std::string ns,
+Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, double & n_total, arma::vec & n0, double & prob_treat0,
+                               bool & borrow_treat0, Rcpp::List & historical0, std::string ns,
                                arma::mat & beta_c_prior_samps, arma::vec & init_var0, arma::vec & c_10, arma::vec & c_20, arma::vec & coef0,
                                arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,
                               double & delta, double & gamma,
@@ -351,8 +363,11 @@ Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, doubl
     arma::vec vect(x_s.n_rows);
     vect.ones();
     x_s.insert_cols(0, vect);
-    arma::vec x_trt = Rcpp::rbinom(n_total, 1, 0.5);
-    x_s.insert_cols(1, x_trt);
+    // if not borrowing for treatment effect, the historical data doesn't have the treatment indicator
+    if(borrow_treat0==FALSE){
+      arma::vec x_trt = Rcpp::rbinom(n_total, 1, prob_treat0);
+      x_s.insert_cols(1, x_trt);
+    }
 
 
     arma::vec mean = x_s*beta_s.t();
@@ -383,7 +398,7 @@ Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, doubl
 
     arma::mat beta_samps(nMC,x_s.n_cols);
 
-    Rcpp::List lis = glm_random_a0(dType0, dLink0, y_s, n0, x_sub, historical0, init_var0, c_10, c_20, coef0,
+    Rcpp::List lis = glm_random_a0(dType0, dLink0, y_s, n0, x_sub, borrow_treat0, historical0, init_var0, c_10, c_20, coef0,
                                      lower_limits0, upper_limits0, slice_widths0,
                                      nMC, nBI);
 
@@ -423,6 +438,13 @@ Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, doubl
   for(int k = 0; (unsigned)k < beta_mean.n_cols; k++){
     mean_beta_vec(k) = arma::mean(beta_mean.col(k));
   }
+  
+  // compute bias
+  arma::vec prior_means(beta_mean.n_cols);
+  for(int k = 0; (unsigned)k < beta_mean.n_cols; k++){
+    prior_means(k) = arma::mean(beta_c_prior_samps.col(k));
+  }
+  arma::vec bias = mean_beta_vec - prior_means;
 
   arma::vec final_a0_vec(a0_mean.n_cols);
   for(int k = 0; (unsigned)k < a0_mean.n_cols; k++){
@@ -430,11 +452,18 @@ Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, doubl
   }
 
 
+  std::string alt;
+  if(ns == ">"){ alt = " < ";} else { alt = " > ";}
+  std::string name_alt("posterior probabilities of P(beta_1");
+  name_alt += alt;
+  name_alt += "delta)";
+  
   return Rcpp::List::create(
+    Rcpp::Named("power/type I error")    = res,
+    Rcpp::Named(name_alt)    = power,
     Rcpp::Named("average posterior mean of beta") = mean_beta_vec,
     Rcpp::Named("average posterior means of a0")  = final_a0_vec,
-    Rcpp::Named("power/type I error")    = res
-  );
+    Rcpp::Named("bias of the average posterior mean of beta")  = bias);
 }
 
 

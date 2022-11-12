@@ -15,6 +15,8 @@ using namespace Rcpp;
     double n_c;
     double v_c;
 
+    bool borrow_treat; // whether borrowing on treatment effect parameter
+    
     arma::mat historical;
     Rcpp::List historical_normal; // for normal data with covariates
 
@@ -39,7 +41,7 @@ using namespace Rcpp;
 
     // public member functions;
     random_a0(std::string dType0, double y0, double n0, double v0, arma::vec y_normal0,
-              arma::mat x_normal0, arma::mat historical0,
+              arma::mat x_normal0, bool borrow_treat0, arma::mat historical0,
               Rcpp::List historical_normal0,
               double b_010, double b_020, arma::vec c_10, arma::vec c_20,
               arma::vec & lower_limits0, arma::vec & upper_limits0,
@@ -53,7 +55,7 @@ using namespace Rcpp;
 
 // define constructor
 random_a0::random_a0(std::string dType0, double y0, double n0, double v0,
-                     arma::vec y_normal0, arma::mat x_normal0, arma::mat historical0,
+                     arma::vec y_normal0, arma::mat x_normal0, bool borrow_treat0, arma::mat historical0,
                      Rcpp::List historical_normal0,
                      double b_010, double b_020, arma::vec c_10, arma::vec c_20,
                      arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0)
@@ -69,7 +71,7 @@ random_a0::random_a0(std::string dType0, double y0, double n0, double v0,
 
   dType = dType0;
 
-
+  borrow_treat = borrow_treat0;
 
   if((dType=="Normal") & (x_normal0.n_rows!=0)){
     historical_normal = historical_normal0;
@@ -154,9 +156,13 @@ double random_a0::logFC(const arma::vec & parm0, const int & p)
 
       double a_y2 = 0;
       double a_n = 0;
-      arma::mat a_xy(x_normal.n_cols-1,1);
+      
+      int dim;
+      if(borrow_treat==FALSE){ dim = x_normal.n_cols-1; }else{ dim = x_normal.n_cols; }
+        
+      arma::mat a_xy(dim,1);
       a_xy.zeros();
-      arma::mat a_x2(x_normal.n_cols-1,x_normal.n_cols-1);
+      arma::mat a_x2(dim,dim);
       a_x2.zeros();
       for(int j=0;j<historical_normal.size();j++){
         Rcpp::List dat = historical_normal[j];
@@ -185,9 +191,12 @@ double random_a0::logFC(const arma::vec & parm0, const int & p)
       arma::vec v(x_h.n_rows);
       v.ones();
       x_h.insert_cols(0, v);
-      arma::vec ins(x_h.n_rows);
-      ins.zeros();
-      x_h.insert_cols(1, ins); // x_h does not have treatment indicator
+      
+      if(borrow_treat==FALSE){
+        arma::vec ins(x_h.n_rows);
+        ins.zeros();
+        x_h.insert_cols(1, ins); // x_h does not have treatment indicator
+      }
       log_C_0 = parm0[p] * parm0[P+x_normal.n_cols] / 2 * sum((y_h - x_h*parm0.subvec(P,P+x_normal.n_cols-1))%(y_h - x_h*parm0.subvec(P,P+x_normal.n_cols-1))) + log_c_a0;
       log_C_1 = parm0[p] * y_h.size() / 2 * log(parm0[P+x_normal.n_cols]);
     }
@@ -308,7 +317,7 @@ Rcpp::List two_grp_random_a0(std::string & dType0, double & y0, double & n0, arm
   arma::vec y_normal0(1);
   arma::mat x_normal0(1,1);
   x_normal0.zeros();
-  random_a0 b(dType0, y0, n0, 0.1, y_normal0, x_normal0, historical0, historical_normal0, b_010, b_020, c_10, c_20, lower_limits0, upper_limits0, slice_widths0);
+  random_a0 b(dType0, y0, n0, 0.1, y_normal0, x_normal0, FALSE, historical0, historical_normal0, b_010, b_020, c_10, c_20, lower_limits0, upper_limits0, slice_widths0);
 
 
 
@@ -429,7 +438,7 @@ Rcpp::List two_grp_random_a0_normal(double y0, double n0, double v0,
     arma::vec y_normal0(1);
     arma::mat x_normal0(0,1);
     x_normal0.zeros();
-    random_a0 b(dType0, y0, n0, v0, y_normal0, x_normal0, historical0,
+    random_a0 b(dType0, y0, n0, v0, y_normal0, x_normal0, FALSE, historical0,
                 historical_normal0, 0.1, 0.1, c_10, c_20,
                 lower_limits0, upper_limits0, slice_widths0);
 
@@ -468,7 +477,7 @@ Rcpp::List two_grp_random_a0_normal(double y0, double n0, double v0,
 // The normalized power prior is used. 
 // [[Rcpp::export]]
 Rcpp::List glm_random_a0_normal(arma::vec y_normal0, arma::mat x_normal0,
-                                Rcpp::List historical_normal0,
+                                bool borrow_treat0, Rcpp::List historical_normal0,
                                 arma::vec & c_10, arma::vec & c_20,
                                 arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,
                                 int nMC, int nBI) {
@@ -500,9 +509,13 @@ Rcpp::List glm_random_a0_normal(arma::vec y_normal0, arma::mat x_normal0,
       arma::vec v(x_h.n_rows);
       v.ones();
       x_h.insert_cols(0, v);
-      arma::vec ins(x_h.n_rows);
-      ins.zeros();
-      x_h.insert_cols(1, ins);
+      
+      //insert treatment indicator if not borrowing on treatment effect
+      if(borrow_treat0 == FALSE){
+        arma::vec ins(x_h.n_rows);
+        ins.zeros();
+        x_h.insert_cols(1, ins);
+      }
       double a0 = a0_samples(i-1,j);
       num = num + a0 * x_h.t() * x_h;
       denom = denom + a0 * x_h.t() * y_h;
@@ -526,9 +539,12 @@ Rcpp::List glm_random_a0_normal(arma::vec y_normal0, arma::mat x_normal0,
       arma::vec v(x_h.n_rows);
       v.ones();
       x_h.insert_cols(0, v);
-      arma::vec ins(x_h.n_rows);
-      ins.zeros();
-      x_h.insert_cols(1, ins);
+      //insert treatment indicator if not borrowing on treatment effect
+      if(borrow_treat0 == FALSE){
+        arma::vec ins(x_h.n_rows);
+        ins.zeros();
+        x_h.insert_cols(1, ins);
+      }
       double a0 = a0_samples(i-1,k);
       arma::mat m2 = (y_h-x_h*gibbs_beta.row(i).t()).t() * (y_h-x_h*gibbs_beta.row(i).t());
       num1 = num1 + a0*m2(0,0);
@@ -548,7 +564,7 @@ Rcpp::List glm_random_a0_normal(arma::vec y_normal0, arma::mat x_normal0,
     std::string dType0 = "Normal";
     arma::mat historical0(1,1);
     historical0.zeros();
-    random_a0 b(dType0, 0.1, 1, 0.1, y_normal0, x_normal0, historical0,
+    random_a0 b(dType0, 0.1, 1, 0.1, y_normal0, x_normal0, borrow_treat0, historical0,
                 historical_normal0, 0.1, 0.1, c_10, c_20,
                 lower_limits0, upper_limits0, slice_widths0);
 
@@ -726,7 +742,8 @@ Rcpp::List power_two_grp_random_a0(std::string & dType0, double & n_t, double & 
 
     mu_c_samples[i] = mean(mu_c_post);
     mu_t_samples[i] = mean(mu_t_post);
-
+    
+    
     arma::vec mean_a0_vec(a0_mat.n_cols);
 
     for(int k = 0; (unsigned)k < a0_mat.n_cols; k++){
@@ -744,22 +761,42 @@ Rcpp::List power_two_grp_random_a0(std::string & dType0, double & n_t, double & 
   }
 
   double res = mean(post_probs >= gamma);
+  
   double mean_mu_t = mean(mu_t_samples);
   double mean_mu_c = mean(mu_c_samples);
+  
+  double prior_mean_mut = mean(mu_t_prior_samps);
+  double prior_mean_muc = mean(mu_c_prior_samps);
+  
+  double bias_mut = mean_mu_t - prior_mean_mut;
+  double bias_muc = mean_mu_c - prior_mean_muc;
+  
+  std::string alt;
+  if(ns == ">"){ alt = " < ";} else { alt = " > ";}
+  std::string name_alt("posterior probabilities of P(mu_t - mu_c");
+  name_alt += alt;
+  name_alt += "delta)";
+  
   if(dType0 == "Normal"){
     double mean_tau = mean(tau_samples);
     return Rcpp::List::create(
+      Rcpp::Named("power/type I error")    = res,
+      Rcpp::Named(name_alt)    = post_probs,
       Rcpp::Named("average posterior mean of mu_t")  = mean_mu_t,
       Rcpp::Named("average posterior mean of mu_c")  = mean_mu_c,
       Rcpp::Named("average posterior mean of tau")  = mean_tau,
       Rcpp::Named("average posterior means of a0")  = final_a0_vec,
-      Rcpp::Named("power/type I error")    = res);
+      Rcpp::Named("bias of the average posterior mean of mu_t")    = bias_mut,
+      Rcpp::Named("bias of the average posterior mean of mu_c")    = bias_muc);
   }else{
       return Rcpp::List::create(
+        Rcpp::Named("power/type I error")    = res,
+        Rcpp::Named(name_alt)    = post_probs,
         Rcpp::Named("average posterior mean of mu_t")  = mean_mu_t,
         Rcpp::Named("average posterior mean of mu_c")  = mean_mu_c,
         Rcpp::Named("average posterior means of a0")  = final_a0_vec,
-        Rcpp::Named("power/type I error")    = res);
+        Rcpp::Named("bias of the average posterior mean of mu_t")    = bias_mut,
+        Rcpp::Named("bias of the average posterior mean of mu_c")    = bias_muc);
       }
 
 
@@ -770,7 +807,7 @@ Rcpp::List power_two_grp_random_a0(std::string & dType0, double & n_t, double & 
 // This function performs sample size determination for the normal linear model using the normalized power prior.
 // This function calls glm_random_a0_normal() to obtain posterior samples of a_0, tau and beta. 
 // [[Rcpp::export]]
-Rcpp::List power_glm_random_a0_normal(double & n_total, Rcpp::List & historical0, std::string ns,
+Rcpp::List power_glm_random_a0_normal(double & n_total, double & prob_treat0, bool & borrow_treat0, Rcpp::List & historical0, std::string ns,
                                       arma::mat & beta_c_prior_samps, arma::vec & var_prior_samps,
                                       arma::vec & c_10, arma::vec & c_20,
                                       arma::vec & lower_limits0, arma::vec & upper_limits0, arma::vec & slice_widths0,
@@ -809,8 +846,11 @@ Rcpp::List power_glm_random_a0_normal(double & n_total, Rcpp::List & historical0
     arma::vec vect(x_s.n_rows);
     vect.ones();
     x_s.insert_cols(0, vect);
-    arma::vec x_trt = Rcpp::rbinom(n_total, 1, 0.5);
-    x_s.insert_cols(1, x_trt);
+    //insert treatment indicator if not borrowing on treatment effect
+    if(borrow_treat0 == FALSE){
+      arma::vec x_trt = Rcpp::rbinom(n_total, 1, prob_treat0);
+      x_s.insert_cols(1, x_trt);
+    }
 
 
     arma::vec mean = x_s*beta_s.t();
@@ -831,6 +871,7 @@ Rcpp::List power_glm_random_a0_normal(double & n_total, Rcpp::List & historical0
     arma::mat x_sub = x_s.cols(1, x_s.n_cols-1);
 
     Rcpp::List lis = glm_random_a0_normal(y_s, x_sub,
+                                         borrow_treat0,
                                          historical0,
                                          c_10, c_20,
                                          lower_limits0, upper_limits0, slice_widths0,
@@ -874,6 +915,15 @@ Rcpp::List power_glm_random_a0_normal(double & n_total, Rcpp::List & historical0
   for(int k = 0; (unsigned)k < beta_mean.n_cols; k++){
     mean_beta_vec(k) = arma::mean(beta_mean.col(k));
   }
+  
+  // compute bias
+  arma::vec prior_means(beta_mean.n_cols);
+  for(int k = 0; (unsigned)k < beta_mean.n_cols; k++){
+    prior_means(k) = arma::mean(beta_c_prior_samps.col(k));
+  }
+  
+  arma::vec bias = mean_beta_vec - prior_means;
+  
 
   arma::vec final_a0_vec(a0_mean.n_cols);
   for(int k = 0; (unsigned)k < a0_mean.n_cols; k++){
@@ -881,12 +931,19 @@ Rcpp::List power_glm_random_a0_normal(double & n_total, Rcpp::List & historical0
   }
 
   double mean_tau = mean(tau_samples);
+  
+  std::string alt;
+  if(ns == ">"){ alt = " < ";} else { alt = " > ";}
+  std::string name_alt("posterior probabilities of P(beta_1");
+  name_alt += alt;
+  name_alt += "delta)";
 
   return Rcpp::List::create(
+    Rcpp::Named("power/type I error")    = res,
+    Rcpp::Named(name_alt)    = power,
     Rcpp::Named("average posterior mean of beta") = mean_beta_vec,
     Rcpp::Named("average posterior mean of tau")  = mean_tau,
     Rcpp::Named("average posterior means of a0")  = final_a0_vec,
-    Rcpp::Named("power/type I error")    = res
-  );
+    Rcpp::Named("bias of the average posterior mean of beta")  = bias);
 
 }

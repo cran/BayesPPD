@@ -23,7 +23,7 @@ normalizing.constant(
 \item{historical}{List of historical dataset(s). East historical dataset is stored in a list which constains two \emph{named} elements: \code{y0} and \code{x0}.
 \itemize{
 \item \code{y0} is a vector of responses.
-\item \code{x0} is a matrix of covariates. \code{x0} should NOT have the treatment/control group indicator. Apart from missing the treatent/control indicator, \code{x0} should have the same set of covariates in the same order as \code{x}.
+\item \code{x0} is a matrix of covariates.
 }
 For binomial data, an additional element \code{n0} is required.
 \itemize{
@@ -73,9 +73,11 @@ The degree of the polynomial regression is determined by the algorithm to ensure
 When a row of the \code{grid} contains elements that are close to zero, the resulting power prior will be flat and estimates of normalizing constants may be inaccurate.
 Therefore, it is recommended that \code{grid} values should be at least 0.05.
 
-If one encounters the error message "some coefficients not defined because of singularities",
+If one encounters the error message "some coefficients are not defined because of singularities",
 it could be due to the following factors: number of \code{grid} rows too large or too small, insufficient sample size of the historical data, insufficient number of iterations for the slice sampler,
 or near-zero \code{grid} values.
+
+Note that due to computational intensity, the \code{normalizing.constant} function has not been evaluated for accuracy for high dimensional \eqn{\beta} (e.g., dimension > 10) or high dimensional \eqn{a_0} (e.g., dimension > 5).
 }
 \examples{
 
