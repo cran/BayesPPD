@@ -97,8 +97,9 @@ double random_a0_glm::logFC(const arma::vec & parm0, const int & p)
   
   
 
-  arma::uvec ind;
-  ind << 0;
+  //arma::uvec ind;
+  //ind << 0;
+  arma::uvec ind{0};
   
   // if not borrowing for treatment effect, the historical data doesn't have the treatment indicator
   arma::vec beta_h;

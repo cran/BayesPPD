@@ -100,8 +100,9 @@ double glm::logFC(const arma::vec & parm0, const int & p)
 
     // if not borrowing for treatment effect, the historical data doesn't have the treatment indicator
     if(borrow_treat==FALSE){
-      arma::uvec ind;
-      ind << 0;
+      //arma::uvec ind;
+      //ind << 0;
+      arma::uvec ind{0};
       beta_h = join_cols(parm0.elem(ind), parm0.subvec(2,P-1));
       
     }

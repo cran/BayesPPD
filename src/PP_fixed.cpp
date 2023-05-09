@@ -3,7 +3,9 @@
 // [[Rcpp::depends(RcppEigen)]]
 // [[Rcpp::depends(RcppNumerical)]]
 #include <RcppArmadillo.h>
+#ifndef NDEBUG
 #define NDEBUG
+#endif
 #include <RcppEigen.h>
 #include <RcppNumerical.h>
 

@@ -1,3 +1,13 @@
+
+# BayesPPD 1.1.1 - May 8, 2023
+
+## Enhancements
+
+* Update link to the package review article published in R Journal in DESCRIPTION.
+* Update syntax that is deprecated by RcppArmadillo.
+
+
+
 # BayesPPD 1.1.0 - Nov 11, 2022
 
 ## Enhancements

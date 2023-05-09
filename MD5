@@ -1,6 +1,6 @@
-f147d48dadabda7ab1afbaea7e58371c *DESCRIPTION
+c2672ca4fa3fd82b8c783ffabe259715 *DESCRIPTION
 fa56ed0fc24ea9f2a16cd0b0315ae8d4 *NAMESPACE
-04a3ad1dd3145a9549e4fcdd5a6d8190 *NEWS.md
+7e87f1aba035ce1fdbf1d90f7d2330d5 *NEWS.md
 be9d7e86759588fcfd7b631d6c307f7e *R/BayesPPD-package.R
 5682e515c3e95d354402c1ed891331ba *R/PWK_helper.R
 1d72523a772acfb6b460d475eefe0bb2 *R/PWK_main.R
@@ -15,7 +15,7 @@ b1d805a5a90c2c82856f12c845648584 *R/two_grp_fixed.R
 1ce3b69b9b8ac5a0f8260c82e4b6b5e7 *data/actg036.RData
 63694835bdc936f4a43fb64e5081ec4b *inst/doc/bayesppd-vignette.R
 8380c609a463d5a12d12bc238875d745 *inst/doc/bayesppd-vignette.Rmd
-22cf5fe3d8d08c5c0fe66f1df215d690 *inst/doc/bayesppd-vignette.html
+84a0f0dc264aed99007395d9c216be4c *inst/doc/bayesppd-vignette.html
 24d9bc9ab4e657f709de4fbd7ce8111a *man/BayesPPD-package.Rd
 70becfb0f31da1860d0b4897bde97ea6 *man/actg019.Rd
 43e83513cd11870cd1ac179a0d52d01d *man/actg036.Rd
@@ -28,12 +28,12 @@ e8bd30103cf5d1828dce09fe29c3cc3e *man/glm.random.a0.Rd
 452f123add10f7d72c10750f896fbcce *man/power.two.grp.random.a0.Rd
 0af3b0fead487807928c15b1d8e1080a *man/two.grp.fixed.a0.Rd
 3cab0c5fe516f59fc2749637c22da785 *man/two.grp.random.a0.Rd
-e4a9a47c4a3aca98677ab8b16336e5de *src/Makevars
-e4a9a47c4a3aca98677ab8b16336e5de *src/Makevars.win
-934b841a4ddfeede610c353017caf005 *src/PP_fixed.cpp
-985fe2489309d354f519681e906f7324 *src/PP_fixed_glm.cpp
+c89d6b95d18721894ab45341d0fbc7a6 *src/Makevars
+c89d6b95d18721894ab45341d0fbc7a6 *src/Makevars.win
+e38977a9cab2c14e4ee8a7d8432693a4 *src/PP_fixed.cpp
+b900d66a48295d9c1096f254dbc179eb *src/PP_fixed_glm.cpp
 f9edc9e355daaaac6e24d85a346f3e10 *src/PP_random.cpp
-91898ecbfaea0ce3c274775c727c4243 *src/PP_random_glm.cpp
+c36188ecf8aeb656ba31014c34a17dec *src/PP_random_glm.cpp
 25472286063faaeb64178f4881aeb44b *src/RcppExports.cpp
 e3bf023288ec20f17fc6ad773e71350f *tests/testthat.R
 fe22fbe82cf79cf9e33251a3f11abd36 *tests/testthat/df_glm_bern.csv
