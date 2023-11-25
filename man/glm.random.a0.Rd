@@ -8,16 +8,16 @@ glm.random.a0(
   data.type,
   data.link,
   y,
-  n = 1,
   x,
+  n = 1,
   borrow.treat = FALSE,
   historical,
   prior.beta.var = rep(10, 50),
   prior.a0.shape1 = rep(1, 10),
   prior.a0.shape2 = rep(1, 10),
   a0.coefficients,
-  lower.limits = rep(-100, 50),
-  upper.limits = rep(100, 50),
+  lower.limits = NULL,
+  upper.limits = NULL,
   slice.widths = rep(0.1, 50),
   nMC = 10000,
   nBI = 250
@@ -30,9 +30,10 @@ glm.random.a0(
 
 \item{y}{Vector of responses.}
 
-\item{n}{(For binomial data only) vector of integers specifying the number of subjects who have a particular value of the covariate vector. If the data is binary and all covariates are discrete, collapsing Bernoulli data into a binomial structure can make the slice sampler much faster.}
-
 \item{x}{Matrix of covariates. The first column should be the treatment indicator with 1 indicating treatment group. The number of rows should equal the length of the response vector \code{y}.}
+
+\item{n}{(For binomial data only) vector of integers specifying the number of subjects who have a particular value of the covariate vector. If the data is binary and all covariates are discrete, collapsing Bernoulli data into a binomial structure can make the slice sampler much faster.
+The sum of \code{n} should be equal to \code{data.size}. The length of \code{n} should be equal to the number of rows of \code{x0}.}
 
 \item{borrow.treat}{Logical value indicating whether the historical information is used to inform the treatment effect parameter. The default value is FALSE. If TRUE, the first column of the historical covariate matrix must be the treatment indicator.
 If FALSE, the historical covariate matrix must NOT have the treatment indicator, since the historical data is assumed to be from the control group only.}
@@ -46,6 +47,7 @@ If \code{borrow.treat} is TRUE, \code{x0} should have the same set of covariates
 For binomial data, an additional element \code{n0} is required.
 \itemize{
 \item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
+The length of \code{n0} should be equal to the number of rows of \code{x0}.
 }}
 
 \item{prior.beta.var}{Vector of variances of the independent normal initial priors on \eqn{\beta} with mean zero. The length of the vector should be equal to the length of \eqn{\beta}. The default variance is 10.}
@@ -59,12 +61,12 @@ For binomial data, an additional element \code{n0} is required.
 \item{lower.limits}{Vector of lower limits for parameters to be used by the slice sampler. If \code{data.type} is "Normal", slice sampling is used for \eqn{a_0}, and the length of the vector should be equal to the number of historical datasets.
 For all other data types, slice sampling is used for \eqn{\beta} and \eqn{a_0}. The first P+1 elements apply to the sampling of \eqn{\beta} and the rest apply to the sampling of \eqn{a_0}.
 The length of the vector should be equal to the sum of the total number of parameters (i.e. P+1 where P is the number of covariates) and the number of historical datasets.
-The default is -100 for all parameters (may not be appropriate for all situations).}
+The default is -100 for \eqn{\beta} and 0 for \eqn{a_0} (may not be appropriate for all situations).}
 
 \item{upper.limits}{Vector of upper limits for parameters to be used by the slice sampler. If \code{data.type} is "Normal", slice sampling is used for \eqn{a_0}, and the length of the vector should be equal to the number of historical datasets.
 For all other data types, slice sampling is used for \eqn{\beta} and \eqn{a_0}. The first P+1 elements apply to the sampling of \eqn{\beta} and the rest apply to the sampling of \eqn{a_0}.
 The length of the vector should be equal to the sum of the total number of parameters (i.e. P+1 where P is the number of covariates) and the number of historical datasets.
-The default is 100 for all parameters (may not be appropriate for all situations).}
+The default is 100 for \eqn{\beta} and 1 for \eqn{a_0}  (may not be appropriate for all situations).}
 
 \item{slice.widths}{Vector of initial slice widths used by the slice sampler. If \code{data.type} is "Normal", slice sampling is used for \eqn{a_0}, and the length of the vector should be equal to the number of historical datasets.
 For all other data types, slice sampling is used for \eqn{\beta} and \eqn{a_0}. The first P+1 elements apply to the sampling of \eqn{\beta} and the rest apply to the sampling of \eqn{a_0}.
@@ -94,8 +96,8 @@ Independent normal priors with mean zero and variance \code{prior.beta.var} are 
 Independent beta(\code{prior.a0.shape1}, \code{prior.a0.shape1}) priors are used for \eqn{a_0}. Posterior samples for \eqn{a_0} are obtained through slice sampling.
 
 For all other data types, posterior samples are obtained through slice sampling.
-The default lower limits for the parameters are -100. The default upper limits
-for the parameters are 100. The default slice widths for the parameters are 0.1.
+The default lower limits are -100 for \eqn{\beta} and 0 for \eqn{a_0}. The default upper limits
+for the parameters are 100 for \eqn{\beta} and 1 for \eqn{a_0}. The default slice widths for the parameters are 0.1.
 The defaults may not be appropriate for all situations, and the user can specify the appropriate limits
 and slice width for each parameter.
 }
@@ -128,8 +130,8 @@ a0.coefficients <- c(1, 0.5, -1)
 # Set parameters of the slice sampler
 # The dimension is the number of columns of x plus 1 (intercept)
 # plus the number of historical datasets
-lower.limits <- rep(-100, 7)
-upper.limits <- rep(100, 7)
+lower.limits <- c(rep(-100, 5), rep(0, 2))
+upper.limits <- c(rep(100, 5), rep(1, 2))
 slice.widths <- rep(0.1, 7)
 
 nMC <- 500 # nMC should be larger in practice

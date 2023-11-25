@@ -9,12 +9,19 @@
 #'
 #' @param y Vector of responses.
 #' @param x Matrix of covariates. The first column should be the treatment indicator with 1 indicating treatment group. The number of rows should equal the length of the response vector \code{y}.
+#' @param n (For binomial data only) vector of integers specifying the number of subjects who have a particular value of the covariate vector. If the data is binary and all covariates are discrete, collapsing Bernoulli data into a binomial structure can make the slice sampler much faster.
+#' The length of \code{n} should be equal to the number of rows of \code{x}. 
 #' @param historical (Optional) list of historical dataset(s). East historical dataset is stored in a list which contains three \emph{named} elements: \code{y0}, \code{x0} and \code{a0}.
 #' \itemize{
 #' \item \code{y0} is a vector of responses.
 #' \item \code{x0} is a matrix of covariates. If \code{borrow.treat} is FALSE (the default), \code{x0} should NOT have the treatment indicator. Apart from missing the treatment indicator, \code{x0} should have the same set of covariates in the same order as \code{x}.
 #' If \code{borrow.treat} is TRUE, \code{x0} should have the same set of covariates in the same order as \code{x}, where the first column of \code{x0} must be the treatment indicator.
 #' \item \code{a0} is a number between 0 and 1 indicating the discounting parameter value for that historical dataset.
+#' }
+#' For binomial data, an additional element \code{n0} is required.
+#' \itemize{
+#' \item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector. 
+#' The length of \code{n0} should be equal to the number of rows of \code{x0}. 
 #' }
 #' @param current.data Logical value indicating whether current data is included. The default is TRUE. If FALSE, only historical data is included in the analysis,
 #' and the posterior samples can be used as a discrete approximation to the sampling prior in \code{\link{power.glm.fixed.a0}}.
@@ -76,7 +83,7 @@
 #' summary(result)
 #'
 #' @export
-glm.fixed.a0 <- function(data.type, data.link, y=0, n=1, x=matrix(), borrow.treat=FALSE, 
+glm.fixed.a0 <- function(data.type, data.link, y=0, x=matrix(), n=1, borrow.treat=FALSE, 
                          historical=list(), 
                          lower.limits=rep(-100, 50), upper.limits=rep(100, 50),
                          slice.widths=rep(1, 50), nMC=10000, nBI=250, current.data=TRUE, 
@@ -160,6 +167,7 @@ summary.glmfixed <- function(object, ...) {
 #' @param data.type Character string specifying the type of response. The options are "Normal", "Bernoulli", "Binomial", "Poisson" and "Exponential".
 #' @param data.link Character string specifying the link function. The options are "Logistic", "Probit", "Log", "Identity-Positive", "Identity-Probability" and "Complementary Log-Log". Does not apply if \code{data.type} is "Normal".
 #' @param n (For binomial data only) vector of integers specifying the number of subjects who have a particular value of the covariate vector. If the data is binary and all covariates are discrete, collapsing Bernoulli data into a binomial structure can make the slice sampler much faster.
+#' The sum of \code{n} should be equal to \code{data.size}. The length of \code{n} should be equal to the number of rows of \code{x0}. 
 #' @param borrow.treat Logical value indicating whether the historical information is used to inform the treatment effect parameter. The default value is FALSE. If TRUE, the first column of the historical covariate matrix must be the treatment indicator. 
 #' If FALSE, the historical covariate matrix must NOT have the treatment indicator, since the historical data is assumed to be from the control group only.  
 #' @param treat.assign.prob Probability of being assigned to the treatment group. The default value is 0.5. Only applies if \code{borrow.treat=FALSE}. 
@@ -172,7 +180,8 @@ summary.glmfixed <- function(object, ...) {
 #' }
 #' For binomial data, an additional element \code{n0} is required.
 #' \itemize{
-#' \item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
+#' \item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector. 
+#' The length of \code{n0} should be equal to the number of rows of \code{x0}. 
 #' }
 #' @param nullspace.ineq Character string specifying the inequality of the null hypothesis. The options are ">" and "<". If ">" is specified, the null hypothesis is \eqn{H_0}: \eqn{\beta_1} \eqn{\ge} \eqn{\delta}. If "<" is specified, the null hypothesis is \eqn{H_0}: \eqn{\beta_1} \eqn{\le} \eqn{\delta}. The default choice is ">".
 #' @param x.samples (Only applies when there is no historical dataset) matrix of possible values of covariates from which covariate vectors are sampled with replacement. 

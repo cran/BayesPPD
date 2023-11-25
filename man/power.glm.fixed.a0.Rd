@@ -36,7 +36,8 @@ power.glm.fixed.a0(
 
 \item{data.size}{Sample size of the simulated datasets.}
 
-\item{n}{(For binomial data only) vector of integers specifying the number of subjects who have a particular value of the covariate vector. If the data is binary and all covariates are discrete, collapsing Bernoulli data into a binomial structure can make the slice sampler much faster.}
+\item{n}{(For binomial data only) vector of integers specifying the number of subjects who have a particular value of the covariate vector. If the data is binary and all covariates are discrete, collapsing Bernoulli data into a binomial structure can make the slice sampler much faster.
+The sum of \code{n} should be equal to \code{data.size}. The length of \code{n} should be equal to the number of rows of \code{x0}.}
 
 \item{borrow.treat}{Logical value indicating whether the historical information is used to inform the treatment effect parameter. The default value is FALSE. If TRUE, the first column of the historical covariate matrix must be the treatment indicator.
 If FALSE, the historical covariate matrix must NOT have the treatment indicator, since the historical data is assumed to be from the control group only.}
@@ -53,6 +54,7 @@ If \code{borrow.treat} is TRUE, the first column of \code{x0} must be the treatm
 For binomial data, an additional element \code{n0} is required.
 \itemize{
 \item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
+The length of \code{n0} should be equal to the number of rows of \code{x0}.
 }}
 
 \item{nullspace.ineq}{Character string specifying the inequality of the null hypothesis. The options are ">" and "<". If ">" is specified, the null hypothesis is \eqn{H_0}: \eqn{\beta_1} \eqn{\ge} \eqn{\delta}. If "<" is specified, the null hypothesis is \eqn{H_0}: \eqn{\beta_1} \eqn{\le} \eqn{\delta}. The default choice is ">".}

@@ -8,8 +8,8 @@ glm.fixed.a0(
   data.type,
   data.link,
   y = 0,
-  n = 1,
   x = matrix(),
+  n = 1,
   borrow.treat = FALSE,
   historical = list(),
   lower.limits = rep(-100, 50),
@@ -28,9 +28,10 @@ glm.fixed.a0(
 
 \item{y}{Vector of responses.}
 
-\item{n}{(For binomial data only) vector of integers specifying the number of subjects who have a particular value of the covariate vector. If the data is binary and all covariates are discrete, collapsing Bernoulli data into a binomial structure can make the slice sampler much faster.}
-
 \item{x}{Matrix of covariates. The first column should be the treatment indicator with 1 indicating treatment group. The number of rows should equal the length of the response vector \code{y}.}
+
+\item{n}{(For binomial data only) vector of integers specifying the number of subjects who have a particular value of the covariate vector. If the data is binary and all covariates are discrete, collapsing Bernoulli data into a binomial structure can make the slice sampler much faster.
+The length of \code{n} should be equal to the number of rows of \code{x}.}
 
 \item{borrow.treat}{Logical value indicating whether the historical information is used to inform the treatment effect parameter. The default value is FALSE. If TRUE, the first column of the historical covariate matrix must be the treatment indicator.
 If FALSE, the historical covariate matrix must NOT have the treatment indicator, since the historical data is assumed to be from the control group only.}
@@ -41,6 +42,11 @@ If FALSE, the historical covariate matrix must NOT have the treatment indicator,
 \item \code{x0} is a matrix of covariates. If \code{borrow.treat} is FALSE (the default), \code{x0} should NOT have the treatment indicator. Apart from missing the treatment indicator, \code{x0} should have the same set of covariates in the same order as \code{x}.
 If \code{borrow.treat} is TRUE, \code{x0} should have the same set of covariates in the same order as \code{x}, where the first column of \code{x0} must be the treatment indicator.
 \item \code{a0} is a number between 0 and 1 indicating the discounting parameter value for that historical dataset.
+}
+For binomial data, an additional element \code{n0} is required.
+\itemize{
+\item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
+The length of \code{n0} should be equal to the number of rows of \code{x0}.
 }}
 
 \item{lower.limits}{Vector of lower limits for parameters to be used by the slice sampler. The length of the vector should be equal to the total number of parameters, i.e. P+1 where P is the number of covariates. The default is -100 for all parameters (may not be appropriate for all situations). Does not apply if \code{data.type} is "Normal".}

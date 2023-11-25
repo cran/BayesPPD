@@ -433,6 +433,8 @@ Rcpp::List power_glm_fixed_a0(std::string & dType0, std::string & dLink0, double
   arma::mat beta_mean(N, beta_c_prior_samps.n_cols);
   arma::vec tau_samples(N);
   arma::mat tau0_samples(N, historical0.size());
+  
+  
 
   for (int i=0;i<N;i++){
 
@@ -447,14 +449,24 @@ Rcpp::List power_glm_fixed_a0(std::string & dType0, std::string & dLink0, double
     if(historical0.size()==0){
       x_prior_samps = x_samps;
     }
-
+    
     for(int j = 0; j < historical0.size(); j++){
       Rcpp::List dat = historical0[j];
       arma::mat x_h = dat["x0"];
       x_prior_samps = join_cols(x_prior_samps, x_h);
     }
+    
 
-    NumericVector ind = floor(Rcpp::runif(n_total,0,x_prior_samps.n_rows));
+    Rcpp::List d = historical0[0];
+    arma::mat x0 = d["x0"];
+    int n_binom = x0.n_rows;
+
+    NumericVector ind;
+    if ((dType0=="Binomial")) {
+      ind = floor(Rcpp::runif(n_binom,0,x_prior_samps.n_rows));
+    }else{
+      ind = floor(Rcpp::runif(n_total,0,x_prior_samps.n_rows));
+    }
     arma::uvec v = Rcpp::as<arma::uvec>(ind);
     arma::mat x_s = x_prior_samps.rows(v);
     arma::vec vect(x_s.n_rows);
@@ -462,7 +474,7 @@ Rcpp::List power_glm_fixed_a0(std::string & dType0, std::string & dLink0, double
     x_s.insert_cols(0, vect);
 
     if(borrow_treat0==FALSE){
-      arma::vec x_trt = Rcpp::rbinom(n_total, 1, prob_treat0);
+      arma::vec x_trt = Rcpp::rbinom(ind.size(), 1, prob_treat0);
       x_s.insert_cols(1, x_trt);
     }
     
@@ -482,17 +494,23 @@ Rcpp::List power_glm_fixed_a0(std::string & dType0, std::string & dLink0, double
 
 
     // simulate y's
-    arma::vec y_s(n_total);
-    arma::vec n0(n_total);
+    arma::vec y_s;
+    
+    if (dType0=="Binomial")	{ 
+      y_s.resize(n_binom);
+      for(int k = 0; k < n_binom; k++){ y_s[k] = R::rbinom(n0(k), mean(k)); }
+      
+    }else{
+      y_s.resize(n_total);
 
-    if (dType0=="Bernoulli")	{ for(int k = 0; k < n_total; k++){ y_s[k] = R::rbinom(1, mean(k)); }}
-    if (dType0=="Binomial")	{ for(int k = 0; k < n_total; k++){ y_s[k] = R::rbinom(n0(k), mean(k)); }}
-    if (dType0=="Poisson")	{ for(int k = 0; k < n_total; k++){ y_s[k] = R::rpois(mean(k)); }}
-    if (dType0=="Exponential")	{ for(int k = 0; k < n_total; k++){ y_s[k] = R::rexp(1/mean(k)); }}
-    if (dType0=="Normal")	{
-      int ind_v = floor(R::runif(0,var_prior_samps.size()));
-      double var = var_prior_samps[ind_v];
-      for(int k = 0; k < n_total; k++){ y_s[k] = R::rnorm(mean(k),sqrt(var)); }
+      if (dType0=="Bernoulli")	{ for(int k = 0; k < n_total; k++){ y_s[k] = R::rbinom(1, mean(k)); }}
+      if (dType0=="Poisson")	{ for(int k = 0; k < n_total; k++){ y_s[k] = R::rpois(mean(k)); }}
+      if (dType0=="Exponential")	{ for(int k = 0; k < n_total; k++){ y_s[k] = R::rexp(1/mean(k)); }}
+      if (dType0=="Normal")	{
+        int ind_v = floor(R::runif(0,var_prior_samps.size()));
+        double var = var_prior_samps[ind_v];
+        for(int k = 0; k < n_total; k++){ y_s[k] = R::rnorm(mean(k),sqrt(var)); }
+      }
     }
 
 

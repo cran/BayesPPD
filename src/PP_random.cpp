@@ -558,7 +558,6 @@ Rcpp::List glm_random_a0_normal(arma::vec y_normal0, arma::mat x_normal0,
     gibbs_tau[i] = R::rgamma(alpha, 1/beta);
 
 
-
     //sampling a0
 
     std::string dType0 = "Normal";

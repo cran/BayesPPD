@@ -14,17 +14,18 @@
 #' }
 #' For binomial data, an additional element \code{n0} is required.
 #' \itemize{
-#' \item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
+#' \item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector. 
+#' The length of \code{n0} should be equal to the number of rows of \code{x0}. 
 #' }
 #' @param prior.beta.var Vector of variances of the independent normal initial priors on \eqn{\beta} with mean zero. The length of the vector should be equal to the length of \eqn{\beta}. The default variance is 10.   
 #' @param lower.limits Vector of lower limits for parameters to be used by the slice sampler. If \code{data.type} is "Normal", slice sampling is used for \eqn{a_0}, and the length of the vector should be equal to the number of historical datasets.
 #' For all other data types, slice sampling is used for \eqn{\beta} and \eqn{a_0}. The first P+1 elements apply to the sampling of \eqn{\beta} and the rest apply to the sampling of \eqn{a_0}.
 #' The length of the vector should be equal to the sum of the total number of parameters (i.e. P+1 where P is the number of covariates) and the number of historical datasets.
-#'  The default is -100 for all parameters (may not be appropriate for all situations).
+#'  The default is -100 for \eqn{\beta} and 0 for \eqn{a_0} (may not be appropriate for all situations).
 #' @param upper.limits Vector of upper limits for parameters to be used by the slice sampler. If \code{data.type} is "Normal", slice sampling is used for \eqn{a_0}, and the length of the vector should be equal to the number of historical datasets.
 #' For all other data types, slice sampling is used for \eqn{\beta} and \eqn{a_0}. The first P+1 elements apply to the sampling of \eqn{\beta} and the rest apply to the sampling of \eqn{a_0}.
 #' The length of the vector should be equal to the sum of the total number of parameters (i.e. P+1 where P is the number of covariates) and the number of historical datasets.
-#'  The default is 100 for all parameters (may not be appropriate for all situations).
+#'  The default is 100 for \eqn{\beta} and 1 for \eqn{a_0}  (may not be appropriate for all situations).
 #' @param slice.widths Vector of initial slice widths used by the slice sampler. If \code{data.type} is "Normal", slice sampling is used for \eqn{a_0}, and the length of the vector should be equal to the number of historical datasets.
 #' For all other data types, slice sampling is used for \eqn{\beta} and \eqn{a_0}. The first P+1 elements apply to the sampling of \eqn{\beta} and the rest apply to the sampling of \eqn{a_0}.
 #' The length of the vector should be equal to the sum of the total number of parameters (i.e. P+1 where P is the number of covariates) and the number of historical datasets.
@@ -45,8 +46,8 @@
 #' Independent beta(\code{prior.a0.shape1}, \code{prior.a0.shape1}) priors are used for \eqn{a_0}. Posterior samples for \eqn{a_0} are obtained through slice sampling.
 #'
 #' For all other data types, posterior samples are obtained through slice sampling.
-#' The default lower limits for the parameters are -100. The default upper limits
-#' for the parameters are 100. The default slice widths for the parameters are 0.1.
+#' The default lower limits are -100 for \eqn{\beta} and 0 for \eqn{a_0}. The default upper limits
+#' for the parameters are 100 for \eqn{\beta} and 1 for \eqn{a_0}. The default slice widths for the parameters are 0.1.
 #' The defaults may not be appropriate for all situations, and the user can specify the appropriate limits
 #' and slice width for each parameter.
 #'
@@ -86,8 +87,8 @@
 #' # Set parameters of the slice sampler
 #' # The dimension is the number of columns of x plus 1 (intercept)
 #' # plus the number of historical datasets
-#' lower.limits <- rep(-100, 7)
-#' upper.limits <- rep(100, 7)
+#' lower.limits <- c(rep(-100, 5), rep(0, 2))
+#' upper.limits <- c(rep(100, 5), rep(1, 2))
 #' slice.widths <- rep(0.1, 7)
 #'
 #' nMC <- 500 # nMC should be larger in practice
@@ -99,9 +100,9 @@
 #' summary(result)
 #'
 #' @export
-glm.random.a0 <- function(data.type, data.link, y, n=1, x, borrow.treat=FALSE, historical, prior.beta.var=rep(10,50),
+glm.random.a0 <- function(data.type, data.link, y, x, n=1, borrow.treat=FALSE, historical, prior.beta.var=rep(10,50),
                           prior.a0.shape1=rep(1,10), prior.a0.shape2=rep(1,10), a0.coefficients,
-                          lower.limits=rep(-100, 50), upper.limits=rep(100, 50),
+                          lower.limits=NULL, upper.limits=NULL,
                           slice.widths=rep(0.1, 50), nMC=10000, nBI=250) {
   
 
@@ -109,8 +110,20 @@ glm.random.a0 <- function(data.type, data.link, y, n=1, x, borrow.treat=FALSE, h
     colnames(x) <- paste0("X", 1:ncol(x))
   }
   if(data.type == "Normal"){
+    if(is.null(lower.limits)){
+      lower.limits = rep(0,length(historical))
+    }
+    if(is.null(upper.limits)){
+      upper.limits = rep(1,length(historical))
+    }
     result <- glm_random_a0_normal(y, x, borrow.treat, historical, prior.a0.shape1, prior.a0.shape2, lower.limits, upper.limits, slice.widths, nMC, nBI)
   }else{
+    if(is.null(lower.limits)){
+      lower.limits = c(rep(-100, ncol(x)+1), rep(0,length(historical)))
+    }
+    if(is.null(upper.limits)){
+      upper.limits = c(rep(100, ncol(x)+1), rep(1,length(historical)))
+    }
     result <- glm_random_a0(data.type, data.link, y, n, x, borrow.treat, historical, prior.beta.var, 
                          prior.a0.shape1, prior.a0.shape2, a0.coefficients,
                          lower.limits, upper.limits,
@@ -184,7 +197,8 @@ summary.glmrandom <- function(object, ...) {
 #' }
 #' For binomial data, an additional element \code{n0} is required.
 #' \itemize{
-#' \item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector.
+#' \item \code{n0} is vector of integers specifying the number of subjects who have a particular value of the covariate vector. 
+#' The length of \code{n0} should be equal to the number of rows of \code{x0}. 
 #' }
 #' @inheritParams glm.random.a0
 #' @inheritParams power.glm.fixed.a0
@@ -208,8 +222,8 @@ summary.glmrandom <- function(object, ...) {
 #' Independent beta(\code{prior.a0.shape1}, \code{prior.a0.shape1}) priors are used for \eqn{a_0}. Posterior samples for \eqn{a_0} are obtained through slice sampling.
 #'
 #' For all other data types, posterior samples are obtained through slice sampling. 
-#' The default lower limits for the parameters are -100. The default upper limits
-#' for the parameters are 100. The default slice widths for the parameters are 0.1.
+#' The default lower limits are -100 for \eqn{\beta} and 0 for \eqn{a_0}. The default upper limits
+#' for the parameters are 100 for \eqn{\beta} and 1 for \eqn{a_0}. The default slice widths for the parameters are 0.1.
 #' The defaults may not be appropriate for all situations, and the user can specify the appropriate limits
 #' and slice width for each parameter.
 #'
@@ -274,7 +288,7 @@ summary.glmrandom <- function(object, ...) {
 power.glm.random.a0 <- function(data.type, data.link, data.size, n=1, treat.assign.prob=0.5, borrow.treat=FALSE, historical,nullspace.ineq=">",
                                 samp.prior.beta, samp.prior.var, prior.beta.var=rep(10,50),
                                 prior.a0.shape1=rep(1,10), prior.a0.shape2=rep(1,10), a0.coefficients,
-                                lower.limits=rep(-100, 50), upper.limits=rep(100, 50),slice.widths=rep(0.1, 50),
+                                lower.limits=NULL, upper.limits=NULL,slice.widths=rep(0.1, 50),
                                 delta=0, gamma=0.95, nMC=10000, nBI=250, N=10000) {
   
 
@@ -284,12 +298,24 @@ power.glm.random.a0 <- function(data.type, data.link, data.size, n=1, treat.assi
   }
   
   if(data.type == "Normal"){
+    if(is.null(lower.limits)){
+      lower.limits = rep(0,length(historical))
+    }
+    if(is.null(upper.limits)){
+      upper.limits = rep(1,length(historical))
+    }
     out <- power_glm_random_a0_normal(data.size, treat.assign.prob, borrow.treat, historical,nullspace.ineq,
                                       samp.prior.beta, samp.prior.var,
                                       prior.a0.shape1, prior.a0.shape2,
                                       lower.limits, upper.limits, slice.widths,
                                       delta, gamma, nMC, nBI, N)
   }else{
+    if(is.null(lower.limits)){
+      lower.limits = c(rep(-100, ncol(samp.prior.beta)), rep(0,length(historical)))
+    }
+    if(is.null(upper.limits)){
+      upper.limits = c(rep(100, ncol(samp.prior.beta)), rep(1,length(historical)))
+    }
     out <- power_glm_random_a0(data.type, data.link, data.size, n, treat.assign.prob, borrow.treat, historical,nullspace.ineq,
                                samp.prior.beta, prior.beta.var, prior.a0.shape1, prior.a0.shape2,
                                a0.coefficients, lower.limits, upper.limits, slice.widths,

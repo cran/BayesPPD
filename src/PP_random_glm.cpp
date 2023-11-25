@@ -94,7 +94,8 @@ double random_a0_glm::logFC(const arma::vec & parm0, const int & p)
   arma::vec beta0 = parm0.subvec(0,P-1);
   arma::vec mean;
   arma::vec a0_vec = parm0.subvec(P, parm0.size()-1);
-  
+  //Rcout << "beta="<< beta0 << "\n";
+  //Rcout << "a0="<< a0_vec << "\n";
   
 
   //arma::uvec ind;
@@ -111,6 +112,8 @@ double random_a0_glm::logFC(const arma::vec & parm0, const int & p)
 
   // compute mean parameter;
   mean = x*beta0;
+  //Rcout << "x="<< x << "\n";
+  //Rcout << "beta0="<< beta0 << "\n";
 
 
   if (dLink=="Logistic") 		    { mean = exp(mean) / (1 + exp(mean)); 					}
@@ -126,8 +129,10 @@ double random_a0_glm::logFC(const arma::vec & parm0, const int & p)
 
   // compute likelihood contribution;
   double lp = 0;
+  //Rcout << "mean="<< mean << "\n";
 
   if ((dType=="Bernoulli") || (dType=="Binomial"))	{lp += sum( y % log(mean) + (n-y) % log(1-mean) );}
+  //Rcout << "lp+="<< sum( y % log(mean) + (n-y) % log(1-mean) ) << "\n";
   if (dType=="Poisson")	{ lp += sum(  y % log(mean) - mean );}
   if (dType=="Exponential")	{ lp += sum(  log(mean) - y % mean );}
 
@@ -151,6 +156,8 @@ double random_a0_glm::logFC(const arma::vec & parm0, const int & p)
       if (dType=="Binomial") {n_h = Rcpp::as<arma::vec>(dat["n0"]);}
 
 
+      //Rcout << "x_h="<< x_h << "\n";
+      //Rcout << "beta_h="<< beta_h << "\n";
       arma:: vec mean_h = x_h*beta_h;
 
       if (dLink=="Logistic") 		    { mean_h = exp(mean_h) / (1 + exp(mean_h)); 					}
@@ -164,7 +171,7 @@ double random_a0_glm::logFC(const arma::vec & parm0, const int & p)
       if (dLink=="Complementary Log-Log")    {  mean_h = 1 - exp(-exp(mean_h)); }
 
 
-
+      //Rcout << "lp0+="<< a0 * sum( y_h % log(mean_h) + (n_h - y_h) % log(1-mean_h) ) << "\n";
       if ((dType=="Bernoulli") || (dType=="Binomial")) {lp += a0 * sum( y_h % log(mean_h) + (n_h - y_h) % log(1-mean_h) );}
       if (dType=="Poisson")	{ lp += a0 * sum( y_h % log(mean_h) - mean_h );}
       if (dType=="Exponential")	{lp += a0 * sum( log(mean_h) - y_h % mean_h );}
@@ -357,8 +364,21 @@ Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, doubl
       arma::mat x_h = dat["x0"];
       x_prior_samps = join_cols(x_prior_samps, x_h);
     }
-
-    NumericVector ind = floor(Rcpp::runif(n_total,0,x_prior_samps.n_rows));
+    
+    
+    Rcpp::List d = historical0[0];
+    arma::mat x0 = d["x0"];
+    int n_binom = x0.n_rows;
+    
+    NumericVector ind;
+    if ((dType0=="Binomial")) {
+      ind = floor(Rcpp::runif(n_binom,0,x_prior_samps.n_rows));
+    }else{
+      ind = floor(Rcpp::runif(n_total,0,x_prior_samps.n_rows));
+    }
+    
+    
+    
     arma::uvec v = Rcpp::as<arma::uvec>(ind);
     arma::mat x_s = x_prior_samps.rows(v);
     arma::vec vect(x_s.n_rows);
@@ -366,7 +386,7 @@ Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, doubl
     x_s.insert_cols(0, vect);
     // if not borrowing for treatment effect, the historical data doesn't have the treatment indicator
     if(borrow_treat0==FALSE){
-      arma::vec x_trt = Rcpp::rbinom(n_total, 1, prob_treat0);
+      arma::vec x_trt = Rcpp::rbinom(ind.size(), 1, prob_treat0);
       x_s.insert_cols(1, x_trt);
     }
 
@@ -385,19 +405,29 @@ Rcpp::List power_glm_random_a0(std::string & dType0, std::string & dLink0, doubl
     if (dLink0=="Complementary Log-Log")    {  mean = 1 - exp(-exp(mean)); }
 
     // simulate y's
-    arma::vec y_s(n_total);
-    arma::vec n0(n_total);
-
-    if (dType0=="Bernoulli")	{ for(int k = 0; k < n_total; k++){ y_s[k] = R::rbinom(1, mean(k)); }}
-    if (dType0=="Binomial")	{ for(int k = 0; k < n_total; k++){ y_s[k] = R::rbinom(n0(k), mean(k)); }}
-    if (dType0=="Poisson")	{ for(int k = 0; k < n_total; k++){ y_s[k] = R::rpois(mean(k)); }}
-    if (dType0=="Exponential")	{ for(int k = 0; k < n_total; k++){ y_s[k] = R::rexp(1/mean(k)); }}
+    arma::vec y_s;
+    if (dType0=="Binomial")	{ 
+      y_s.resize(n_binom);
+      for(int k = 0; k < n_binom; k++){ y_s[k] = R::rbinom(n0(k), mean(k)); }
+      //Rcout << "y_s="<< y_s << "\n";
+      
+    }else{
+      y_s.resize(n_total);
+      
+      if (dType0=="Bernoulli")	{ for(int k = 0; k < n_total; k++){ y_s[k] = R::rbinom(1, mean(k)); }}
+      if (dType0=="Poisson")	{ for(int k = 0; k < n_total; k++){ y_s[k] = R::rpois(mean(k)); }}
+      if (dType0=="Exponential")	{ for(int k = 0; k < n_total; k++){ y_s[k] = R::rexp(1/mean(k)); }}
+    }
+    
 
 
     // need to remove intercept column when plugging into following functions
     arma::mat x_sub = x_s.cols(1, x_s.n_cols-1);
 
     arma::mat beta_samps(nMC,x_s.n_cols);
+    
+    //Rcout << "y_s="<< y_s << "\n";
+    //Rcout << "x_sub="<< x_sub << "\n";
 
     Rcpp::List lis = glm_random_a0(dType0, dLink0, y_s, n0, x_sub, borrow_treat0, historical0, init_var0, c_10, c_20, coef0,
                                      lower_limits0, upper_limits0, slice_widths0,

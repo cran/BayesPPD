@@ -19,7 +19,7 @@ logpowerprior <- function(mcmc, a0, historical, data.type, data.link,init_var){
       x_h = cbind(1,x_h)
 
       if (data.type=="Bernoulli") {n_h = rep(1,length(y_h))}
-      if (data.type=="Binomial") {n_h = dat[["n"]]}
+      if (data.type=="Binomial") {n_h = dat[["n0"]]}
 
       a0_i = a0[i]
 

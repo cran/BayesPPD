@@ -1,4 +1,13 @@
 
+# BayesPPD 1.1.2 - Nov 25, 2023
+
+## Bug Fixes
+
+* Fix bug for glm.random.a0() and power.glm.random.a0() for binomial data.
+* Update default values for lower.limits and upper.limits for glm.random.a0() and power.glm.random.a0().
+
+
+
 # BayesPPD 1.1.1 - May 8, 2023
 
 ## Enhancements
