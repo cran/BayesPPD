@@ -92,6 +92,7 @@ glm.fixed.a0 <- function(data.type, data.link, y=0, x=matrix(), n=1, borrow.trea
   if(is.na(x[1,1])){
     x <- historical[[1]]$x0
   }
+  x <- as.matrix(x)
   if(is.null(colnames(x))){
     colnames(x) <- paste0("X", 1:ncol(x))
   }

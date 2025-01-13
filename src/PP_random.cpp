@@ -100,6 +100,7 @@ double random_a0::logFC(const arma::vec & parm0, const int & p)
 {
   double log_C_1 = 0;
   double log_C_0 = 0;
+  //Rcout << "parm:" << parm0 << std::endl;
   if (dType=="Bernoulli")	{
     log_C_0 = R::lbeta(arma::dot(historical.col(0), parm0) + b_01,
                        arma::dot((historical.col(1) - historical.col(0)), parm0) + b_02);
@@ -126,6 +127,10 @@ double random_a0::logFC(const arma::vec & parm0, const int & p)
   }
   if (dType=="Normal"){
     if (x_normal.n_rows==0){ // if there are no covariates
+      
+      //Rcout << "no covariates" << std::endl;
+      //Rcout << "b.P:" << P << std::endl;
+      
       double a_n = 0;
       double a_y = 0;
       double a_y2 = 0;
@@ -228,6 +233,7 @@ double random_a0::logFC(const arma::vec & parm0, const int & p)
     w     = b.slice_widths[p];
     lower = b.lower_limits[p];
     upper = b.upper_limits[p];
+    //Rcout << "lower:" << lower;
 
     // skip over fixed parameter values;
     if (lower==upper){parms(p) = lower;}
@@ -335,7 +341,6 @@ Rcpp::List two_grp_random_a0(std::string & dType0, double & y0, double & n0, arm
   {
     // call the slice sampler for samples of a_0
     slice(parms,b);
-
     if (s>=0){	a0_samples.row(s) = parms.t();	}
   }
 
@@ -387,17 +392,34 @@ Rcpp::List two_grp_random_a0_normal(double y0, double n0, double v0,
   Rcpp::RNGScope scope;
 
 
-
+  //Rcout << "here" << std::endl;
   arma::vec gibbs_mu_c(nMC+nBI);
   gibbs_mu_c.zeros();
   arma::vec gibbs_tau(nMC+nBI);
   gibbs_tau.ones();
   arma::mat a0_samples(nMC+nBI,historical0.n_rows);
-
+  
+  std::string dType0 = "Normal";
+  Rcpp::List historical_normal0;
+  arma::vec y_normal0(1);
+  arma::mat x_normal0(0,1);
+  x_normal0.zeros();
+  random_a0 b(dType0, y0, n0, v0, y_normal0, x_normal0, FALSE, historical0,
+              historical_normal0, 0.1, 0.1, c_10, c_20,
+              lower_limits0, upper_limits0, slice_widths0);
+  
+  int P = historical0.n_rows;
+  arma::vec parms(P+2);
+  for (int p=0;p < P;p++)
+  {
+    parms[p]= R::runif(0,1);
+  }
+  parms[P] = 0;
+  parms[P+1] = 1;
 
   for (int i=1;i<nMC+nBI;i++){
 
-
+    //Rcout << "iteration:" << std::endl;
     double num = 0;
     double denom = 0;
     for(int j=0;(unsigned)j<historical0.n_rows;j++){
@@ -411,6 +433,7 @@ Rcpp::List two_grp_random_a0_normal(double y0, double n0, double v0,
     double mu = (y0 + num)/(n0 + denom);
     double var = 1/(n0*gibbs_tau[i-1] + gibbs_tau[i-1]*denom);
     gibbs_mu_c[i] = R::rnorm(mu, sqrt(var));
+    //Rcout << "mu: " << gibbs_mu_c[i] << std::endl;
 
     //sampling tau
 
@@ -429,35 +452,17 @@ Rcpp::List two_grp_random_a0_normal(double y0, double n0, double v0,
     double ss = y2sum - 2*gibbs_mu_c[i]*y0 + n0*pow(gibbs_mu_c[i],2);
 
     gibbs_tau[i] = R::rgamma((n0+denom)/2, 1/((ss + a)/2));
+    //Rcout << "tau: " << gibbs_tau[i] << std::endl;
 
 
     //sampling a0
-
-    std::string dType0 = "Normal";
-    Rcpp::List historical_normal0;
-    arma::vec y_normal0(1);
-    arma::mat x_normal0(0,1);
-    x_normal0.zeros();
-    random_a0 b(dType0, y0, n0, v0, y_normal0, x_normal0, FALSE, historical0,
-                historical_normal0, 0.1, 0.1, c_10, c_20,
-                lower_limits0, upper_limits0, slice_widths0);
-
-    int P = historical0.n_rows;
-
-    arma::vec parms(P+2);
-    for (int p=0;p < P;p++)
-    {
-      parms[p]= R::runif(0,1);
-    }
     parms[P] = gibbs_mu_c[i];
     parms[P+1] = gibbs_tau[i];
 
-
-
     slice(parms,b);
 
-
     a0_samples.row(i) = parms.subvec(0,P-1).t();
+    //Rcout << "a0: " << a0_samples.row(i) << std::endl;
 
   }
   arma::vec gibbs_mu_c_sub = gibbs_mu_c.subvec(nBI, nMC+nBI-1);
@@ -493,6 +498,21 @@ Rcpp::List glm_random_a0_normal(arma::vec y_normal0, arma::mat x_normal0,
   gibbs_tau.ones();
   int P = historical_normal0.size();
   arma::mat a0_samples(nMC+nBI,P);
+  
+  std::string dType0 = "Normal";
+  arma::mat historical0(1,1);
+  historical0.zeros();
+  random_a0 b(dType0, 0.1, 1, 0.1, y_normal0, x_normal0, borrow_treat0, historical0,
+              historical_normal0, 0.1, 0.1, c_10, c_20,
+              lower_limits0, upper_limits0, slice_widths0);
+  
+  
+  arma::vec parms(P+x_normal0.n_cols+1);
+  for (int p=0;p < P+x_normal0.n_cols;p++)
+  {
+    parms[p]= R::runif(0,1);
+  }
+  parms[P+x_normal0.n_cols] = 1;
 
 
   for (int i=1;i<nMC+nBI;i++){
@@ -559,23 +579,8 @@ Rcpp::List glm_random_a0_normal(arma::vec y_normal0, arma::mat x_normal0,
 
 
     //sampling a0
-
-    std::string dType0 = "Normal";
-    arma::mat historical0(1,1);
-    historical0.zeros();
-    random_a0 b(dType0, 0.1, 1, 0.1, y_normal0, x_normal0, borrow_treat0, historical0,
-                historical_normal0, 0.1, 0.1, c_10, c_20,
-                lower_limits0, upper_limits0, slice_widths0);
-
-
-    arma::vec parms(P+x_normal0.n_cols+1);
-    for (int p=0;p < P;p++)
-    {
-      parms[p]= R::runif(0,1);
-    }
     parms.subvec(P,P+x_normal0.n_cols-1) = gibbs_beta.row(i).t();
     parms[P+x_normal0.n_cols] = gibbs_tau[i];
-
 
     slice(parms,b);
 

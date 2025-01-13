@@ -1,4 +1,14 @@
 
+
+# BayesPPD 1.1.3 - Jan 3, 2025
+
+## Bug Fixes
+
+* Improve the accuracy of estimating a0 for two.grp.random.a0() and glm.random.a0() for normal data.
+
+
+
+
 # BayesPPD 1.1.2 - Nov 25, 2023
 
 ## Bug Fixes

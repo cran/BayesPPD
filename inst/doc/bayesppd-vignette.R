@@ -1,10 +1,10 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 
-## ---- echo=FALSE--------------------------------------------------------------
+## ----echo=FALSE---------------------------------------------------------------
 library(kableExtra)
 df <- data.frame(Cat = c("Historical Trial 1", "Historical Trial 2"), 
                  Sad = c("8.2% (44/535)", "10.9% (33/304)"))
@@ -12,14 +12,14 @@ kable(df, col.names = c("", "% TLF (# of failure/sample size)"), escape = F, cap
   kable_styling(latex_options = "hold_position")
 
 
-## ---- eval=TRUE---------------------------------------------------------------
+## ----eval=TRUE----------------------------------------------------------------
 
 historical <- matrix(0, ncol=3, nrow=2)
 historical[1,] <- c(44, 535, 0.3)
 historical[2,] <- c(33, 304, 0.3)
 
 
-## ---- eval=TRUE---------------------------------------------------------------
+## ----eval=TRUE----------------------------------------------------------------
 
 library(BayesPPD)
 
@@ -44,7 +44,7 @@ powers
 
 
 
-## ---- eval=TRUE---------------------------------------------------------------
+## ----eval=TRUE----------------------------------------------------------------
 library(ggplot2)
 
 df <- data.frame(sample_size=n.t_vals, power=powers)
@@ -55,7 +55,7 @@ ggplot(data=df, aes(x=sample_size, y=powers)) +
   ylab("Power")
 
 
-## ---- eval=TRUE---------------------------------------------------------------
+## ----eval=TRUE----------------------------------------------------------------
 TIEs <- NULL
 
 for(i in 1:length(n.t_vals)){
@@ -73,24 +73,24 @@ for(i in 1:length(n.t_vals)){
 TIEs
 
 
-## ---- eval=FALSE--------------------------------------------------------------
-#  historical <- matrix(0, ncol=2, nrow=2)
-#  historical[1,] <- c(44, 535)
-#  historical[2,] <- c(33, 304)
+## ----eval=FALSE---------------------------------------------------------------
+# historical <- matrix(0, ncol=2, nrow=2)
+# historical[1,] <- c(44, 535)
+# historical[2,] <- c(33, 304)
 
-## ---- eval=FALSE--------------------------------------------------------------
-#  n.t <- 750
-#  results <- power.two.grp.random.a0(data.type="Bernoulli",
-#        n.t=n.t, n.c=round(n.t/3),historical=historical,
-#        samp.prior.mu.t=0.092, samp.prior.mu.c=0.092,
-#        prior.mu.t.shape1=0.0001, prior.mu.t.shape2=0.0001,
-#        prior.mu.c.shape1=0.0001,prior.mu.c.shape2=0.0001,
-#        prior.a0.shape1=1,prior.a0.shape2=1,
-#        delta=0.041, gamma=0.95,
-#        nMC=10000, nBI=250, N=10000)
-#  summary(results)
+## ----eval=FALSE---------------------------------------------------------------
+# n.t <- 750
+# results <- power.two.grp.random.a0(data.type="Bernoulli",
+#       n.t=n.t, n.c=round(n.t/3),historical=historical,
+#       samp.prior.mu.t=0.092, samp.prior.mu.c=0.092,
+#       prior.mu.t.shape1=0.0001, prior.mu.t.shape2=0.0001,
+#       prior.mu.c.shape1=0.0001,prior.mu.c.shape2=0.0001,
+#       prior.a0.shape1=1,prior.a0.shape2=1,
+#       delta=0.041, gamma=0.95,
+#       nMC=10000, nBI=250, N=10000)
+# summary(results)
 
-## ---- eval=TRUE---------------------------------------------------------------
+## ----eval=TRUE----------------------------------------------------------------
 data.type <- "Normal"
 n.t <- 100
 n.c <- 100
@@ -103,7 +103,7 @@ historical[1,] <- c(50, 50, 1, 0.3)
 historical[2,] <- c(30, 50, 1, 0.5)
 historical[3,] <- c(20, 50, 1, 0.7)
 
-## ---- eval=TRUE---------------------------------------------------------------
+## ----eval=TRUE----------------------------------------------------------------
 # Generate sampling priors
 set.seed(1)
 samp.prior.mu.t <- rnorm(50000)
@@ -117,7 +117,7 @@ samp.prior.var.t <- rgamma(100, 1, 1)
 samp.prior.var.c <- rgamma(100, 1, 1)
 
 
-## ---- eval=TRUE---------------------------------------------------------------
+## ----eval=TRUE----------------------------------------------------------------
 set.seed(1)
 results <- power.two.grp.fixed.a0(data.type=data.type, n.t=n.t, n.c=n.t, historical=historical,  
            samp.prior.mu.t=samp.prior.mu.t, samp.prior.mu.c=samp.prior.mu.c, 
@@ -126,7 +126,7 @@ results <- power.two.grp.fixed.a0(data.type=data.type, n.t=n.t, n.c=n.t, histori
 
 summary(results)
 
-## ---- eval=TRUE---------------------------------------------------------------
+## ----eval=TRUE----------------------------------------------------------------
 # Generate sampling priors
 set.seed(1)
 samp.prior.mu.t <- rnorm(50000)
@@ -145,7 +145,7 @@ results <- power.two.grp.fixed.a0(data.type=data.type, n.t=n.t, n.c=n.t, histori
 
 summary(results)
 
-## ---- eval=TRUE---------------------------------------------------------------
+## ----eval=TRUE----------------------------------------------------------------
 data.type <- "Normal"
 n.t <- 100
 n.c <- 100
@@ -158,7 +158,7 @@ historical[1,] <- c(50, 50, 1)
 historical[2,] <- c(30, 50, 1)
 historical[3,] <- c(20, 50, 1)
 
-## ---- eval=TRUE---------------------------------------------------------------
+## ----eval=TRUE----------------------------------------------------------------
 # Generate sampling priors
 set.seed(1)
 samp.prior.mu.t <- rnorm(50000)
@@ -172,7 +172,7 @@ samp.prior.var.t <- rgamma(100, 1, 1)
 samp.prior.var.c <- rgamma(100, 1, 1)
 
 
-## ---- eval=TRUE---------------------------------------------------------------
+## ----eval=TRUE----------------------------------------------------------------
 set.seed(1)
 results <- power.two.grp.random.a0(data.type=data.type, n.t=n.t, n.c=n.t, historical=historical,  
            samp.prior.mu.t=samp.prior.mu.t, samp.prior.mu.c=samp.prior.mu.c, 
@@ -183,7 +183,7 @@ summary(results)
 results$`average posterior means of a0`
 results$`average posterior mean of tau`
 
-## ---- eval=TRUE---------------------------------------------------------------
+## ----eval=TRUE----------------------------------------------------------------
 # Generate sampling priors
 set.seed(1)
 samp.prior.mu.t <- rnorm(50000)

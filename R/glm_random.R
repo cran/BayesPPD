@@ -105,7 +105,7 @@ glm.random.a0 <- function(data.type, data.link, y, x, n=1, borrow.treat=FALSE, h
                           lower.limits=NULL, upper.limits=NULL,
                           slice.widths=rep(0.1, 50), nMC=10000, nBI=250) {
   
-
+  x <- as.matrix(x)
   if(is.null(colnames(x))){
     colnames(x) <- paste0("X", 1:ncol(x))
   }

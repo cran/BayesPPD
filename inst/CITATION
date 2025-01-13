@@ -1,0 +1,11 @@
+citHeader("To cite BayesPPD in publications use:")
+
+
+bibentry(bibtype = "Article",
+     textVersion = "Shen Y, Psioda MA, Ibrahim JG (2023). “BayesPPD: An R Package for  Bayesian Sample Size Determination Using the Power and Normalized Power  Prior for Generalized Linear Models.” The R Journal, 14(4).",
+     title = "BayesPPD: An R Package for Bayesian Sample Size Determination Using the Power and Normalized Power Prior for Generalized Linear Models",
+     author = as.person("Yueqi Shen [aut], Matthew A. Psioda [aut], Joseph G. Ibrahim [aut]"),
+     journal  = "The R Journal",
+  year     = "2023",
+  volume   = "14",
+  number   = "4")
